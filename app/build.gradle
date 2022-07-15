@@ -51,4 +51,7 @@ dependencies {
     //mqtt
     implementation 'org.eclipse.paho:org.eclipse.paho.client.mqttv3:1.2.0'
     implementation 'org.eclipse.paho:org.eclipse.paho.android.service:1.1.1'
+
+    //gps
+    implementation 'com.google.android.gms:play-services-location:18.0.0'
 }

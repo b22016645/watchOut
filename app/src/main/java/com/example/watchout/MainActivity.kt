@@ -7,11 +7,7 @@ import android.content.Intent
 import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
-import android.location.LocationManager
-import android.os.Bundle
-import android.os.Handler
-import android.os.VibrationEffect
-import android.os.Vibrator
+import android.os.*
 import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.KeyEvent
@@ -19,6 +15,7 @@ import android.view.WindowManager
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import com.example.watchout.databinding.ActivityMainBinding
+import com.google.android.gms.location.*
 import model.DoRetrofitData
 import model.NaviData
 import utils.Constant.API.LOG
@@ -30,6 +27,9 @@ class MainActivity : Activity(), LocationListener {
     lateinit var x: TextView
     lateinit var y: TextView
 
+    private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private val REQUEST_PERMISSION_LOCATION = 10
+
     //mqtt관련
     //var server_uri = "tcp://15.165.174.55:1883"
     var server_uri = "tcp://172.20.10.6:1883"
@@ -38,10 +38,6 @@ class MainActivity : Activity(), LocationListener {
 
     //음성출력관련
     private lateinit var tts: TextToSpeech
-
-    //위치정보를 얻기 위한 변수
-    private var locationManager: LocationManager? = null
-    private var lastKnownLocation: Location? = null
 
     // 현재위치
     private var lat: Double = 0.0
@@ -91,51 +87,50 @@ class MainActivity : Activity(), LocationListener {
         //진동관련
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
 
-        //위치관련 (GPS)
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            return
+
+        //통합 위치 정보 제공자 클라이언트의 인스턴스
+        val locationRequest = LocationRequest.create()
+        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+        locationRequest.interval = 5000
+        //locationRequest.fastestInterval = 5000
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+
+        if (checkPermissionForLocation(this)) {
+            if (ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_FINE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+                    this,
+                    Manifest.permission.ACCESS_COARSE_LOCATION
+                ) != PackageManager.PERMISSION_GRANTED
+            ) {
+
+            }
+            fusedLocationClient.requestLocationUpdates(locationRequest,
+                locationCallback,
+                Looper.getMainLooper());
         }
 
-
-        locationManager = getSystemService(Context.LOCATION_SERVICE) as LocationManager
-//        val isGpsEnable = locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)
-//        Log.d(LOG,"isGps?"+"${isGpsEnable}")
-        lastKnownLocation = locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)
-        //lastKnownLocation = locationManager!!.getLastKnownLocation(LocationManager.GPS_PROVIDER)?: locationManager!!.getLastKnownLocation(LocationManager.NETWORK_PROVIDER)
-        if(lastKnownLocation == null){
-            Log.d(LOG,"위치 받기 실패!!")
-
-        }
-        //현재위치받기
-        if (lastKnownLocation != null) {
-            lon = lastKnownLocation!!.longitude
-            lat = lastKnownLocation!!.altitude
-
-            Log.d(LOG,"현재위치 : ["+"${lat}"+", "+"${lon}"+"]")
-
-            locationManager!!.requestLocationUpdates(
-                LocationManager.GPS_PROVIDER,
-                1000,  //1.0초마다
-                0.5f, //0.5미터마다 위치 갱신
-                gpsLocationListener
-            )
-        }
     }
 
-    //현재위치 갱신
-    val gpsLocationListener: LocationListener = object : LocationListener {
-        override fun onLocationChanged(location: Location) {
-            lon = location.longitude
-            lat = location.latitude
+    val locationCallback = object : LocationCallback() {
+        override fun onLocationResult(locationResult: LocationResult) {
+            if (locationResult == null) {
+                return
+            }
 
-            x.setText(lon.toString())
-            y.setText(lat.toString())
+            for (location in locationResult.locations) {
+                if (location != null) {
+                    lon = location.longitude
+                    lat = location.latitude
 
-            modified++
+                    x.setText(lon.toString())
+                    y.setText(lat.toString())
+                    Log.d("Test", "Latitude: $lat, Longitude: $lon")
+
+                    modified++
             if(modified==3){
 //            현재위치가 조정 완료되었다는 tts
 //            실제로 조정이 완료되었다고는 할 수 없는데 그냥 알려는 줘야 할 것 같아서
@@ -150,8 +145,11 @@ class MainActivity : Activity(), LocationListener {
             nowBuilder.append(lat.toString()).append(",").append(lon.toString())
             var now = nowBuilder.toString()
             publish("now",now)
+                }
+            }
         }
     }
+
 
     //mqtt관련
     fun publish(topic:String,data:String){
@@ -324,21 +322,36 @@ class MainActivity : Activity(), LocationListener {
         }
     }
 
-//    //워치 자체에 gps가 꺼져있으면 gps설정으로 이동
-//    private fun mOnGPSClick() {
-//        if (!locationManager!!.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
-//            val intent = Intent(Settings.ACTION_LOCATION_SOURCE_SETTINGS)
-//            intent.addCategory(Intent.CATEGORY_DEFAULT)
-//            startActivity(intent)
-//        }
-//    }
 
-
+    // 위치 권한이 있는지 확인하는 메서드 seul
+    private fun checkPermissionForLocation(context: Context): Boolean {
+        // Android 6.0 Marshmallow 이상에서는 위치 권한에 추가 런타임 권한이 필요
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            if (context.checkSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+                true
+            } else {
+                // 권한이 없으므로 권한 요청 알림 보내기
+                ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.ACCESS_FINE_LOCATION), REQUEST_PERMISSION_LOCATION)
+                false
+            }
+        } else {
+            true
+        }
+    }
     //음성출력
     private fun ttsSpeak(strTTS:String){
         tts.speak(strTTS, TextToSpeech.QUEUE_ADD,null,null)
     }
 
     override fun onLocationChanged(p0: Location) { }
+
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+
+    private fun stopLocationUpdates() {
+        fusedLocationClient.removeLocationUpdates(locationCallback)
+    }
 
 }
