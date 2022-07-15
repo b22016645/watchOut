@@ -268,7 +268,7 @@ class DoRetrofitActivity : Activity(){
                                 for (i in 1..3) {
                                     if (scoreList[i] < min) {
                                         min = scoreList[i]
-                                        ind++
+                                        ind = i
                                     }
                                 }
                                 var timercount = 0
