@@ -32,7 +32,7 @@ import java.util.*
 
 
 class NavigationActivity : Activity(), LocationListener {
-
+//네비게이션바껴됴
     lateinit var text: TextView
 
     //mqtt관련
