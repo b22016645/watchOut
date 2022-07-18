@@ -66,7 +66,7 @@ class SensorActivity : Activity(), SensorEventListener {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setContentView(R.layout.activity_sensor)
-        Log.d(Constant.API.LOG,"Sensor호출됨")
+        Log.d(LOG,"Sensor호출됨")
 
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
 

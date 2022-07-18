@@ -134,12 +134,12 @@ class MainActivity : Activity() {
                     Log.d("Test", "Latitude: $lat, Longitude: $lon")
 
                     modified++
-            if(modified==3){
-//            현재위치가 조정 완료되었다는 tts
-//            실제로 조정이 완료되었다고는 할 수 없는데 그냥 알려는 줘야 할 것 같아서
-                ttsSpeak("현재위치 조정이 완료되었습니다.")
-                val effect = VibrationEffect.createOneShot(1500, 150)
-                vibrator.vibrate(effect)
+                    if(modified==3){
+//                  현재위치가 조정 완료되었다는 tts
+//                  실제로 조정이 완료되었다고는 할 수 없는데 그냥 알려는 줘야 할 것 같아서
+                    ttsSpeak("현재위치 조정이 완료되었습니다.")
+                    val effect = VibrationEffect.createOneShot(1500, 150)
+                    vibrator.vibrate(effect)
             }
 
             Log.d(LOG,"MainActivity - 현재위치 : ["+"${lat}"+", "+"${lon}"+"]")
@@ -153,7 +153,6 @@ class MainActivity : Activity() {
         }
     }
 
-
     //mqtt관련
     fun publish(topic:String,data:String){
         Handler().postDelayed(java.lang.Runnable {
@@ -163,7 +162,7 @@ class MainActivity : Activity() {
 
     private fun startSTT(){
         //SpeechToTextActivity 실행
-        if(modified<=4){
+        if(modified<3){
             ttsSpeak("위치 조정 중")
         }
         else {
