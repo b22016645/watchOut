@@ -47,9 +47,6 @@ class NavigationActivity : Activity(), LocationListener {
     //경로 안내에 사용한 변수
     private var midPointNum: Int = 0
 
-    //초기 위치 선정을 위한 변수
-    private var setting : Int = 0
-
     //UI에서 거리 계산을 위해
     private var turnPoint = arrayListOf<List<Double>>()
     private var turnPointCount = 0
@@ -63,7 +60,7 @@ class NavigationActivity : Activity(), LocationListener {
     private var lat: Double = 0.0
     private var lon: Double = 0.0
 
-    private var sppoint = 0  //특정 장소에서의 알람을 반복하지 않기 위해 vibe만 이용하면 onSensor가 있는 애들은 해결이 되는데 나머지가 안되서 만듦
+    private var sppoint = 0  //특정 장소에서의 알람을 반복하지 않기 위해
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -75,13 +72,11 @@ class NavigationActivity : Activity(), LocationListener {
         setContentView(R.layout.activity_navigation)
         Log.d(LOG,"Navigation호출됨")
 
-
         text = findViewById<TextView>(R.id.text)
 
         //mqtt관련
         myMqtt = MyMqtt(this,server_uri)
         myMqtt.connect(arrayOf<String>(sub_topic))
-
 
         //Intent값 받기
         val naviData = intent.getSerializableExtra("naviData") as model.NaviData
@@ -92,7 +87,6 @@ class NavigationActivity : Activity(), LocationListener {
         turnPoint = naviData.turnPoint
 
         Log.d(LOG,"NavigationActivity - turnTypeList : " +"${turnTypeList}")
-
 
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
 
@@ -130,7 +124,6 @@ class NavigationActivity : Activity(), LocationListener {
                     lon = location.longitude
                     lat = location.latitude
 
-
                     if(midpointList.size!=0) { //NavigationActivity가 겹치는 문제를 해결
                         Log.d(LOG,"==========================================================================================================")
                         Log.d(LOG,"midpointNum : ["+"${midPointNum}"+"] " + "현재위치 : ["+"${lat}"+", "+"${lon}"+"] "  + "다음위치 : ["+"${midpointList[midPointNum][0]}"+", "+"${midpointList[midPointNum][1]}"+"]" )
@@ -143,34 +136,29 @@ class NavigationActivity : Activity(), LocationListener {
                         //UI에서 보이는 거리 -> 현재 위치에서부터 가장 가까운 분기점까지
                         text.setText("${(round(DetailRoute.getDistance( lat, lon, turnPoint[turnPointCount][0], turnPoint[turnPointCount][1]))*10)/10}"+"m")
 
-                        //도착
-                        if (midPointNum == midpointList.size-1) {
-                            vibe(1500,100)
-                            publish("topic","목적지에 도착하였습니다")
-                            Log.d(LOG,"안내완료")
-                            midpointList.clear()
-                            turnPoint.clear()
-                            turnTypeList.clear()
-
-                            val returnIntent = Intent()
-                            setResult(0,returnIntent)
-                            finish()
-                        }
-
                         //안내시작 일단 0->1을 안내
                         //나침반불러와서
-                        if (midPointNum == 0 && setting == 0 && sppoint == 0 ) {
+                        if (midPointNum == 0 && sppoint == 0 ) {
                             vibe(1000,150)
                             sppoint ++
                             Log.d(LOG, "NavigationActivity 첫 방향 조정")
                             doSensor(lat,lon)
                         }
+                        //도착
+                        else if (midPointNum == midpointList.size-1 && sppoint == 0) {
+                            vibe(1500,100)
+                            publish("topic","목적지에 도착하였습니다")
+                            Log.d(LOG,"안내완료")
+                            clear()
+                            val returnIntent = Intent()
+                            setResult(0,returnIntent)
+                            finish()
+                        }
                         else {
-
                             //분기점일때
-                            if ((turnTypeList[midPointNum] >= 212 || (turnTypeList[midPointNum] in 12..19)) && sppoint != 0) {
+                            if ((turnTypeList[midPointNum] >= 212 || (turnTypeList[midPointNum] in 12..19)) && sppoint == 0) {
                                 vibe(1000, 150)
-                                sppoint = 0
+                                sppoint ++
                                 turnPointCount++
                                 publish("topic", "분기점을 마주했습니다")
                                 Log.d(LOG, "NavigationActivity 분기점일 때")
@@ -178,21 +166,19 @@ class NavigationActivity : Activity(), LocationListener {
                             }
 
                             //위험요소 (횡단보도, 육교 등)
-                            else if (((turnTypeList[midPointNum] in 125..129) || turnTypeList[midPointNum] == 211) && sppoint != 0) {
+                            else if (((turnTypeList[midPointNum] in 125..129) || turnTypeList[midPointNum] == 211) && sppoint == 0) {
                                 publish("topic", "위험요소 앞입니다")
-//                    watchOut()
-                                sppoint = 0
+                                sppoint ++
                                 Log.d(LOG, "NavigationActivity 위험요소")
                             }
 
-
                             //경로이탈인지 아닌지 판단
-                            if (setting != 0 && (DetailRoute.getDistance(
+                            if (DetailRoute.getDistance(
                                     lat,
                                     lon,
                                     midpointList[midPointNum][0],
                                     midpointList[midPointNum][1]
-                                ) > 8.0)
+                                ) > 8.0
                             ) {  //p1에서 멀어졌는데
                                 if (DetailRoute.getDistance(
                                         lat,
@@ -208,29 +194,25 @@ class NavigationActivity : Activity(), LocationListener {
                                         youOut()
                                         outNum = 0
                                         Log.d(LOG, "NavigationActivity 경로이탈일 때")
-                                        midpointList.clear()
-                                        turnPoint.clear()
-                                        turnTypeList.clear()
+                                        clear()
                                         val returnIntent = Intent()
-                                        returnIntent.putExtra(
-                                            "destination",
-                                            destination
-                                        )  //목적지를 main에 넘기고 그 값을 다시 DoRetrofit으로 넘긴다.
+                                        returnIntent.putExtra("destination", destination)
                                         setResult(3, returnIntent)
                                         finish()
                                     }
-                                } else { //p1에선 멀지만 p2와 가깝다면  그리고 직진일 때 알림을 주는 건 여기서 주면 되는거 아닌가?? => 맞음 여기서 주면 됨
+                                } else {
                                     outNum = 0
                                     Log.d(LOG, "NavigationActivity p1->p2")
-//                        goStraiht()
                                     if (midPointNum < midpointList.size - 1) {
                                         midPointNum++
-                                        sppoint++
+                                        sppoint = 0
                                     }
                                 }
                             }
+                            else{
+                                sppoint++
+                            }
                         }
-
                     }
                 }
             }
@@ -249,11 +231,10 @@ class NavigationActivity : Activity(), LocationListener {
         },1000)
     }
 
-
     private fun doSensor(lat : Double, lon : Double) {
         //SensorActivity 실행
         publish("vibe","start")
-        var sensorItem = SensorItem(lat,lon,midpointList,midPointNum,setting)
+        var sensorItem = SensorItem(lat,lon,midpointList,midPointNum)
         val intent = Intent(this, SensorActivity::class.java)
         intent.putExtra("sensorItem",sensorItem)
         startActivityForResult(intent, 4)
@@ -263,9 +244,7 @@ class NavigationActivity : Activity(), LocationListener {
         if(keyCode== KeyEvent.KEYCODE_BACK){
             publish("topic","목적지를 재 입력합니다")
             publish("route","restart")
-            midpointList.clear()
-            turnTypeList.clear()
-            turnPoint.clear()
+            clear()
             val returnIntent = Intent()
             setResult(2,returnIntent)
             finish()
@@ -282,16 +261,13 @@ class NavigationActivity : Activity(), LocationListener {
             if (resultCode == RESULT_OK) {
                 Log.d(LOG, "방향 조정 완료")
                 publish("vibe", "end")
-                setting++
                 publish("topic", "이동중입니다...")
             }
             else if (resultCode == 2){
                 publish("vibe", "stop")
                 publish("topic","목적지를 재 입력합니다")
                 publish("route","restart")
-                midpointList.clear()
-                turnTypeList.clear()
-                turnPoint.clear()
+                clear()
                 Handler().postDelayed(java.lang.Runnable {
                     val returnIntent = Intent()
                     setResult(2,returnIntent)
@@ -301,12 +277,10 @@ class NavigationActivity : Activity(), LocationListener {
         }
     }
 
-
-    fun goStraiht() { //비프음
-
+    //평소 비프음
+    fun goStraiht() {
         vibe(1000,100)
     }
-
 
     //위험요소앞일때
     fun watchOut() {
@@ -323,8 +297,14 @@ class NavigationActivity : Activity(), LocationListener {
         vibrator.vibrate(effect)
     }
 
+    //clear함수
+    fun clear(){
+        midpointList.clear()
+        turnPoint.clear()
+        turnTypeList.clear()
+    }
+
     override fun onLocationChanged(p0: Location) {}
-//    override fun onAccuracyChanged(p0: Sensor?, p1: Int) {}
 
     // 위치 권한이 있는지 확인하는 메서드
     private fun checkPermissionForLocation(context: Context): Boolean {
