@@ -21,13 +21,14 @@ import model.NaviData
 import utils.Constant.API.LOG
 import java.util.*
 
-class MainActivity : Activity(), LocationListener {
+class MainActivity : Activity() {
 
     private lateinit var binding: ActivityMainBinding
     lateinit var x: TextView
     lateinit var y: TextView
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationRequest:LocationRequest
     private val REQUEST_PERMISSION_LOCATION = 10
 
     //mqtt관련
@@ -89,14 +90,17 @@ class MainActivity : Activity(), LocationListener {
 
 
         //통합 위치 정보 제공자 클라이언트의 인스턴스
-        val locationRequest = LocationRequest.create()
+        locationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         locationRequest.interval = 5000
-        //locationRequest.fastestInterval = 5000
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
+        startLocationUpdates()
 
+    }
+
+    private fun startLocationUpdates() {
         if (checkPermissionForLocation(this)) {
             if (ActivityCompat.checkSelfPermission(
                     this,
@@ -112,7 +116,6 @@ class MainActivity : Activity(), LocationListener {
                 locationCallback,
                 Looper.getMainLooper());
         }
-
     }
 
     val locationCallback = object : LocationCallback() {
@@ -343,11 +346,15 @@ class MainActivity : Activity(), LocationListener {
         tts.speak(strTTS, TextToSpeech.QUEUE_ADD,null,null)
     }
 
-    override fun onLocationChanged(p0: Location) { }
-
     override fun onPause() {
         super.onPause()
         stopLocationUpdates()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        //if (requestingLocationUpdates)
+        startLocationUpdates()
     }
 
     private fun stopLocationUpdates() {

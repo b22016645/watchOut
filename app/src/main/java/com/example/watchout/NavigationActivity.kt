@@ -24,6 +24,7 @@ class NavigationActivity : Activity(), LocationListener {
     lateinit var text: TextView
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
+    private lateinit var locationRequest:LocationRequest
     private val REQUEST_PERMISSION_LOCATION = 10
 
     //mqtt관련
@@ -63,6 +64,7 @@ class NavigationActivity : Activity(), LocationListener {
     private var sppoint = 0  //특정 장소에서의 알람을 반복하지 않기 위해
 
 
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -91,11 +93,22 @@ class NavigationActivity : Activity(), LocationListener {
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
 
         //통합 위치 정보 제공자 클라이언트의 인스턴스
-        val locationRequest = LocationRequest.create()
+        locationRequest = LocationRequest.create()
         locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
         locationRequest.interval = 5000
 
         fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        startLocationUpdates()
+
+    }
+
+//    override fun onSaveInstanceState(outState: Bundle?) {
+//        outState?.putBoolean(REQUESTING_LOCATION_UPDATES_KEY, requestingLocationUpdates)
+//        super.onSaveInstanceState(outState)
+//    }
+
+    private fun startLocationUpdates() {
         if (checkPermissionForLocation(this)) {
             if (ActivityCompat.checkSelfPermission(
                     this,
@@ -219,10 +232,12 @@ class NavigationActivity : Activity(), LocationListener {
         }
     }
 
-    override fun onDestroy() {
-        super.onDestroy()
-        myMqtt.mqttClient.unregisterResources()
-    }
+//    override fun onDestroy() {
+//        super.onDestroy()
+//        myMqtt.mqttClient.unregisterResources()
+//    }
+
+
 
     //mqtt관련
     fun publish(topic:String,data:String){
@@ -322,10 +337,17 @@ class NavigationActivity : Activity(), LocationListener {
         }
     }
 
-//    override fun onPause() {
-//        super.onPause()
-//        stopLocationUpdates()
-//    }
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        //if (requestingLocationUpdates)
+            startLocationUpdates()
+    }
+
 
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
