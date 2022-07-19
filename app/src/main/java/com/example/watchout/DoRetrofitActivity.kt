@@ -42,8 +42,10 @@ class DoRetrofitActivity : Activity(){
     //searchOption 목록
     private var safeList = listOf(0,4,10,30)
 
-    private var lat: Double = 37.58217852030164
-    private var lon: Double = 127.01152516595631
+//    private var lat: Double = 37.58217852030164
+//    private var lon: Double = 127.01152516595631
+    private var lat: Double = 0.0
+    private var lon: Double = 0.0
 
     private var sttResultMsg : String = ""
 
@@ -78,8 +80,8 @@ class DoRetrofitActivity : Activity(){
         routeBuilder.clear()
 
         var byteAudioData = doRrtrofitData.byteAudioData
-//        lat = doRrtrofitData.lat
-//        lon = doRrtrofitData.lon
+        lat = doRrtrofitData.lat
+        lon = doRrtrofitData.lon
         sttResultMsg = doRrtrofitData.destination
 
         Handler().postDelayed(java.lang.Runnable {
