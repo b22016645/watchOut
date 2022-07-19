@@ -8,6 +8,7 @@ import android.content.pm.PackageManager
 import android.location.Location
 import android.location.LocationListener
 import android.os.*
+import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.KeyEvent
 import android.view.WindowManager
@@ -17,6 +18,7 @@ import com.google.android.gms.location.*
 import model.SensorItem
 import route.DetailRoute
 import utils.Constant.API.LOG
+import java.util.*
 import kotlin.math.round
 
 class NavigationActivity : Activity(), LocationListener {
@@ -32,6 +34,9 @@ class NavigationActivity : Activity(), LocationListener {
     var server_uri = "tcp://172.20.10.6:1883"
     private lateinit var myMqtt: MyMqtt
     val sub_topic = "android"
+
+    //음성출력관련
+    private lateinit var tts: TextToSpeech
 
     //세분화된 좌표를 저장할 배열
     private var midpointList = arrayListOf<List<Double>>()
@@ -67,6 +72,20 @@ class NavigationActivity : Activity(), LocationListener {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        // TTS를 생성하고 OnInitListener로 초기화 한다.
+        tts= TextToSpeech(this){
+            if(it==TextToSpeech.SUCCESS){
+                val result = tts?.setLanguage(Locale.KOREAN)
+                if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+                    Log.d("로그","지원하지 않은 언어")
+                    return@TextToSpeech
+                }
+                Log.d("로그","TTS 세팅 성공")
+            }else{
+                Log.d("로그","TTS 세텅 실패")
+            }
+        }
 
         //화면이 꺼지지 않게
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -147,7 +166,8 @@ class NavigationActivity : Activity(), LocationListener {
                         publish("now",now)
 
                         //UI에서 보이는 거리 -> 현재 위치에서부터 가장 가까운 분기점까지
-                        text.setText("${(round(DetailRoute.getDistance( lat, lon, turnPoint[turnPointCount][0], turnPoint[turnPointCount][1]))*10)/10}"+"m")
+                        var distance = (round(DetailRoute.getDistance( lat, lon, turnPoint[turnPointCount][0], turnPoint[turnPointCount][1]))*10)/10
+                        text.setText("${distance}"+"m")
 
                         //안내시작 일단 0->1을 안내
                         //나침반불러와서
@@ -169,7 +189,7 @@ class NavigationActivity : Activity(), LocationListener {
                         }
                         else {
                             //분기점일때
-                            if ((turnTypeList[midPointNum] >= 212 || (turnTypeList[midPointNum] in 12..19)) && sppoint == 0) {
+                            if ((turnTypeList[midPointNum] in 12..19) && sppoint == 0) {
                                 vibe(1000, 150)
                                 sppoint ++
                                 turnPointCount++
@@ -179,10 +199,29 @@ class NavigationActivity : Activity(), LocationListener {
                             }
 
                             //위험요소 (횡단보도, 육교 등)
-                            else if (((turnTypeList[midPointNum] in 125..129) || turnTypeList[midPointNum] == 211) && sppoint == 0) {
+                            else if ((turnTypeList[midPointNum] in 125..129 || turnTypeList[midPointNum] in 211..217) && sppoint == 0) {
                                 publish("topic", "위험요소 앞입니다")
+                                var turnNum = turnTypeList[midPointNum]
+                                ttsSpeak("버튼을 눌러 목적지를 말하세요.")
                                 sppoint ++
                                 Log.d(LOG, "NavigationActivity 위험요소")
+                                val turnName = when (turnNum) {
+                                    125 -> "육교"
+                                    211 -> "직진 횡단보도"
+                                    212 -> "좌측 횡단보도"
+                                    213 -> "우측 횡단보도"
+                                    214 -> "8시 횡단보도"
+                                    215 -> "10시 횡단보도"
+                                    216 -> "2시 횡단보도"
+                                    217 -> "4시 횡단보도"
+                                    else -> ""
+                                }
+                                ttsSpeak("${distance}"+"m 뒤에 "+"${turnName}"+"입니다")
+                            }
+
+                            //예외 (엘베, 직진암시)
+                            else if ((turnTypeList[midPointNum] == 218 || turnTypeList[midPointNum] == 233) && sppoint == 0 ){
+                                Log.d(LOG,"NavigationActivity 예외 길")
                             }
 
                             //경로이탈인지 아닌지 판단
@@ -216,6 +255,7 @@ class NavigationActivity : Activity(), LocationListener {
                                 } else {
                                     outNum = 0
                                     Log.d(LOG, "NavigationActivity p1->p2")
+
                                     if (midPointNum < midpointList.size - 1) {
                                         midPointNum++
                                         sppoint = 0
@@ -236,8 +276,6 @@ class NavigationActivity : Activity(), LocationListener {
 //        super.onDestroy()
 //        myMqtt.mqttClient.unregisterResources()
 //    }
-
-
 
     //mqtt관련
     fun publish(topic:String,data:String){
@@ -277,6 +315,7 @@ class NavigationActivity : Activity(), LocationListener {
                 Log.d(LOG, "방향 조정 완료")
                 publish("vibe", "end")
                 publish("topic", "이동중입니다...")
+                ttsSpeak("다음 안내까지 직진입니다")
             }
             else if (resultCode == 2){
                 publish("vibe", "stop")
@@ -348,6 +387,10 @@ class NavigationActivity : Activity(), LocationListener {
             startLocationUpdates()
     }
 
+    //음성출력
+    private fun ttsSpeak(strTTS:String){
+        tts.speak(strTTS, TextToSpeech.QUEUE_ADD,null,null)
+    }
 
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
