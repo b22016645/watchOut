@@ -140,14 +140,14 @@ class MainActivity : Activity() {
                     ttsSpeak("현재위치 조정이 완료되었습니다.")
                     val effect = VibrationEffect.createOneShot(1500, 150)
                     vibrator.vibrate(effect)
-            }
+                    }
 
-            Log.d(LOG,"MainActivity - 현재위치 : ["+"${lat}"+", "+"${lon}"+"]")
+                Log.d(LOG,"MainActivity - 현재위치 : ["+"${lat}"+", "+"${lon}"+"]")
 
-            var nowBuilder = StringBuilder()
-            nowBuilder.append(lat.toString()).append(",").append(lon.toString())
-            var now = nowBuilder.toString()
-            publish("now",now)
+                var nowBuilder = StringBuilder()
+                nowBuilder.append(lat.toString()).append(",").append(lon.toString())
+                var now = nowBuilder.toString()
+                publish("now",now)
                 }
             }
         }

@@ -158,7 +158,7 @@ class NavigationActivity : Activity(), LocationListener {
 
                     if(midpointList.size!=0) { //NavigationActivity가 겹치는 문제를 해결
                         Log.d(LOG,"==========================================================================================================")
-                        Log.d(LOG,"midpointNum : ["+"${midPointNum}"+"] " + "현재위치 : ["+"${lat}"+", "+"${lon}"+"] "  + "다음위치 : ["+"${midpointList[midPointNum][0]}"+", "+"${midpointList[midPointNum][1]}"+"]" )
+                        Log.d(LOG,"midpointNum : ["+"${midPointNum}"+"/"+"${midpointList.size-1}"+"] " + "현재위치 : ["+"${lat}"+", "+"${lon}"+"] "  + "다음위치 : ["+"${midpointList[midPointNum][0]}"+", "+"${midpointList[midPointNum][1]}"+"]" )
 
                         var nowBuilder = StringBuilder()
                         nowBuilder.append(lat.toString()).append(",").append(lon.toString())
@@ -168,6 +168,8 @@ class NavigationActivity : Activity(), LocationListener {
                         //UI에서 보이는 거리 -> 현재 위치에서부터 가장 가까운 분기점까지
                         var distance = (round(DetailRoute.getDistance( lat, lon, turnPoint[turnPointCount][0], turnPoint[turnPointCount][1]))*10)/10
                         text.setText("${distance}"+"m")
+
+                        var turnNum = turnTypeList[midPointNum]
 
                         //안내시작 일단 0->1을 안내
                         //나침반불러와서
@@ -189,7 +191,7 @@ class NavigationActivity : Activity(), LocationListener {
                         }
                         else {
                             //분기점일때
-                            if ((turnTypeList[midPointNum] in 12..19) && sppoint == 0) {
+                            if ((turnNum in 12..19) && sppoint == 0) {
                                 vibe(1000, 150)
                                 sppoint ++
                                 turnPointCount++
@@ -199,9 +201,8 @@ class NavigationActivity : Activity(), LocationListener {
                             }
 
                             //위험요소 (횡단보도, 육교 등)
-                            else if ((turnTypeList[midPointNum] in 125..129 || turnTypeList[midPointNum] in 211..217) && sppoint == 0) {
+                            else if ((turnNum in 125..129 || turnNum in 211..217) && sppoint == 0) {
                                 publish("topic", "위험요소 앞입니다")
-                                var turnNum = turnTypeList[midPointNum]
                                 ttsSpeak("버튼을 눌러 목적지를 말하세요.")
                                 sppoint ++
                                 Log.d(LOG, "NavigationActivity 위험요소")
@@ -220,7 +221,7 @@ class NavigationActivity : Activity(), LocationListener {
                             }
 
                             //예외 (엘베, 직진암시)
-                            else if ((turnTypeList[midPointNum] == 218 || turnTypeList[midPointNum] == 233) && sppoint == 0 ){
+                            else if ((turnNum == 218 || turnNum == 233) && sppoint == 0 ){
                                 Log.d(LOG,"NavigationActivity 예외 길")
                             }
 
@@ -255,10 +256,17 @@ class NavigationActivity : Activity(), LocationListener {
                                 } else {
                                     outNum = 0
                                     Log.d(LOG, "NavigationActivity p1->p2")
+                                    midPointNum++
+                                    sppoint = 0
 
-                                    if (midPointNum < midpointList.size - 1) {
-                                        midPointNum++
-                                        sppoint = 0
+                                    //다음 좌표가 분기점일때
+                                    if (turnTypeList[midPointNum+1] in 12..19) {
+                                        Log.d(LOG, "다음좌표 분기점입니다")
+                                        when (turnTypeList[midPointNum+1]) {
+                                            12, 16, 17 -> ttsSpeak("${distance}"+"m 뒤에 좌회전입니다")
+                                            13, 18, 19 -> ttsSpeak("${distance}"+"m 뒤에 우회전입니다")
+                                            else -> Log.d(LOG,"uuuuuuuuuuu턴")
+                                        }
                                     }
                                 }
                             }

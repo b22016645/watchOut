@@ -244,7 +244,6 @@ class DoRetrofitActivity : Activity(){
                             routeBuilder.append("!")
                         }
 
-
                         if (getscorecount == 4 && errorcount != 0) {  // 4번 돌았는데 403에러가 1개라도 있었다면
                             Log.d(LOG, "DoRetrofit - ROUTE API 403에러 - getScore")
                             scoreList.clear()
@@ -256,9 +255,6 @@ class DoRetrofitActivity : Activity(){
                             Log.d(SCORE_SAFEROUTE, "scoreList : " + "${saftyScore}")
                             //경로 배열에 경로의 모든 정보 추가
 
-
-
-
                             if (scoreList.size ==4)  {
 
                                 var routeString = routeBuilder.toString()
@@ -266,7 +262,6 @@ class DoRetrofitActivity : Activity(){
 
                                 Log.d(SCORE_SAFEROUTE, "${saftyScore}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보)
-
 
                                 var max = scoreList[0]?.score!!
 
@@ -316,8 +311,6 @@ class DoRetrofitActivity : Activity(){
         Log.d(LOG,"DoRetrofit - getRoute호출")
         Log.d(LOG,"DoRetrofit - searchOption : "+"${searchOption}")
 //        publish("topic","안전한 길 알고리즘으로 선택된 길입니다")
-
-
 
         scoreList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
 
@@ -379,8 +372,6 @@ class DoRetrofitActivity : Activity(){
 
                         rawRouteRes.add(arrayListOf(endx,endy))
 
-
-
                         //UI에 나오는 거리 계산을 위해 분기점 좌표만 얻는 중
                         for( i in turnTypeList.indices){
                             if((turnTypeList[i] >= 212 || (turnTypeList[i] in 12..19))){
@@ -388,6 +379,8 @@ class DoRetrofitActivity : Activity(){
                             }
                         }
 
+
+                        //routeRes 보냄
 
                         var routeResBuilder = StringBuilder()
 
@@ -413,8 +406,63 @@ class DoRetrofitActivity : Activity(){
                         publish("route_res",routeResString)
                         Log.d(LOG,"routeRes : "+"${routeResString}")
 
+                        var size=0
 
-                        var naviData = NaviData(rawRouteRes, turnTypeList, sttResultMsg, turnPoint)
+                        //중간좌표를 얻음.
+                        for (i in rawRouteRes.indices) {
+                            if (i < rawRouteRes.size-1) {
+                                midpointList.add(listOf(rawRouteRes[i][1], rawRouteRes[i][0]))
+                                size = midpointList.size
+                                midpointList = DetailRoute.midPoint(
+                                    rawRouteRes[i][1],
+                                    rawRouteRes[i][0],
+                                    rawRouteRes[i + 1][1],
+                                    rawRouteRes[i + 1][0],
+                                    midpointList
+                                )
+                                for (j in size..midpointList.size - 1) {
+                                    turnTypeList.add(j, 0)
+                                }
+                            }
+
+                            else {
+                                midpointList.add(  //맨 마지막 값 넣기
+                                    listOf(
+                                        rawRouteRes[i][1],
+                                        rawRouteRes[i][0]
+                                    )
+                                )
+                            }
+                        }
+
+                        //midpointList 보냄
+
+                        var midpointBuilder = StringBuilder()
+
+                        // x좌표 다 넣기
+                        for (i in midpointList.indices) {
+                            midpointBuilder.append(midpointList[i][0].toString())
+                            if (i < midpointList.size-1){
+                                midpointBuilder.append(",")
+                            }
+                        }
+
+                        //y좌표 다 스트링으로 만듬
+                        midpointBuilder.append("/")
+                        for (i in midpointList.indices) {
+                            midpointBuilder.append(midpointList[i][1].toString())
+                            if (i < midpointList.size-1){
+                                midpointBuilder.append(",")
+                            }
+                        }
+
+                        var midpointString = midpointBuilder.toString()
+
+                        publish("midpoint",midpointString)
+                        Log.d(LOG,"midpoint : "+"${midpointString}")
+
+
+                        var naviData = NaviData(midpointList, turnTypeList, sttResultMsg, turnPoint)
                         //받아서 retrunMain호출함수호출
                         retrunMain(naviData)
 

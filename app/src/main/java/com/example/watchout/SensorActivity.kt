@@ -20,9 +20,6 @@ import kotlin.math.abs
 
 class SensorActivity : Activity(), SensorEventListener {
 
-//    //초기 위치 선정을 위한 변수
-//    private var setting : Int = 0
-
     //onsencorChange가 너무 빠르고 많이 호출되기 때문에 진동을 적당히 주기가 어려움. 그래서 사용함.
     private var sensorCount = 1
 
@@ -77,7 +74,6 @@ class SensorActivity : Activity(), SensorEventListener {
         lon = sensorItem.lon
         midpointList = sensorItem.midPointList
         midPointNum = sensorItem.midPointNum
-        //setting = sensorItem.setting
 
         //나침반관련 변수 초기화
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
@@ -131,7 +127,6 @@ class SensorActivity : Activity(), SensorEventListener {
                     if ((x in -1.8..1.8) && (y in -1.8..1.8) && (z in 9.0..9.8)) {
                         var size = 0f
                         var angle = 0f
-                       // if (setting == 0) { //현재위치에서 p1을 바라보기
                         size = getAngle(
                             lat,
                             lon,
@@ -144,21 +139,6 @@ class SensorActivity : Activity(), SensorEventListener {
                             midpointList[midPointNum + 1][0],
                             midpointList[midPointNum + 1][1]
                         )
-                       // }
-//                        else {//p1에서 p2바라보기
-//                            size = getAngle(
-//                                midpointList[midPointNum][0],
-//                                midpointList[midPointNum][1],
-//                                midpointList[midPointNum + 1][0],
-//                                midpointList[midPointNum + 1][1]
-//                            ) - azimuthinDegress
-//                            angle = getAngle(
-//                                midpointList[midPointNum][0],
-//                                midpointList[midPointNum][1],
-//                                midpointList[midPointNum + 1][0],
-//                                midpointList[midPointNum + 1][1]
-//                            )
-//                        }
 //                        Log.d(LOG,"size : "+"${size}")
                         //맞으면 센서 끔
                         if (abs(size) < 2f) {
