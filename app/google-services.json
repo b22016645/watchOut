@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "638777275456",
+    "project_id": "watchout-4bc58",
+    "storage_bucket": "watchout-4bc58.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:638777275456:android:c5c38a44f4238750b91ba5",
+        "android_client_info": {
+          "package_name": "com.example.watchout"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "638777275456-posj566pbs6irarhvniv9ccgc17dk41n.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBHjDKgDN7qmQjA7PiebsIcWhYdiwdERhs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "638777275456-posj566pbs6irarhvniv9ccgc17dk41n.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
