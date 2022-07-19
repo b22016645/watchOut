@@ -21,7 +21,7 @@ import kotlin.concurrent.timer
 
 
 class DoRetrofitActivity : Activity(){
-
+//dd
     //mqtt관련
     var server_uri = "tcp://15.165.174.55:1883"
     private lateinit var myMqtt: MyMqtt
