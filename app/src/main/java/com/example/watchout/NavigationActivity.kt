@@ -225,21 +225,19 @@ class NavigationActivity : Activity(), LocationListener {
                                 Log.d(LOG,"NavigationActivity 예외 길")
                             }
 
+                            var distanceRange:Double = 8.0      //오차범위
+
                             //경로이탈인지 아닌지 판단
-                            if (DetailRoute.getDistance(
-                                    lat,
+                            if (DetailRoute.isRightCource(lat,
                                     lon,
                                     midpointList[midPointNum][0],
-                                    midpointList[midPointNum][1]
-                                ) > 8.0
-                            ) {  //p1에서 멀어졌는데
-                                if (DetailRoute.getDistance(
-                                        lat,
+                                    midpointList[midPointNum][1],distanceRange)){
+                                //p1에서 멀어졌는데
+                                if (DetailRoute.isRightCource(lat,
                                         lon,
-                                        midpointList[midPointNum + 1][0],
-                                        midpointList[midPointNum + 1][1]
-                                    ) > 8.0
-                                ) {  //p2에서도 멀어졌다.
+                                        midpointList[midPointNum+1][0],
+                                        midpointList[midPointNum+1][1],distanceRange)){  //p2에서도 멀어졌다.
+
                                     outNum++
                                     Log.d(LOG, "NavigationActivity " + "${outNum}" + "번 나갔다.")
                                     //15초동안 이탈이면 경로이탈
