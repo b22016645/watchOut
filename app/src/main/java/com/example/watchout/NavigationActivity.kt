@@ -30,8 +30,8 @@ class NavigationActivity : Activity(), LocationListener {
     private val REQUEST_PERMISSION_LOCATION = 10
 
     //mqtt관련
-    // var server_uri = "tcp://15.165.174.55:1883"
-    var server_uri = "tcp://172.20.10.6:1883"
+    var server_uri = "tcp://15.165.174.55:1883"
+    //var server_uri = "tcp://172.20.10.6:1883"
     private lateinit var myMqtt: MyMqtt
     val sub_topic = "android"
 
