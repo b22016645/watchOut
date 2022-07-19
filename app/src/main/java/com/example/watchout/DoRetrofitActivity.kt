@@ -21,9 +21,10 @@ import kotlin.concurrent.timer
 
 
 class DoRetrofitActivity : Activity(){
-//dd
+
     //mqtt관련
     var server_uri = "tcp://15.165.174.55:1883"
+    //var server_uri = "tcp://172.20.10.6:1883"
     private lateinit var myMqtt: MyMqtt
     val sub_topic = "android"
 
@@ -42,8 +43,8 @@ class DoRetrofitActivity : Activity(){
     //searchOption 목록
     private var safeList = listOf(0,4,10,30)
 
-//    private var lat: Double = 37.58217852030164
-//    private var lon: Double = 127.01152516595631
+    //private var lat: Double = 37.58217852030164
+    //private var lon: Double = 127.01152516595631
     private var lat: Double = 0.0
     private var lon: Double = 0.0
 
