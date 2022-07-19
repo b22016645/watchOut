@@ -5,6 +5,7 @@ import android.util.Log
 import com.google.gson.JsonElement
 import model.POI
 import model.Route
+import model.SaftyScore
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
@@ -93,7 +94,7 @@ class RetrofitManager {
 
 
     //경로탐색 api호출
-    fun searchRoute(startX:Double, startY:Double, endX:Double, endY:Double, startname:String, endname:String, searchOption:Int, completion: (Constant.RESPONSE_STATE, ArrayList<Route>?,Double) -> Unit){
+    fun searchRoute(startX:Double, startY:Double, endX:Double, endY:Double, startname:String, endname:String, searchOption:Int, completion: (Constant.RESPONSE_STATE, ArrayList<Route>?,SaftyScore?) -> Unit){
         val iRetrofitRoute : IRetrofit? = RouteRetrofitClient.getRouteClient(Constant.API.BASE_URL)?.create(IRetrofit::class.java)
         val startX=startX
         val startY=startY
@@ -109,7 +110,7 @@ class RetrofitManager {
 
         call.enqueue(object : retrofit2.Callback<JsonElement>{
             override fun onFailure(call: Call<JsonElement>, t: Throwable) {
-                completion(Constant.RESPONSE_STATE.FAIL, null,0.0)
+                completion(Constant.RESPONSE_STATE.FAIL, null,null)
             }
 
             override fun onResponse(call: Call<JsonElement>, response: Response<JsonElement>) {
@@ -124,6 +125,12 @@ class RetrofitManager {
                             var score = 0.0
                             var totalDistance : Int? = 0
                             val features=body.getAsJsonArray("features")
+                            var saftyScore = SaftyScore(.0,0,0,0,.0,
+                                .0,.0,.0,.0,
+                                0,0,0,0,0,0,0,0)
+
+
+
 
                             features.forEach { featuresItem->
                                 val featureObject = featuresItem.asJsonObject
@@ -131,19 +138,23 @@ class RetrofitManager {
                                 val coordinates=geometry.get("coordinates")//JsonElement
 
                                 val properties = featureObject.get("properties").asJsonObject
-                                var turnType : Int?
-                                var roadType : Int?
-                                var distance : Int?
 
-                                turnType = properties.get("turnType")?.asInt
-                                roadType = properties.get("roadType")?.asInt
-                                distance = properties.get("distance")?.asInt
+                                var turnType : Int? = properties.get("turnType")?.asInt
+                                var roadType : Int? = properties.get("roadType")?.asInt
+                                var distance : Int? = properties.get("distance")?.asInt
+                                var facilityType : Int? = properties.get("facility")?.asInt
+
 
                                 if (totalDistance==0){
                                     totalDistance = properties.get("totalDistance")?.asInt
                                 }
+                                saftyScore.totalDistance = totalDistance
 
-                                score += SafeRoute.calcPartialScore(totalDistance,distance,roadType,turnType)
+                                SafeRoute.calcPartialScore(facilityType,distance,roadType,turnType, saftyScore
+                                )
+                                Log.d(Constant.API.SCORE_SAFEROUTE, "FFFFFFFFFFFFFFF" + "${saftyScore}")
+
+
 
                                 var RouteItem = Route(
                                     coordinates = coordinates,
@@ -151,12 +162,12 @@ class RetrofitManager {
                                 )
                                 parseRouteDataArray.add(RouteItem)
                             }
-                            completion(Constant.RESPONSE_STATE.OKAY,parseRouteDataArray,score)
+                            completion(Constant.RESPONSE_STATE.OKAY,parseRouteDataArray,saftyScore)
                         }
                     }
                     403->{
                         Log.d(LOG,"Manager - ROUTE API 403에러")
-                        completion(Constant.RESPONSE_STATE.ERROR403,null,0.0)
+                        completion(Constant.RESPONSE_STATE.ERROR403,null,null)
                     }
                 }
             }

@@ -1,4 +1,4 @@
-package com.example.watchout
+package com.example.track
 
 import android.app.Activity
 import android.content.Intent
@@ -6,20 +6,24 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.WindowManager
+import com.example.watchout.MyMqtt
+import com.example.watchout.R
 import com.example.watchout.databinding.ActivityMainBinding
 import com.google.gson.Gson
 import model.NaviData
+import model.SaftyScore
 import retrofit.RetrofitManager
 import route.DetailRoute
 import utils.Constant
 import utils.Constant.API.LOG
+import utils.Constant.API.SCORE_SAFEROUTE
 import kotlin.concurrent.timer
+
 
 class DoRetrofitActivity : Activity(){
 
     //mqtt관련
-    //var server_uri = "tcp://15.165.174.55:1883"
-    var server_uri = "tcp://172.20.10.6:1883"
+    var server_uri = "tcp://15.165.174.55:1883"
     private lateinit var myMqtt: MyMqtt
     val sub_topic = "android"
 
@@ -31,15 +35,15 @@ class DoRetrofitActivity : Activity(){
     private var routeBuilder = StringBuilder()
 
     //안전할 길 점수 받을 배열
-    private var scoreList = arrayListOf<Double>()
+    //private var scoreList = arrayListOf<Double>()
+    private var scoreList = arrayListOf<SaftyScore?>()
+    //private var scoreList = Array<SaftyScore?>(4){null}
 
     //searchOption 목록
     private var safeList = listOf(0,4,10,30)
 
-//    private var lat: Double = 37.58217852030164
-//    private var lon: Double = 127.01152516595631
-    private var lat: Double = 0.0
-    private var lon: Double = 0.0
+    private var lat: Double = 37.58217852030164
+    private var lon: Double = 127.01152516595631
 
     private var sttResultMsg : String = ""
 
@@ -74,17 +78,17 @@ class DoRetrofitActivity : Activity(){
         routeBuilder.clear()
 
         var byteAudioData = doRrtrofitData.byteAudioData
-        lat = doRrtrofitData.lat
-        lon = doRrtrofitData.lon
+//        lat = doRrtrofitData.lat
+//        lon = doRrtrofitData.lon
         sttResultMsg = doRrtrofitData.destination
 
         Handler().postDelayed(java.lang.Runnable {
 
-        if (byteAudioData != null) { //정상적으로 들어왔을 때
-            requestStt(byteAudioData)
-        } else if (byteAudioData == null) { //경로이탈로 재검색해서 들어왔을 때
-            getPOI(sttResultMsg, lat, lon)
-        }
+            if (byteAudioData != null) { //정상적으로 들어왔을 때
+                requestStt(byteAudioData)
+            } else if (byteAudioData == null) { //경로이탈로 재검색해서 들어왔을 때
+                getPOI(sttResultMsg, lat, lon)
+            }
         }, 1000)
     }
 
@@ -154,6 +158,7 @@ class DoRetrofitActivity : Activity(){
                         timer(period = 500,initialDelay = 500){
                             if(timercount!=4){
                                 getScore(lon,lat,destinationPoint[1],destinationPoint[0],startname,endname,safeList[timercount],timercount)
+
                                 timercount++
                                 getscorecount++
                             }
@@ -190,7 +195,7 @@ class DoRetrofitActivity : Activity(){
             startname = startname,
             endname = endname,
             searchOption = searchOption,
-            completion = { responseState, parseRouteDataArray, score ->
+            completion = { responseState, parseRouteDataArray, saftyScore ->
                 when (responseState) {
                     Constant.RESPONSE_STATE.OKAY -> {  //만약 STATE가 OKEY라면
 
@@ -238,17 +243,7 @@ class DoRetrofitActivity : Activity(){
                         if (tcount < 3 ){
                             routeBuilder.append("!")
                         }
-//
-//                        var routeString = routeBuilder.toString()
 
-//                        if (tcount == 0) {
-//                            publish("topic","4가지 경로입니다")
-//                            publish("route_start", routeString)
-//                            Log.d(LOG, "route_start : " + "${routeString}")
-//                        } else {
-//                            publish("route", routeString)
-//                            Log.d(LOG, "route : " + "${routeString}")
-//                        }
 
                         if (getscorecount == 4 && errorcount != 0) {  // 4번 돌았는데 403에러가 1개라도 있었다면
                             Log.d(LOG, "DoRetrofit - ROUTE API 403에러 - getScore")
@@ -257,18 +252,29 @@ class DoRetrofitActivity : Activity(){
                             errorcount = 0
                             getPOI(sttResultMsg, lat, lon)
                         } else {
-                            scoreList.add(score)
-                            Log.d(LOG, "scoreList : " + "${scoreList}")
-                            if (scoreList.size == 4) {
+                            scoreList.add(saftyScore)
+                            Log.d(SCORE_SAFEROUTE, "scoreList : " + "${saftyScore}")
+                            //경로 배열에 경로의 모든 정보 추가
+
+
+
+
+                            if (scoreList.size ==4)  {
+
                                 var routeString = routeBuilder.toString()
                                 publish("route",routeString)
 
-                                var min = scoreList[0]
+                                Log.d(SCORE_SAFEROUTE, "${saftyScore}" )
+                                //경로 배열내 4가지(전부임)경로 모두 프린트(정보)
+
+
+                                var max = scoreList[0]?.score!!
+
                                 var ind = 0
                                 for (i in 1..3) {
-                                    if (scoreList[i] < min) {
-                                        min = scoreList[i]
-                                        ind = i
+                                    if (scoreList[i]?.score!! > max) {
+                                        max = scoreList[i]?.score!!
+                                        ind=i
                                     }
                                 }
                                 var timercount = 0
@@ -311,6 +317,8 @@ class DoRetrofitActivity : Activity(){
         Log.d(LOG,"DoRetrofit - searchOption : "+"${searchOption}")
 //        publish("topic","안전한 길 알고리즘으로 선택된 길입니다")
 
+
+
         scoreList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
 
         getscorecount = 0
@@ -336,7 +344,7 @@ class DoRetrofitActivity : Activity(){
             startname = startname,
             endname = endname,
             searchOption = searchOption,
-            completion = { responseState, parseRouteDataArray, score ->
+            completion = { responseState, parseRouteDataArray, saftyScore ->
                 when (responseState) {
                     Constant.RESPONSE_STATE.OKAY -> {  //만약 STATE가 OKEY라면
                         if (parseRouteDataArray != null) {
@@ -372,31 +380,6 @@ class DoRetrofitActivity : Activity(){
                         rawRouteRes.add(arrayListOf(endx,endy))
 
 
-//                        //routeRes 보냄
-//
-//                        var routeResBuilder = StringBuilder()
-//
-//                        // x좌표 다 넣기
-//                        for (i in rawRouteRes.indices) {
-//                            routeResBuilder.append(rawRouteRes[i][1].toString())
-//                            if (i < rawRouteRes.size-1){
-//                                routeResBuilder.append(",")
-//                            }
-//                        }
-//
-//                        //y좌표 다 스트링으로 만듬
-//                        routeResBuilder.append("/")
-//                        for (i in rawRouteRes.indices) {
-//                            routeResBuilder.append(rawRouteRes[i][0].toString())
-//                            if (i < rawRouteRes.size-1){
-//                                routeResBuilder.append(",")
-//                            }
-//                        }
-//
-//                        var routeResString = routeResBuilder.toString()
-//
-//                        publish("route_res",routeResString)
-//                        Log.d(LOG,"routeRes : "+"${routeResString}")
 
                         //UI에 나오는 거리 계산을 위해 분기점 좌표만 얻는 중
                         for( i in turnTypeList.indices){
@@ -406,63 +389,32 @@ class DoRetrofitActivity : Activity(){
                         }
 
 
-                        var size=0
-
-                        //중간좌표를 얻음.
-                        for (i in rawRouteRes.indices) {
-                            if (i < rawRouteRes.size-1) {
-                                midpointList.add(listOf(rawRouteRes[i][1], rawRouteRes[i][0]))
-                                size = midpointList.size
-                                midpointList = DetailRoute.midPoint(
-                                    rawRouteRes[i][1],
-                                    rawRouteRes[i][0],
-                                    rawRouteRes[i + 1][1],
-                                    rawRouteRes[i + 1][0],
-                                    midpointList
-                                )
-                                for (j in size..midpointList.size - 1) {
-                                    turnTypeList.add(j, 0)
-                                }
-                            }
-
-                            else {
-                                midpointList.add(  //맨 마지막 값 넣기
-                                    listOf(
-                                        rawRouteRes[i][1],
-                                        rawRouteRes[i][0]
-                                    )
-                                )
-                            }
-                        }
-
-                        //midpointList 보냄
-
-                        var midpointBuilder = StringBuilder()
+                        var routeResBuilder = StringBuilder()
 
                         // x좌표 다 넣기
-                        for (i in midpointList.indices) {
-                            midpointBuilder.append(midpointList[i][0].toString())
-                            if (i < midpointList.size-1){
-                                midpointBuilder.append(",")
+                        for (i in rawRouteRes.indices) {
+                            routeResBuilder.append(rawRouteRes[i][1].toString())
+                            if (i < rawRouteRes.size-1){
+                                routeResBuilder.append(",")
                             }
                         }
 
                         //y좌표 다 스트링으로 만듬
-                        midpointBuilder.append("/")
-                        for (i in midpointList.indices) {
-                            midpointBuilder.append(midpointList[i][1].toString())
-                            if (i < midpointList.size-1){
-                                midpointBuilder.append(",")
+                        routeResBuilder.append("/")
+                        for (i in rawRouteRes.indices) {
+                            routeResBuilder.append(rawRouteRes[i][0].toString())
+                            if (i < rawRouteRes.size-1){
+                                routeResBuilder.append(",")
                             }
                         }
 
-                        var midpointString = midpointBuilder.toString()
+                        var routeResString = routeResBuilder.toString()
 
-                        publish("midpoint",midpointString)
-                        Log.d(LOG,"midpoint : "+"${midpointString}")
+                        publish("route_res",routeResString)
+                        Log.d(LOG,"routeRes : "+"${routeResString}")
 
 
-                        var naviData = NaviData(midpointList, turnTypeList, sttResultMsg, turnPoint)
+                        var naviData = NaviData(rawRouteRes, turnTypeList, sttResultMsg, turnPoint)
                         //받아서 retrunMain호출함수호출
                         retrunMain(naviData)
 
