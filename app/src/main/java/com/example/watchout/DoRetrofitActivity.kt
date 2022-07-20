@@ -18,6 +18,7 @@ import utils.Constant
 import utils.Constant.API.LOG
 import utils.Constant.API.SCORE_SAFEROUTE
 import kotlin.concurrent.timer
+import kotlin.math.floor
 
 
 class DoRetrofitActivity : Activity(){
@@ -252,17 +253,24 @@ class DoRetrofitActivity : Activity(){
                             errorcount = 0
                             getPOI(sttResultMsg, lat, lon)
                         } else {
+                            Log.d(SCORE_SAFEROUTE, "나누기전 스코어" + "${saftyScore?.score}")
+                            Log.d(SCORE_SAFEROUTE, "나누기전 토탈디스탄스" + "${saftyScore?.totalDistance}")
+                            saftyScore?.score = floor(saftyScore?.score!! / saftyScore.totalDistance!! *100)
+                            Log.d(SCORE_SAFEROUTE, "나누고 스코어" + "${saftyScore?.score}")
+                            Log.d(SCORE_SAFEROUTE, "나누고 토탈디스탄스" + "${saftyScore?.totalDistance}")
+
                             scoreList.add(saftyScore)
                             Log.d(SCORE_SAFEROUTE, "scoreList : " + "${saftyScore}")
-                            //경로 배열에 경로의 모든 정보 추가
+
+                            //경로 배열에 경로의 모든 정보 추가함수, 경로 하나 추가시 마다 호출
 
                             if (scoreList.size ==4)  {
 
                                 var routeString = routeBuilder.toString()
                                 publish("route",routeString)
 
-                                Log.d(SCORE_SAFEROUTE, "${saftyScore}" )
-                                //경로 배열내 4가지(전부임)경로 모두 프린트(정보)
+                                Log.d(SCORE_SAFEROUTE, "ㅁㅁㅁㅁㅁㅁ"+"${saftyScore}" )
+                                //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 다 추가 되면 한번 불림
 
                                 var max = scoreList[0]?.score!!
 

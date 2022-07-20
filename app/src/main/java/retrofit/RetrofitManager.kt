@@ -150,9 +150,12 @@ class RetrofitManager {
                                 }
                                 saftyScore.totalDistance = totalDistance
 
+
+                                //얘는 점수 하나 추가될 때마다 계속불리는 함수
                                 SafeRoute.calcPartialScore(facilityType,distance,roadType,turnType, saftyScore
                                 )
-                                Log.d(Constant.API.SCORE_SAFEROUTE, "FFFFFFFFFFFFFFF" + "${saftyScore}")
+                                //Log.d(Constant.API.SCORE_SAFEROUTE, "FFFFFFFFFFFFFFF" + "${saftyScore}")
+
 
 
 
