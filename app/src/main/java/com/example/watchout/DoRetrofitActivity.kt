@@ -255,7 +255,7 @@ class DoRetrofitActivity : Activity(){
                         } else {
                             Log.d(SCORE_SAFEROUTE, "나누기전 스코어" + "${saftyScore?.score}")
                             Log.d(SCORE_SAFEROUTE, "나누기전 토탈디스탄스" + "${saftyScore?.totalDistance}")
-                            saftyScore?.score = floor(saftyScore?.score!! / saftyScore.totalDistance!! *100)
+                            saftyScore?.score = floor((saftyScore?.score!! / saftyScore.totalDistance!!) *1000)
                             Log.d(SCORE_SAFEROUTE, "나누고 스코어" + "${saftyScore?.score}")
                             Log.d(SCORE_SAFEROUTE, "나누고 토탈디스탄스" + "${saftyScore?.totalDistance}")
 
