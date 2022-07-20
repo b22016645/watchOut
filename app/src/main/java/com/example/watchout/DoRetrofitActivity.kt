@@ -321,6 +321,17 @@ class DoRetrofitActivity : Activity(){
         Log.d(LOG,"DoRetrofit - searchOption : "+"${searchOption}")
 //        publish("topic","안전한 길 알고리즘으로 선택된 길입니다")
 
+        //Safey data 4개 pub
+        var scoreBuilder = StringBuilder()
+        for(i in 0..3) {
+            scoreBuilder.append(scoreList[i].toString())
+            if (i < 3) {
+                scoreBuilder.append(",")
+            }
+        }
+        var scoreStr = scoreBuilder.toString()
+        publish("",scoreStr)
+
         scoreList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
 
         getscorecount = 0
