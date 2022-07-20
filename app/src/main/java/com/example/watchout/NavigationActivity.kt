@@ -225,7 +225,12 @@ class NavigationActivity : Activity(), LocationListener {
                                 Log.d(LOG,"NavigationActivity 예외 길")
                             }
 
-                            var distanceRange:Double = 8.0      //오차범위
+                            //분기점 다음 좌표에서 직진임을 알려줌
+                            else if (sppoint == 1){
+                                ttsSpeak("다음 안내까지 "+"${distance}"+"m 직진입니다")
+                            }
+
+                            var distanceRange = 8.0      //오차범위
 
                             //경로이탈인지 아닌지 판단 (false 반환시 이탈)
                             if (!DetailRoute.isRightCource(lat,
@@ -321,7 +326,6 @@ class NavigationActivity : Activity(), LocationListener {
                 Log.d(LOG, "방향 조정 완료")
                 publish("vibe", "end")
                 publish("topic", "이동중입니다...")
-                ttsSpeak("다음 안내까지 직진입니다")
             }
             else if (resultCode == 2){
                 publish("vibe", "stop")
