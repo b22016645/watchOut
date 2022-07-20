@@ -53,6 +53,7 @@ object DetailRoute {
 
     //현재위치와 미드포인트를 받고, 오차 범위를 받아서
     //현재 위치가 미드포인트의 오차범위 밖에 있으면 경로이탈이라고 판단 -> False 반환.
+    //오차범위 안 -> true , 밖 -> false
     fun isRightCource(nowX: Double, nowY: Double, midPointX: Double, midPointY: Double,distanceRange:Double):Boolean{
         //현재위치x와 현재위치 y가 기준위치 x,y와 비교했을때 절댓값 기준으로 오차범위만큼 차이나면 경로이탈로 판단
         var howFarX:Double = abs(nowX - midPointX)
