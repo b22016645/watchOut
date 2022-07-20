@@ -32,8 +32,6 @@ class MainActivity : Activity() {
     private val REQUEST_PERMISSION_LOCATION = 10
 
     //mqtt관련
-    var server_uri = "tcp://15.165.174.55:1883"
-    //var server_uri = "tcp://172.20.10.6:1883"
     private lateinit var myMqtt: MyMqtt
     val sub_topic = "android"
 
@@ -82,7 +80,7 @@ class MainActivity : Activity() {
         y.setText(lat.toString())
 
         //mqtt관련
-        myMqtt = MyMqtt(this,server_uri)
+        myMqtt = MyMqtt(this)
         myMqtt.connect(arrayOf<String>(sub_topic))
 
         //진동관련

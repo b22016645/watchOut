@@ -23,8 +23,6 @@ import kotlin.concurrent.timer
 class DoRetrofitActivity : Activity(){
 
     //mqtt관련
-    var server_uri = "tcp://15.165.174.55:1883"
-    //var server_uri = "tcp://172.20.10.6:1883"
     private lateinit var myMqtt: MyMqtt
     val sub_topic = "android"
 
@@ -71,7 +69,7 @@ class DoRetrofitActivity : Activity(){
         Log.d(LOG,"DoRetrofit호출됨")
 
         //mqtt관련
-        myMqtt = MyMqtt(this,server_uri)
+        myMqtt = MyMqtt(this)
         myMqtt.connect(arrayOf<String>(sub_topic))
 
         val doRrtrofitData = intent.getSerializableExtra("doRrtrofitData") as model.DoRetrofitData

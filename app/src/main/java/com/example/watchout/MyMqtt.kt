@@ -8,7 +8,10 @@ import org.eclipse.paho.client.mqttv3.MqttClient.generateClientId
 
 
 //client의 첫번째 인자 context룰 위해 매개변수로 전달 받음
-class MyMqtt(val context: Context, val uri:String) {
+class MyMqtt(val context: Context, val uri:String = "tcp://15.165.174.55:1883") {
+    //"tcp://172.20.10.6:1883"
+    //"tcp://15.165.174.55:1883"
+
     /*broker에 접속하기 위한 메소드*/
 
     //1. client
@@ -16,10 +19,6 @@ class MyMqtt(val context: Context, val uri:String) {
     var mqttClient:MqttAndroidClient = MqttAndroidClient(context, uri ,generateClientId())
 
     //2.mqtt클라이언트가 connection을 해야한다
-    //connection 설정 메소드
-    //connection을 하는 이유: publish도하고 subscribe도 하기위해 (지금은 publish만 할거지만)
-    //subscribe도 하기 위해서는 topic대로 받는다(?)
-    // topic은 하나가 아니라 여러개일 수도 있기 때문에 array로 받음 , topic명은 String , null 허용
     fun connect(topics:Array<String>?=null){
         //연결에 관련된 여러가지 설정 정보를 담고 있는 Option객체 같이 넘겨줘야한다
         // => 위에서 만들어놓은 mqttclient의 connect메소드를 호출할 때 인자로 들어간다
