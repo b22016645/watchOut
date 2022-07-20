@@ -5,8 +5,6 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
-import android.location.Location
-import android.location.LocationListener
 import android.os.*
 import android.speech.tts.TextToSpeech
 import android.util.Log
@@ -43,8 +41,12 @@ class MainActivity : Activity() {
     private var lon: Double = 0.0
 //    private var lat: Double = 37.58217852030164
 //    private var lon: Double = 127.01152516595631
+
     //현재위치조정완료
     private var modified = 0
+
+    //즐겨찾기 등록
+    private var favor = false
 
     //진동관련
     lateinit var vibrator: Vibrator
@@ -85,7 +87,6 @@ class MainActivity : Activity() {
 
         //진동관련
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
-
 
         //통합 위치 정보 제공자 클라이언트의 인스턴스
         locationRequest = LocationRequest.create()
@@ -180,7 +181,6 @@ class MainActivity : Activity() {
         return super.onKeyDown(keyCode, event)
     }
 
-
     //다른 Activity로부터 결과값 받기
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
@@ -231,7 +231,8 @@ class MainActivity : Activity() {
             if (resultCode == 0 ) {//목적지 도착했을 때
 //                publish("topic","목적지에 도착하였습니다")
                 Log.d(LOG, "도착")
-                ttsSpeak("목적지에 도착했습니다. 어플을 종료합니다")
+                ttsSpeak("목적지에 도착했습니다. 목적지를 즐겨찾기에 등록하려면 아래버튼을 3초이상 눌러주세요.")
+                //favor = true
                 //finish()
             }
             else if (resultCode == 2) {//navi에서 뒤로가기 버튼을 눌렀을 때
