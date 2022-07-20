@@ -15,7 +15,7 @@ import android.view.WindowManager
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
-import model.SensorItem
+import model.DirectionItem
 import route.DetailRoute
 import utils.Constant.API.LOG
 import java.util.*
@@ -296,8 +296,8 @@ class NavigationActivity : Activity(), LocationListener {
     private fun doSensor(lat : Double, lon : Double) {
         //SensorActivity 실행
         publish("vibe","start")
-        var sensorItem = SensorItem(lat,lon,midpointList,midPointNum)
-        val intent = Intent(this, SensorActivity::class.java)
+        var sensorItem = DirectionItem(lat,lon,midpointList,midPointNum)
+        val intent = Intent(this, DirectionActivity::class.java)
         intent.putExtra("sensorItem",sensorItem)
         startActivityForResult(intent, 4)
     }

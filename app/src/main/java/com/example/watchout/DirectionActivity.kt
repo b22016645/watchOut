@@ -12,13 +12,12 @@ import android.os.Vibrator
 import android.util.Log
 import android.view.KeyEvent
 import android.view.WindowManager
-import android.widget.TextView
 import utils.Constant
 import utils.Constant.API.LOG
 import java.lang.IndexOutOfBoundsException
 import kotlin.math.abs
 
-class SensorActivity : Activity(), SensorEventListener {
+class DirectionActivity : Activity(), SensorEventListener {
 
     //onsencorChange가 너무 빠르고 많이 호출되기 때문에 진동을 적당히 주기가 어려움. 그래서 사용함.
     private var sensorCount = 1
@@ -68,7 +67,7 @@ class SensorActivity : Activity(), SensorEventListener {
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
 
         //Intent값 받기
-        val sensorItem = intent.getSerializableExtra("sensorItem") as model.SensorItem
+        val sensorItem = intent.getSerializableExtra("sensorItem") as model.DirectionItem
 
         lat = sensorItem.lat
         lon = sensorItem.lon
@@ -122,57 +121,57 @@ class SensorActivity : Activity(), SensorEventListener {
             var azimuthinDegress = ((Math.toDegrees( SensorManager.getOrientation( mR, mOrientation )[0].toDouble()) + 360).toInt() % 360).toFloat()
 
 //            Log.d(LOG,"azimuthinDegress : "+"$azimuthinDegress")
-                if (midpointList.size != 0) {  //NavigationActivity가 겹치는 문제를 해결
-                    //시계를 들었으면, 나침반 방향이 다음 좌표에 맞을때까지 진동
-                    if ((x in -1.8..1.8) && (y in -1.8..1.8) && (z in 9.0..9.8)) {
-                        var size = 0f
-                        var angle = 0f
-                        size = getAngle(
-                            lat,
-                            lon,
-                            midpointList[midPointNum + 1][0],
-                            midpointList[midPointNum + 1][1]
-                        ) - azimuthinDegress
-                        angle = getAngle(
-                            lat,
-                            lon,
-                            midpointList[midPointNum + 1][0],
-                            midpointList[midPointNum + 1][1]
-                        )
+            if (midpointList.size != 0) {  //NavigationActivity가 겹치는 문제를 해결
+                //시계를 들었으면, 나침반 방향이 다음 좌표에 맞을때까지 진동
+                if ((x in -1.8..1.8) && (y in -1.8..1.8) && (z in 9.0..9.8)) {
+                    var size = 0f
+                    var angle = 0f
+                    size = getAngle(
+                        lat,
+                        lon,
+                        midpointList[midPointNum + 1][0],
+                        midpointList[midPointNum + 1][1]
+                    ) - azimuthinDegress
+                    angle = getAngle(
+                        lat,
+                        lon,
+                        midpointList[midPointNum + 1][0],
+                        midpointList[midPointNum + 1][1]
+                    )
 //                        Log.d(LOG,"size : "+"${size}")
-                        //맞으면 센서 끔
-                        if (abs(size) < 2f) {
-                            vibe(1500,200)
-                            Log.d(LOG,"방향 맞음!")
-                            azimuthinDegress = 1000f
-                            sensorCount = 0
-                            closeSensor()
-                        }
-                        //아니면 맞을 때 까지 진동
-                        else {
-                            sensorCount++
-                            if (sensorCount % 100 == 0) {  //이러면 대략 1초에 한 번씩 판단함.
+                    //맞으면 센서 끔
+                    if (abs(size) < 2f) {
+                        vibe(1500,200)
+                        Log.d(LOG,"방향 맞음!")
+                        azimuthinDegress = 1000f
+                        sensorCount = 0
+                        closeSensor()
+                    }
+                    //아니면 맞을 때 까지 진동
+                    else {
+                        sensorCount++
+                        if (sensorCount % 100 == 0) {  //이러면 대략 1초에 한 번씩 판단함.
 
-                                if ((azimuthinDegress + 179.9f) > 360f) {
-                                    var over = (azimuthinDegress + 179.9f) % 360f
-                                    if ((angle in azimuthinDegress..360f) || (angle in 0f..over)) {
-                                        //오른쪽
-                                        turnRoad(2, size)
-                                    } else {
-                                        //왼쪽
-                                        turnRoad(1, size)
-                                    }
+                            if ((azimuthinDegress + 179.9f) > 360f) {
+                                var over = (azimuthinDegress + 179.9f) % 360f
+                                if ((angle in azimuthinDegress..360f) || (angle in 0f..over)) {
+                                    //오른쪽
+                                    turnRoad(2, size)
                                 } else {
-                                    var over = (azimuthinDegress + 179.9f) % 360f
-                                    if (angle in azimuthinDegress..over) {
-                                        //오른쪽
-                                        turnRoad(2, size)
-                                    } else {
-                                        //왼쪽
-                                        turnRoad(1, size)
-                                    }
+                                    //왼쪽
+                                    turnRoad(1, size)
+                                }
+                            } else {
+                                var over = (azimuthinDegress + 179.9f) % 360f
+                                if (angle in azimuthinDegress..over) {
+                                    //오른쪽
+                                    turnRoad(2, size)
+                                } else {
+                                    //왼쪽
+                                    turnRoad(1, size)
                                 }
                             }
+                        }
 
                     }
                 }

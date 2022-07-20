@@ -45,9 +45,6 @@ class MainActivity : Activity() {
     //현재위치조정완료
     private var modified = 0
 
-    //즐겨찾기 등록
-    private var favor = false
-
     //진동관련
     lateinit var vibrator: Vibrator
 
@@ -231,8 +228,7 @@ class MainActivity : Activity() {
             if (resultCode == 0 ) {//목적지 도착했을 때
 //                publish("topic","목적지에 도착하였습니다")
                 Log.d(LOG, "도착")
-                ttsSpeak("목적지에 도착했습니다. 목적지를 즐겨찾기에 등록하려면 아래버튼을 3초이상 눌러주세요.")
-                //favor = true
+                ttsSpeak("목적지에 도착했습니다. 목적지를 즐겨찾기에 등록하려면 아래버튼을 두번 이상 눌러주세요.")
                 //finish()
             }
             else if (resultCode == 2) {//navi에서 뒤로가기 버튼을 눌렀을 때

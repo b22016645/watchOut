@@ -49,7 +49,7 @@
         <activity android:name="com.example.watchout.NavigationActivity"/>
         <activity android:name="com.example.watchout.SpeechToTextActivity"/>
         <activity android:name="com.example.watchout.DoRetrofitActivity"/>
-        <activity android:name="com.example.watchout.SensorActivity"/>
+        <activity android:name="com.example.watchout.DirectionActivity"/>
 
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
