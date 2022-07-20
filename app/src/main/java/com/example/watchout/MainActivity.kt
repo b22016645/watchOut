@@ -135,19 +135,18 @@ class MainActivity : Activity() {
 
                     modified++
                     if(modified==3){
-//                  현재위치가 조정 완료되었다는 tts
-//                  실제로 조정이 완료되었다고는 할 수 없는데 그냥 알려는 줘야 할 것 같아서
-                    ttsSpeak("현재위치 조정이 완료되었습니다.")
-                    val effect = VibrationEffect.createOneShot(1500, 150)
-                    vibrator.vibrate(effect)
+                        //현재위치가 조정 완료되었다는 tts
+                        ttsSpeak("현재위치 조정이 완료되었습니다.")
+                        val effect = VibrationEffect.createOneShot(1500, 150)
+                        vibrator.vibrate(effect)
                     }
 
-                Log.d(LOG,"MainActivity - 현재위치 : ["+"${lat}"+", "+"${lon}"+"]")
+                    Log.d(LOG,"MainActivity - 현재위치 : ["+"${lat}"+", "+"${lon}"+"]")
 
-                var nowBuilder = StringBuilder()
-                nowBuilder.append(lat.toString()).append(",").append(lon.toString())
-                var now = nowBuilder.toString()
-                publish("now",now)
+                    var nowBuilder = StringBuilder()
+                    nowBuilder.append(lat.toString()).append(",").append(lon.toString())
+                    var now = nowBuilder.toString()
+                    publish("now",now)
                 }
             }
         }
@@ -193,7 +192,6 @@ class MainActivity : Activity() {
             if (resultCode == RESULT_OK) {
                 var byteAudioData: ByteArray? = null
                 byteAudioData = data?.getByteArrayExtra("byteAudioData")
-
 
                 if (byteAudioData != null) { //아무것도 입력하지 않아도 null값은 아니다.
                     publish("topic","목적지를 입력하였습니다")
