@@ -330,7 +330,7 @@ class DoRetrofitActivity : Activity(){
             }
         }
         var scoreStr = scoreBuilder.toString()
-        publish("",scoreStr)
+        publish("saftyScore",scoreStr)
 
         scoreList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
 

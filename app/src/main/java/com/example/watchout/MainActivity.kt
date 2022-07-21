@@ -375,7 +375,6 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        //if (requestingLocationUpdates)
         startLocationUpdates()
     }
 
