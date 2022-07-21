@@ -29,9 +29,6 @@ import java.util.*
 
 class MainActivity : Activity() {
 
-
-
-
     private lateinit var binding: ActivityMainBinding
     lateinit var x: TextView
     lateinit var y: TextView
@@ -87,9 +84,6 @@ class MainActivity : Activity() {
         firestore?.collection("history")?.document("여기다가는 분류값 입력")?.set(history)
         Log.d("파이어베이스 데이터 저장","${history}")
         */
-
-
-
 
         // TTS를 생성하고 OnInitListener로 초기화 한다.
         tts= TextToSpeech(this){
