@@ -2,6 +2,7 @@ package com.example.watchout
 
 import android.Manifest
 import android.app.Activity
+import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -24,6 +25,8 @@ import com.google.firebase.ktx.Firebase
 import model.DoRetrofitData
 import model.History
 import model.NaviData
+import model.Preference
+import route.SafeRoute
 import utils.Constant.API.LOG
 import java.util.*
 
@@ -45,6 +48,8 @@ class MainActivity : Activity() {
     var firestore : FirebaseFirestore? = null
     private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()     //FireBase RealTime
     private val databaseReference: DatabaseReference = firebaseDatabase.reference       //FireBase RealTime
+
+    private var uid : String? = null
 
     //mqtt관련
     private lateinit var myMqtt: MyMqtt
@@ -81,12 +86,31 @@ class MainActivity : Activity() {
                 }
         }
         //Firbase 저장 예시입니다
-        /*
-        var history = History()
-        history.arrivedTime = 11111111.1322
-        firestore?.collection("history")?.document("여기다가는 분류값 입력")?.set(history)
-        Log.d("파이어베이스 데이터 저장","${history}")
-        */
+
+        var preference = Preference()
+        //history.arrivedTime = 11111111.1322
+        firestore?.collection("Preference")?.document("AlgorithmWeight")?.set(preference)
+        Log.d("파이어베이스 데이터 저장","${preference}")
+
+/*
+
+        //데이터 가져오기예시
+        uid = FirebaseAuth.getInstance().currentUser?.uid
+        firestore = FirebaseFirestore.getInstance()
+        firestore!!.collection("Preference")
+            .get()
+            .addOnSuccessListener { result ->
+                for (document in result) {
+                    Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
+                    Log.d("특정 데이터 가져오는 예시","${document.data.get("score")}")
+                }
+
+            }
+            .addOnFailureListener { exception ->
+                Log.w(ContentValues.TAG, "Error getting documents.", exception)
+            }
+*/
+
 
 
 
