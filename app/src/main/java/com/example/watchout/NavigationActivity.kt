@@ -172,7 +172,7 @@ class NavigationActivity : Activity(), LocationListener {
                         //안내시작 일단 0->1을 안내
                         //나침반불러와서
                         if (midPointNum == 0 && sppoint == 0 ) {
-                            vibe(1000,150)
+                            vibe(1000,100)
                             sppoint ++
                             Log.d(LOG, "NavigationActivity 첫 방향 조정")
                             doSensor(lat,lon)
@@ -190,7 +190,7 @@ class NavigationActivity : Activity(), LocationListener {
                         else {
                             //분기점일때
                             if ((turnNum in 12..19) && sppoint == 0) {
-                                vibe(1000, 150)
+                                turnRoad()
                                 sppoint ++
                                 turnPointCount++
                                 publish("topic", "분기점을 마주했습니다")
@@ -200,8 +200,8 @@ class NavigationActivity : Activity(), LocationListener {
 
                             //위험요소 (횡단보도, 육교 등)
                             else if ((turnNum in 125..129 || turnNum in 211..217) && sppoint == 0) {
+                                watchOut()
                                 publish("topic", "위험요소 앞입니다")
-                                ttsSpeak("버튼을 눌러 목적지를 말하세요.")
                                 sppoint ++
                                 Log.d(LOG, "NavigationActivity 위험요소")
                                 val turnName = when (turnNum) {
@@ -321,8 +321,10 @@ class NavigationActivity : Activity(), LocationListener {
         //SensorActivity에서 받음
         if (requestCode == 4){
             if (resultCode == RESULT_OK) {
-                Log.d(LOG, "방향 조정 완료")
-                publish("vibe", "end")
+                var trueName = data.getStringExtra("trueName")
+                ttsSpeak("${trueName}"+" 입니다.")
+                Log.d(LOG, "${trueName}")
+                //publish("vibe", "end")
                 publish("topic", "이동중입니다...")
             }
             else if (resultCode == 2){
@@ -339,11 +341,6 @@ class NavigationActivity : Activity(), LocationListener {
         }
     }
 
-    //평소 비프음
-    fun goStraiht() {
-        vibe(1000,100)
-    }
-
     //위험요소앞일때
     fun watchOut() {
         vibe(2000, 100)
@@ -351,7 +348,15 @@ class NavigationActivity : Activity(), LocationListener {
 
     //경로이탈시
     fun youOut() {
-        vibe(2000, 100)
+        val timing = longArrayOf(0, 500, 0, 500, 0, 500, 0, 500)
+        val amplitudes = intArrayOf(0, 100, 0, 100, 0, 100, 0, 100)
+        val effect = VibrationEffect.createWaveform(timing,amplitudes,-1)
+        vibrator.vibrate(effect)
+    }
+
+    //분기점시
+    fun turnRoad() {
+        vibe(2000,100)
     }
 
     fun vibe( ms : Long , at : Int ){

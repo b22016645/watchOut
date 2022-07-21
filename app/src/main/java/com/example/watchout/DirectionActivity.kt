@@ -14,8 +14,7 @@ import android.view.KeyEvent
 import android.view.WindowManager
 import utils.Constant
 import utils.Constant.API.LOG
-import java.lang.IndexOutOfBoundsException
-import kotlin.math.abs
+import java.lang.Math.abs
 
 class DirectionActivity : Activity(), SensorEventListener {
 
@@ -55,6 +54,8 @@ class DirectionActivity : Activity(), SensorEventListener {
     private var lat: Double = 0.0
     private var lon: Double = 0.0
 
+    private var startDirection = 0f
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
@@ -67,27 +68,68 @@ class DirectionActivity : Activity(), SensorEventListener {
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
 
         //Intent값 받기
-        val sensorItem = intent.getSerializableExtra("sensorItem") as model.DirectionItem
+        val directionItem = intent.getSerializableExtra("sensorItem") as model.DirectionItem
 
-        lat = sensorItem.lat
-        lon = sensorItem.lon
-        midpointList = sensorItem.midPointList
-        midPointNum = sensorItem.midPointNum
+        lat = directionItem.lat
+        lon = directionItem.lon
+        midpointList = directionItem.midPointList
+        midPointNum = directionItem.midPointNum
 
         //나침반관련 변수 초기화
         mSensorManager = getSystemService(SENSOR_SERVICE) as SensorManager
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
-        onSensor()
+        direction()
     }
+    private fun direction() {
+        //출발할때
+        if (midPointNum == 0) {
+            onSensor()
+        }
+        //분기점마다
+        else {
+            startDirection = getAngle(
+                midpointList[midPointNum-1][0],
+                midpointList[midPointNum-1][1],
+                midpointList[midPointNum][0],
+                midpointList[midPointNum][1]
+            )
+        }
+        var endDirection = getAngle(
+            midpointList[midPointNum][0],
+            midpointList[midPointNum][1],
+            midpointList[midPointNum + 1][0],
+            midpointList[midPointNum + 1][1]
+        )
+        var trueDir = startDirection - endDirection
 
-    private fun closeSensor() {
-        offSensor()
+        if (abs(trueDir)>180f) {
+            if (trueDir<0f) {
+                trueDir += 360f
+            }
+            else {
+                trueDir -= 360f
+            }
+        }
+
+        var trueName = when(trueDir) {
+            in -30f .. 30f -> "직진"
+            in 30f .. 60f -> "2시 방향 우회전"
+            in 60f .. 120f -> "우회전"
+            in 120f .. 150f -> "4시 방향 우회전"
+            in -60f .. -30f -> "10시 방향 좌회전"
+            in -120f .. -60f -> "좌회전"
+            in -150f .. -120f -> "8시 방향 좌회전"
+            else -> "유턴"
+        }
+
         midpointList.clear()
         val returnIntent = Intent()
+        returnIntent.putExtra("trueName",trueName)
         setResult(RESULT_OK,returnIntent)
         finish()
+
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -117,74 +159,56 @@ class DirectionActivity : Activity(), SensorEventListener {
         }
         if (mLastAccelerometerSet && mLastMagnetometerSet) {
             SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer)
+
             //현재 나침반 방향
-            var azimuthinDegress = ((Math.toDegrees( SensorManager.getOrientation( mR, mOrientation )[0].toDouble()) + 360).toInt() % 360).toFloat()
+            var azimuthinDegress = 0.0f
 
 //            Log.d(LOG,"azimuthinDegress : "+"$azimuthinDegress")
             if (midpointList.size != 0) {  //NavigationActivity가 겹치는 문제를 해결
                 //시계를 들었으면, 나침반 방향이 다음 좌표에 맞을때까지 진동
                 if ((x in -1.8..1.8) && (y in -1.8..1.8) && (z in 9.0..9.8)) {
-                    var size = 0f
-                    var angle = 0f
-                    size = getAngle(
-                        lat,
-                        lon,
-                        midpointList[midPointNum + 1][0],
-                        midpointList[midPointNum + 1][1]
-                    ) - azimuthinDegress
-                    angle = getAngle(
-                        lat,
-                        lon,
-                        midpointList[midPointNum + 1][0],
-                        midpointList[midPointNum + 1][1]
-                    )
-//                        Log.d(LOG,"size : "+"${size}")
-                    //맞으면 센서 끔
-                    if (abs(size) < 2f) {
-                        vibe(1500,200)
-                        Log.d(LOG,"방향 맞음!")
-                        azimuthinDegress = 1000f
-                        sensorCount = 0
-                        closeSensor()
-                    }
-                    //아니면 맞을 때 까지 진동
-                    else {
-                        sensorCount++
-                        if (sensorCount % 100 == 0) {  //이러면 대략 1초에 한 번씩 판단함.
-
-                            if ((azimuthinDegress + 179.9f) > 360f) {
-                                var over = (azimuthinDegress + 179.9f) % 360f
-                                if ((angle in azimuthinDegress..360f) || (angle in 0f..over)) {
-                                    //오른쪽
-                                    turnRoad(2, size)
-                                } else {
-                                    //왼쪽
-                                    turnRoad(1, size)
-                                }
-                            } else {
-                                var over = (azimuthinDegress + 179.9f) % 360f
-                                if (angle in azimuthinDegress..over) {
-                                    //오른쪽
-                                    turnRoad(2, size)
-                                } else {
-                                    //왼쪽
-                                    turnRoad(1, size)
-                                }
-                            }
+                    if (sensorCount % 100 == 0) {  //이러면 대략 1초에 한 번씩 판단함.
+                        if (sensorCount < 7) {
+                            sensorCount++
+                            azimuthinDegress = ((Math.toDegrees(
+                                SensorManager.getOrientation(
+                                    mR,
+                                    mOrientation
+                                )[0].toDouble()
+                            ) + 360).toInt() % 360).toFloat()
+                            Log.d(
+                                LOG,
+                                "sensorCount=" + "${sensorCount}" + ", azimuthin=" + "${azimuthinDegress}"
+                            )
+                        } else {
+                            startDirection = azimuthinDegress
+                            offSensor()
                         }
-
                     }
                 }
-            }
-            try{
-                mCurrentDegree = -azimuthinDegress
-            } catch (e: IndexOutOfBoundsException) {
-                mCurrentDegree = -azimuthinDegress
+
+                try {
+                    mCurrentDegree = -azimuthinDegress
+                } catch (e: IndexOutOfBoundsException) {
+                    mCurrentDegree = -azimuthinDegress
+                }
             }
         }
     }
 
-    //나침반관련
+    //점1과 점2의 각도를 구함
+    private fun getAngle(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
+        var y1 = lat1 * Math.PI / 180
+        var y2 = lat2 * Math.PI / 180
+        var x1 = lon1 * Math.PI / 180
+        var x2 = lon2 * Math.PI / 180
+
+        var x = Math.sin(x2 - x1) * Math.cos(y2)
+        var y = Math.cos(y1) * Math.sin(y2) - Math.sin(y1) * Math.cos(y2) * Math.cos(x2 - x1)
+        var rad = Math.atan2(x, y)
+        var bearing: Float = ((rad * 180 / Math.PI + 360) % 360).toFloat()
+        return bearing
+    }
 
     //나침반센서 켬
     private fun onSensor() {
@@ -213,19 +237,6 @@ class DirectionActivity : Activity(), SensorEventListener {
         x = accelerationData[0]
         y = accelerationData[1]
         z = accelerationData[2]
-    }
-
-    private fun getAngle(lat1: Double, lon1: Double, lat2: Double, lon2: Double): Float {
-        var y1 = lat1 * Math.PI / 180
-        var y2 = lat2 * Math.PI / 180
-        var x1 = lon1 * Math.PI / 180
-        var x2 = lon2 * Math.PI / 180
-
-        var x = Math.sin(x2 - x1) * Math.cos(y2)
-        var y = Math.cos(y1) * Math.sin(y2) - Math.sin(y1) * Math.cos(y2) * Math.cos(x2 - x1)
-        var rad = Math.atan2(x, y)
-        var bearing: Float = ((rad * 180 / Math.PI + 360) % 360).toFloat()
-        return bearing
     }
 
     //분기점시
