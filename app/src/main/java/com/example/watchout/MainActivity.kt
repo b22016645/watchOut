@@ -14,12 +14,23 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import com.example.watchout.databinding.ActivityMainBinding
 import com.google.android.gms.location.*
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.ktx.Firebase
 import model.DoRetrofitData
+import model.History
 import model.NaviData
 import utils.Constant.API.LOG
 import java.util.*
 
 class MainActivity : Activity() {
+
+
+
 
     private lateinit var binding: ActivityMainBinding
     lateinit var x: TextView
@@ -28,6 +39,12 @@ class MainActivity : Activity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest:LocationRequest
     private val REQUEST_PERMISSION_LOCATION = 10
+
+    //FireBase관련
+    private var auth : FirebaseAuth? = null     //FireBase Auth
+    var firestore : FirebaseFirestore? = null
+    private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()     //FireBase RealTime
+    private val databaseReference: DatabaseReference = firebaseDatabase.reference       //FireBase RealTime
 
     //mqtt관련
     private lateinit var myMqtt: MyMqtt
@@ -51,6 +68,28 @@ class MainActivity : Activity() {
     //여기서부터 onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+        auth = Firebase.auth
+        firestore = FirebaseFirestore.getInstance()
+        auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this){ task->
+                if(task.isSuccessful){
+                    Log.d("파이어베이스로그인","로그인 성공"+"${auth}")
+                }
+                else{
+                    Log.d("파이어베이스로그인","로그인 실패"+"${auth}")
+                }
+        }
+        //Firbase 저장 예시입니다
+        /*
+        var history = History()
+        history.arrivedTime = 11111111.1322
+        firestore?.collection("history")?.document("여기다가는 분류값 입력")?.set(history)
+        Log.d("파이어베이스 데이터 저장","${history}")
+        */
+
+
+
 
         // TTS를 생성하고 OnInitListener로 초기화 한다.
         tts= TextToSpeech(this){
@@ -345,7 +384,6 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
-        //if (requestingLocationUpdates)
         startLocationUpdates()
     }
 

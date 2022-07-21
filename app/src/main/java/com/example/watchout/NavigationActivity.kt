@@ -5,6 +5,8 @@ import android.app.Activity
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.location.Address
+import android.location.Geocoder
 import android.location.Location
 import android.location.LocationListener
 import android.os.*
@@ -18,13 +20,15 @@ import com.google.android.gms.location.*
 import model.DirectionItem
 import route.DetailRoute
 import utils.Constant.API.LOG
+import java.io.IOException
 import java.util.*
 import kotlin.math.round
 
 class NavigationActivity : Activity(), LocationListener {
-
+    private var mContext: Context? = null
     lateinit var text: TextView
 
+    //GPS관련
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest:LocationRequest
     private val REQUEST_PERMISSION_LOCATION = 10
@@ -104,6 +108,7 @@ class NavigationActivity : Activity(), LocationListener {
         turnTypeList = naviData.turnTypeList
         destination = naviData.destination
         turnPoint = naviData.turnPoint
+        mContext = this
 
         Log.d(LOG,"NavigationActivity - turnTypeList : " +"${turnTypeList}")
 
@@ -182,6 +187,10 @@ class NavigationActivity : Activity(), LocationListener {
                             vibe(1500,100)
                             publish("topic","목적지에 도착하였습니다")
                             Log.d(LOG,"안내완료")
+
+                            //히스토리 저장용 (출발 위경도 -> 주소)
+                            val starAddress = getAddress(midpointList[0][0],midpointList[0][1])
+
                             clear()
                             val returnIntent = Intent()
                             setResult(0,returnIntent)
@@ -389,16 +398,6 @@ class NavigationActivity : Activity(), LocationListener {
         }
     }
 
-    override fun onPause() {
-        super.onPause()
-        stopLocationUpdates()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        //if (requestingLocationUpdates)
-            startLocationUpdates()
-    }
 
     //음성출력
     private fun ttsSpeak(strTTS:String){
@@ -408,5 +407,34 @@ class NavigationActivity : Activity(), LocationListener {
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
+
+    /*위도 경도 -> 주소*/
+    fun getAddress(lat: Double, lon: Double): String? {
+        var nowAddr = "없는 주소 입니다." //구글맵에 정보없는 위경도
+        val geocoder = Geocoder(mContext, Locale.KOREA)
+        val address: List<Address>?
+        try {
+            address = geocoder.getFromLocation(lat, lon, 1)
+            if (address != null && address.size > 0) {
+                nowAddr = address[0].getAddressLine(0).toString()
+            }
+        } catch (e: IOException) {
+            Log.d("로그","주소를 가져올 수 없습니다") //인터넷 에러 , 잘못된 위경도
+            e.printStackTrace()
+        }
+        return nowAddr
+    }
+
+    override fun onPause() {
+        super.onPause()
+        stopLocationUpdates()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        //if (requestingLocationUpdates)
+        startLocationUpdates()
+    }
+
 
 }
