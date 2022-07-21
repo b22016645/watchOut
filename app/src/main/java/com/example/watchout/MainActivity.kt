@@ -13,6 +13,7 @@ import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
+import androidx.core.content.ContextCompat
 import com.example.watchout.databinding.ActivityMainBinding
 import com.google.android.gms.location.*
 import com.google.firebase.auth.AuthResult
@@ -330,6 +331,21 @@ class MainActivity : Activity() {
                 0
             )
         }
+
+        if(ContextCompat.checkSelfPermission(
+                this,
+                Manifest.permission.ACTIVITY_RECOGNITION
+            ) != PackageManager.PERMISSION_GRANTED){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+                ActivityCompat.requestPermissions(
+                    this,
+                    arrayOf(Manifest.permission.ACTIVITY_RECOGNITION),
+                    100
+                )
+            }
+        }
+
+
 
         if (ActivityCompat.checkSelfPermission(
                 this,

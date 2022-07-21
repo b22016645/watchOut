@@ -27,7 +27,6 @@ import kotlin.math.round
 class NavigationActivity : Activity(), LocationListener {
     private var mContext: Context? = null
     lateinit var text: TextView
-
     //GPS관련
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest:LocationRequest
@@ -37,6 +36,8 @@ class NavigationActivity : Activity(), LocationListener {
     private lateinit var myMqtt: MyMqtt
     val sub_topic = "android"
 
+    //stepCounter
+    private lateinit var mySensor: MySensor
     //음성출력관련
     private lateinit var tts: TextToSpeech
 
@@ -100,6 +101,10 @@ class NavigationActivity : Activity(), LocationListener {
         //mqtt관련
         myMqtt = MyMqtt(this)
         myMqtt.connect(arrayOf<String>(sub_topic))
+
+        //stepcounter 시작
+        mySensor = MySensor(this)
+        mySensor.startSensor()
 
         //Intent값 받기
         val naviData = intent.getSerializableExtra("naviData") as model.NaviData
@@ -188,10 +193,16 @@ class NavigationActivity : Activity(), LocationListener {
                             publish("topic","목적지에 도착하였습니다")
                             Log.d(LOG,"안내완료")
 
+                            //히스토리 저장용 (발걸음 수)
+                            val historySteps = mySensor.getresSteps()
+
                             //히스토리 저장용 (출발 위경도 -> 주소)
-                            val starAddress = getAddress(midpointList[0][0],midpointList[0][1])
+                            val historyAddr = getAddress(midpointList[0][0],midpointList[0][1])
+
+
 
                             clear()
+                            mySensor.stopSensor()
                             val returnIntent = Intent()
                             setResult(0,returnIntent)
                             finish()
