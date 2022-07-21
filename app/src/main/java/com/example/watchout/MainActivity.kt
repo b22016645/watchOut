@@ -46,8 +46,11 @@ class MainActivity : Activity() {
     var firestore : FirebaseFirestore? = null
     private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()     //FireBase RealTime
     private val databaseReference: DatabaseReference = firebaseDatabase.reference       //FireBase RealTime
-
     private var uid : String? = null
+
+    //FireBase에서 알고리즘 가중치 불러오기
+    var pf = Preference()
+
 
     //mqtt관련
     private lateinit var myMqtt: MyMqtt
@@ -75,24 +78,25 @@ class MainActivity : Activity() {
 
         auth = Firebase.auth
         firestore = FirebaseFirestore.getInstance()
-        auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this){ task->
-                if(task.isSuccessful){
-                    Log.d("파이어베이스로그인","로그인 성공"+"${auth}")
-                }
-                else{
-                    Log.d("파이어베이스로그인","로그인 실패"+"${auth}")
-                }
+        auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                Log.d("파이어베이스로그인", "로그인 성공" + "${auth}")
+            } else {
+                Log.d("파이어베이스로그인", "로그인 실패" + "${auth}")
+            }
         }
-        //Firbase 저장 예시입니다
 
+   /*
+        //Firbase 저장 예시입니다
         var preference = Preference()
         //history.arrivedTime = 11111111.1322
         firestore?.collection("Preference")?.document("AlgorithmWeight")?.set(preference)
         Log.d("파이어베이스 데이터 저장","${preference}")
+*/
 
-/*
 
-        //데이터 가져오기예시
+
+       //FireBase에서 알고리즘 가중치를 불러와 pf에 저장. 처음 앱 실행하고 한번만 불러오고 도중에 바뀌지 않음
         uid = FirebaseAuth.getInstance().currentUser?.uid
         firestore = FirebaseFirestore.getInstance()
         firestore!!.collection("Preference")
@@ -101,13 +105,19 @@ class MainActivity : Activity() {
                 for (document in result) {
                     Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
                     Log.d("특정 데이터 가져오는 예시","${document.data.get("score")}")
+                    pf.awcrossWalk = "${document.data.get("awcrossWalk")}".toDouble()
+                    pf.awft_car= "${document.data.get("awft_car")}".toDouble()
+                    pf.awft_noCar= "${document.data.get("awft_noCar")}".toDouble()
+                    pf.awtableWeight= "${document.data.get("awtableWeight")}".toDouble()
+                    pf.awturnPoint= "${document.data.get("awturnPoint")}".toDouble()
+                    pf.score= "${document.data.get("score")}".toInt()
                 }
-
             }
             .addOnFailureListener { exception ->
                 Log.w(ContentValues.TAG, "Error getting documents.", exception)
             }
-*/
+
+
 
 
         // TTS를 생성하고 OnInitListener로 초기화 한다.
