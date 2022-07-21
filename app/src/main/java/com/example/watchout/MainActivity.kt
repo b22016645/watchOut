@@ -14,12 +14,21 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import com.example.watchout.databinding.ActivityMainBinding
 import com.google.android.gms.location.*
+import com.google.firebase.auth.AuthResult
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.auth.ktx.auth
+import com.google.firebase.database.DatabaseReference
+import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.ktx.Firebase
 import model.DoRetrofitData
 import model.NaviData
 import utils.Constant.API.LOG
 import java.util.*
 
 class MainActivity : Activity() {
+
+
+
 
     private lateinit var binding: ActivityMainBinding
     lateinit var x: TextView
@@ -28,6 +37,11 @@ class MainActivity : Activity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest:LocationRequest
     private val REQUEST_PERMISSION_LOCATION = 10
+
+    //FireBase관련
+    private var auth : FirebaseAuth? = null     //FireBase Auth
+    private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()     //FireBase RealTime
+    private val databaseReference: DatabaseReference = firebaseDatabase.reference       //FireBase RealTime
 
     //mqtt관련
     private lateinit var myMqtt: MyMqtt
@@ -51,6 +65,22 @@ class MainActivity : Activity() {
     //여기서부터 onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+        Log.d("파이어베이스로그인","로그인 시도"+"${auth}")
+        auth = Firebase.auth
+        Log.d("파이어베이스로그인","로그인 시도2"+"${auth}")
+        auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this){ task->
+                if(task.isSuccessful){
+                    Log.d("파이어베이스로그인","로그인 성공"+"${auth}")
+
+                }
+                else{
+                    Log.d("파이어베이스로그인","로그인 실패"+"${auth}")
+                }
+            }
+        Log.d("파이어베이스로그인","로그인 시도결과"+"${auth}")
+
+
 
         // TTS를 생성하고 OnInitListener로 초기화 한다.
         tts= TextToSpeech(this){
