@@ -22,6 +22,7 @@ import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import model.DoRetrofitData
+import model.History
 import model.NaviData
 import utils.Constant.API.LOG
 import java.util.*
@@ -79,6 +80,13 @@ class MainActivity : Activity() {
                     Log.d("파이어베이스로그인","로그인 실패"+"${auth}")
                 }
         }
+        //Firbase 저장 예시입니다
+        /*
+        var history = History()
+        history.arrivedTime = 11111111.1322
+        firestore?.collection("history")?.document("여기다가는 분류값 입력")?.set(history)
+        Log.d("파이어베이스 데이터 저장","${history}")
+        */
 
 
 
