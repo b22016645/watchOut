@@ -21,6 +21,8 @@ class DirectionActivity : Activity(), SensorEventListener {
     //onsencorChange가 너무 빠르고 많이 호출되기 때문에 진동을 적당히 주기가 어려움. 그래서 사용함.
     private var sensorCount = 1
 
+    private var ccccount = 0
+
     //세분화된 좌표를 저장할 배열
     private var midpointList = arrayListOf<List<Double>>()
 
@@ -80,55 +82,61 @@ class DirectionActivity : Activity(), SensorEventListener {
         mAccelerometer = mSensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER)
         mMagnetometer = mSensorManager.getDefaultSensor(Sensor.TYPE_MAGNETIC_FIELD)
 
-        direction()
-    }
-    private fun direction() {
-        //출발할때
-        if (midPointNum == 0) {
+        if (midPointNum == 0){
+            Log.d(LOG,"direction - midpoint 0일때")
             onSensor()
         }
-        //분기점마다
         else {
+            Log.d(LOG,"direction - midpoint 분기점일때")
             startDirection = getAngle(
                 midpointList[midPointNum-1][0],
                 midpointList[midPointNum-1][1],
                 midpointList[midPointNum][0],
                 midpointList[midPointNum][1]
             )
+            direction()
         }
-        var endDirection = getAngle(
-            midpointList[midPointNum][0],
-            midpointList[midPointNum][1],
-            midpointList[midPointNum + 1][0],
-            midpointList[midPointNum + 1][1]
-        )
-        var trueDir = startDirection - endDirection
+    }
+    private fun direction() {
 
-        if (abs(trueDir)>180f) {
-            if (trueDir<0f) {
-                trueDir += 360f
+        if (startDirection != 0f) {
+
+            var endDirection = getAngle(
+                midpointList[midPointNum][0],
+                midpointList[midPointNum][1],
+                midpointList[midPointNum + 1][0],
+                midpointList[midPointNum + 1][1]
+            )
+            var trueDir = startDirection - endDirection
+
+            if (abs(trueDir)>180f) {
+                if (trueDir<0f) {
+                    trueDir += 360f
+                }
+                else {
+                    trueDir -= 360f
+                }
             }
-            else {
-                trueDir -= 360f
+
+            Log.d(LOG,"trueDir="+"${trueDir}")
+
+            var trueName = when(trueDir) {
+                in -30f .. 30f -> "직진"
+                in 30f .. 60f -> "2시 방향 우회전"
+                in 60f .. 120f -> "우회전"
+                in 120f .. 150f -> "4시 방향 우회전"
+                in -60f .. -30f -> "10시 방향 좌회전"
+                in -120f .. -60f -> "좌회전"
+                in -150f .. -120f -> "8시 방향 좌회전"
+                else -> "유턴"
             }
-        }
 
-        var trueName = when(trueDir) {
-            in -30f .. 30f -> "직진"
-            in 30f .. 60f -> "2시 방향 우회전"
-            in 60f .. 120f -> "우회전"
-            in 120f .. 150f -> "4시 방향 우회전"
-            in -60f .. -30f -> "10시 방향 좌회전"
-            in -120f .. -60f -> "좌회전"
-            in -150f .. -120f -> "8시 방향 좌회전"
-            else -> "유턴"
+            midpointList.clear()
+            val returnIntent = Intent()
+            returnIntent.putExtra("trueName",trueName)
+            setResult(RESULT_OK,returnIntent)
+            finish()
         }
-
-        midpointList.clear()
-        val returnIntent = Intent()
-        returnIntent.putExtra("trueName",trueName)
-        setResult(RESULT_OK,returnIntent)
-        finish()
 
     }
 
@@ -161,26 +169,18 @@ class DirectionActivity : Activity(), SensorEventListener {
             SensorManager.getRotationMatrix(mR, null, mLastAccelerometer, mLastMagnetometer)
 
             //현재 나침반 방향
-            var azimuthinDegress = 0.0f
+            var azimuthinDegress = ((Math.toDegrees(SensorManager.getOrientation(mR, mOrientation)[0].toDouble()) + 360).toInt() % 360).toFloat()
 
-//            Log.d(LOG,"azimuthinDegress : "+"$azimuthinDegress")
             if (midpointList.size != 0) {  //NavigationActivity가 겹치는 문제를 해결
-                //시계를 들었으면, 나침반 방향이 다음 좌표에 맞을때까지 진동
+                //시계를 들었으면 현재 바라보는 방향 인식
                 if ((x in -1.8..1.8) && (y in -1.8..1.8) && (z in 9.0..9.8)) {
+                    sensorCount++
                     if (sensorCount % 100 == 0) {  //이러면 대략 1초에 한 번씩 판단함.
-                        if (sensorCount < 7) {
-                            sensorCount++
-                            azimuthinDegress = ((Math.toDegrees(
-                                SensorManager.getOrientation(
-                                    mR,
-                                    mOrientation
-                                )[0].toDouble()
-                            ) + 360).toInt() % 360).toFloat()
-                            Log.d(
-                                LOG,
-                                "sensorCount=" + "${sensorCount}" + ", azimuthin=" + "${azimuthinDegress}"
-                            )
-                        } else {
+                        ccccount++
+                        Log.d(LOG, "ccccount=" + "${ccccount}" + ", azimuthin=" + "${azimuthinDegress}")
+                        val effect = VibrationEffect.createOneShot(500,100)
+                        vibrator.vibrate(effect)
+                        if (ccccount == 5) {
                             startDirection = azimuthinDegress
                             offSensor()
                         }
@@ -220,6 +220,7 @@ class DirectionActivity : Activity(), SensorEventListener {
     //나침반센서 끔
     private fun offSensor() {
         Log.d(Constant.API.LOG,"NavigationActivity 나침반센서 꺼짐 OFF")
+        direction()
         mSensorManager.unregisterListener(this, mAccelerometer)
         mSensorManager.unregisterListener(this, mMagnetometer)
     }
