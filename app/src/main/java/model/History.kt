@@ -20,6 +20,7 @@ data class History ( //히스토리 데이터 클래스 (파이어베이스 저�
     //Biometric Infor 생체성보
     var heartRateAverage : Int? = null,  //평균 심박
     var heartRateMax : Int? = null,      //최대 심박
+    var stepNum : Int? = null,           //발걸음 수
     var kcal : Double? = null,           //소요 칼로리
 
     //RouteInfor 루트 정보 (exp = existPoint: 경로 이탈 부분)
