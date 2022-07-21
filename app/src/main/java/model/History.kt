@@ -12,7 +12,7 @@ data class History ( //히스토리 데이터 클래스 (파이어베이스 저�
     var dpLat : Double? = null,      //도착지 위도 (x)
     var dpLon : Double? = null,      //도착지 경도 (y)
 
-    //TimeInfor 시간정보
+    //TimeInfor 시간정보   YYYYMMDD.HHTT 형식 ( ex) 2022-07-21 15:45 = 20220721.1545)
     var departureTime : Double? = null,  //출발시간
     var arrivedTime : Double ? = null,   //도착시간
     var expectedTime : Double ? = null,  //예상 소요 시간
