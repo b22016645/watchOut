@@ -101,9 +101,10 @@ class DoRetrofitActivity : Activity(){
 
     //mqtt관련
     fun publish(topic:String,data:String){
-        Handler().postDelayed(java.lang.Runnable {
-            myMqtt.publish(topic, data)
-        },1000)
+//        Handler().postDelayed(java.lang.Runnable {
+//            myMqtt.publish(topic, data)
+//        },1000)
+        myMqtt.publish(topic, data)
     }
 
     private fun requestStt(byteAudioData : ByteArray){
