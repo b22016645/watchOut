@@ -11,11 +11,10 @@ import utils.Constant.API.SAFEROUTE
 
 //roadtype+facilityType이랑 turntype중 하나만 옴
 object SafeRoute {
-
     var tw = Preference.tableWeight
     var pf = Preference
 
-    //infix fun Int.fdiv(i: Int): Double = this / i.toDouble();
+
     fun calcPartialScore(
         facilityType: Int?,
         distance: Int?=0,
