@@ -48,9 +48,6 @@ class MainActivity : Activity() {
     private val databaseReference: DatabaseReference = firebaseDatabase.reference       //FireBase RealTime
     private var uid : String? = null
 
-    //FireBase에서 알고리즘 가중치 불러오기
-    var pf = Preference()
-
 
     //mqtt관련
     private lateinit var myMqtt: MyMqtt
@@ -95,8 +92,11 @@ class MainActivity : Activity() {
 */
 
 
-
-       //FireBase에서 알고리즘 가중치를 불러와 pf에 저장. 처음 앱 실행하고 한번만 불러오고 도중에 바뀌지 않음
+        //FireBase에서 알고리즘 가중치를 불러와 pf에 저장.
+        // 처음 앱 실행하고 한번만 불러오고 도중에 바꿀 필요 없기 때문에 싱글톤 객체 Prefrence사용
+        // 파이어베이스에서 데이터를 가져오는데 시간이 걸리기 때문에 바로 Preference가 업데이트 되지는 않지만
+        // SafeRoute 실행 전까지는 충분히 데이터를 가져올 수 있기 때문에 미리 앱 시작하자마자 받아오려고 onCreate에 작성
+        // 수정사항>> 데이터를 하나하나씩 가져오지 말고 스냅샷으로 찍어서 한번에 가져올 수 있는 방법 찾기
         uid = FirebaseAuth.getInstance().currentUser?.uid
         firestore = FirebaseFirestore.getInstance()
         firestore!!.collection("Preference")
@@ -105,18 +105,17 @@ class MainActivity : Activity() {
                 for (document in result) {
                     Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
                     Log.d("특정 데이터 가져오는 예시","${document.data.get("score")}")
-                    pf.awcrossWalk = "${document.data.get("awcrossWalk")}".toDouble()
-                    pf.awft_car= "${document.data.get("awft_car")}".toDouble()
-                    pf.awft_noCar= "${document.data.get("awft_noCar")}".toDouble()
-                    pf.awtableWeight= "${document.data.get("awtableWeight")}".toDouble()
-                    pf.awturnPoint= "${document.data.get("awturnPoint")}".toDouble()
-                    pf.score= "${document.data.get("score")}".toInt()
+                    Preference.awcrossWalk = "${document.data.get("awcrossWalk")}".toDouble()
+                    Preference.awft_car= "${document.data.get("awft_car")}".toDouble()
+                    Preference.awft_noCar= "${document.data.get("awft_noCar")}".toDouble()
+                    Preference.awtableWeight= "${document.data.get("awtableWeight")}".toDouble()
+                    Preference.awturnPoint= "${document.data.get("awturnPoint")}".toDouble()
+                    Preference.score= "${document.data.get("score")}".toInt()
                 }
             }
             .addOnFailureListener { exception ->
                 Log.w(ContentValues.TAG, "Error getting documents.", exception)
             }
-
 
 
 
@@ -133,6 +132,7 @@ class MainActivity : Activity() {
                 Log.d("로그","TTS 세텅 실패")
             }
         }
+
 
         //화면이 꺼지지 않게
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)

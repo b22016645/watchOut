@@ -1,6 +1,8 @@
 package route
 
 import android.util.Log
+import com.example.watchout.MainActivity
+import model.Preference
 import model.SaftyScore
 import utils.Constant
 import utils.Constant.API.LOG
@@ -9,6 +11,13 @@ import utils.Constant.API.SAFEROUTE
 
 //roadtype+facilityType이랑 turntype중 하나만 옴
 object SafeRoute {
+
+    var pre = Preference
+
+
+
+
+
     //infix fun Int.fdiv(i: Int): Double = this / i.toDouble();
     fun calcPartialScore(
         facilityType: Int?,
@@ -17,6 +26,12 @@ object SafeRoute {
         turnType: Int?,
         saftyScore: SaftyScore
     ){
+        //여기서는 미리 업데이트 해놓은 값의 preference 쓸 수 있음
+        Log.d("sdssssssssssssssPREcalcPartialScore","${pre.score}")
+        Log.d("sdssssssssssssssPREFEREcalcPartialScore","${pre.score}")
+        //이따 집에 가서 알고리즘 가중치 DB에서 받아온 값으로 업데이트 할 것
+
+
 
         var minusWeight: Double = 0.4
         var dist = distance?: 0
