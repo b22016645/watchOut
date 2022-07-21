@@ -239,40 +239,10 @@ class DirectionActivity : Activity(), SensorEventListener {
         z = accelerationData[2]
     }
 
-    //분기점시
-    fun turnRoad(num : Int, size : Float) {
-
-        val com = size.toInt()
-        var at = 0
-
-        //분기점안내 (when)
-        when (com) {
-            in 120..150 -> at = 230
-            in 90..120 -> at = 200
-            in 60..90 -> at = 170
-            in 30..60 -> at = 130
-            in 1..30 -> at = 100
-            in 0..1 -> at = 0
-            else -> at = 255
-        }
-        //왼쪽
-        if (num == 1) {
-            vibe(500,at)
-        }
-        //오른쪽
-        else if (num == 2) {
-            val timing = longArrayOf(0,500,0,500)
-            val amplitudes = intArrayOf(0, at, 0, at)
-            val effect = VibrationEffect.createWaveform(timing,amplitudes,-1)
-            vibrator.vibrate(effect)
-        }
-    }
-
-    fun vibe( ms : Long , at : Int ){
-        val effect = VibrationEffect.createOneShot(ms, at)
-        vibrator.vibrate(effect)
-    }
-
+//    fun vibe( ms : Long , at : Int ){
+//        val effect = VibrationEffect.createOneShot(ms, at)
+//        vibrator.vibrate(effect)
+//    }
 
     override fun onAccuracyChanged(p0: Sensor?, p1: Int) {}
 

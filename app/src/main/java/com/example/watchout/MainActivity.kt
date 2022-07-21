@@ -32,9 +32,6 @@ import java.util.*
 
 class MainActivity : Activity() {
 
-
-
-
     private lateinit var binding: ActivityMainBinding
     lateinit var x: TextView
     lateinit var y: TextView
@@ -110,9 +107,6 @@ class MainActivity : Activity() {
                 Log.w(ContentValues.TAG, "Error getting documents.", exception)
             }
 */
-
-
-
 
 
         // TTS를 생성하고 OnInitListener로 초기화 한다.
