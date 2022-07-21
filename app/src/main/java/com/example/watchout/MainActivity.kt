@@ -108,7 +108,7 @@ class MainActivity : Activity() {
                     Preference.awcrossWalk = "${document.data.get("awcrossWalk")}".toDouble()
                     Preference.awft_car= "${document.data.get("awft_car")}".toDouble()
                     Preference.awft_noCar= "${document.data.get("awft_noCar")}".toDouble()
-                    Preference.awtableWeight= "${document.data.get("awtableWeight")}".toDouble()
+                    Preference.tableWeight= "${document.data.get("tableWeight")}".toDouble()
                     Preference.awturnPoint= "${document.data.get("awturnPoint")}".toDouble()
                     Preference.score= "${document.data.get("score")}".toInt()
                 }

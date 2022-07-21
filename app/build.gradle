@@ -57,6 +57,7 @@ dependencies {
     implementation 'com.google.firebase:firebase-auth:19.2.0'
     implementation 'com.google.firebase:firebase-firestore:24.2.1'
     implementation 'com.google.firebase:firebase-database-ktx:20.0.0'
+    implementation 'com.google.firebase:firebase-firestore-ktx:24.2.1'
 
 
     // Add the dependencies for any other desired Firebase products

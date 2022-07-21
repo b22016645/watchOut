@@ -12,65 +12,36 @@ import utils.Constant.API.SAFEROUTE
 //roadtype+facilityType이랑 turntype중 하나만 옴
 object SafeRoute {
 
-    var pre = Preference
-
-
-
-
+    var tw = Preference.tableWeight
+    var pf = Preference
 
     //infix fun Int.fdiv(i: Int): Double = this / i.toDouble();
     fun calcPartialScore(
         facilityType: Int?,
-        distance: Int?,
+        distance: Int?=0,
         roadType: Int?,
         turnType: Int?,
         saftyScore: SaftyScore
     ){
         //여기서는 미리 업데이트 해놓은 값의 preference 쓸 수 있음
-        Log.d("sdssssssssssssssPREcalcPartialScore","${pre.score}")
-        Log.d("sdssssssssssssssPREFEREcalcPartialScore","${pre.score}")
-        //이따 집에 가서 알고리즘 가중치 DB에서 받아온 값으로 업데이트 할 것
-
-
-
-        var minusWeight: Double = 0.4
-        var dist = distance?: 0
-
-
-        // case: Point
-
         if (turnType != null) {
             //회전정보
             when (turnType) {
-                in 1..7, 11 -> {
-                    minusWeight *= 0
-                //    Log.d(SAFEROUTE, "+10/TT/안내없음또는 직진" );
-                //   Log.d(SAFEROUTE, "추가점수"+"${score}" );
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
+                in 1..7, 11 -> {        //안내없음 또는 직진
+                  //  saftyScore.score = saftyScore.score?.plus(0)
                 }
 
-                //안내없음, 직진
-                in 12..19 -> {
-                    minusWeight *= -20
+                in 12..19 -> {      //분기점
                     saftyScore.turnPoint = saftyScore.turnPoint?.plus(1)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
-                //    Log.d(SAFEROUTE, "-10/TT/분기점" );
-                //   Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                    saftyScore.score = saftyScore.score?.plus(tw!! * pf.awturnPoint!!)
                 }
-                218 -> {
-                    minusWeight *= 20
+                218 -> {            //엘리베이터. 고정가중치(-20)
                     saftyScore.elevator = saftyScore.elevator?.plus(1)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
-                //    Log.d(SAFEROUTE, "-10/TT/엘리베이터" );
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                    saftyScore.score = saftyScore.score?.plus(-20*tw!!)
                 }
-
-                //분기점, 엘리베이터
                 in 125..129 -> {
                     //육교, 지하보도, 계단진입, 경사로진입, +
                     //facility에서 계산
-                //    Log.d(SAFEROUTE, "0/TT/facility관련" );
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
                 }
                 /* 125->{
                      //육교
@@ -105,75 +76,52 @@ object SafeRoute {
         }
 
         if (facilityType != null) {
-
             //구간 시설물 정보
             when (facilityType) {
 
-                1->{
-                    minusWeight *= -60
-                //    Log.d(SAFEROUTE, "-30/FT/교량");
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                //차와 함께가는 시설물
+                1->{    //교량
                     saftyScore.bridge = saftyScore.bridge?.plus(1)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
+                    saftyScore.score = saftyScore.score?.plus(tw!! * pf.awft_car!!)
                 }
-                2->{
-                    minusWeight *= -60
-                //    Log.d(SAFEROUTE, "-30/FT/터널");
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                2->{        //터널
                     saftyScore.turnnels = saftyScore.turnnels?.plus(1)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
+                    saftyScore.score = saftyScore.score?.plus(tw!! * pf.awft_car!!)
                 }
-                3->{
-                    minusWeight *= -60
-                //    Log.d(SAFEROUTE, "-30/FT/고가도로");
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                3->{        //고가도로
                     saftyScore.highroad = saftyScore.highroad?.plus(1)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
+                    saftyScore.score = saftyScore.score?.plus(tw!! * pf.awft_car!!)
                 }
 
 
-
-                12->{
-                    minusWeight *= -30
-                //    Log.d(SAFEROUTE, "-20/FT/육교");
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                //차와 분리된 시설물
+                12->{           //육교
                     saftyScore.overPasses = saftyScore.overPasses?.plus(1)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
+                    saftyScore.score = saftyScore.score?.plus(tw!! * pf.awft_noCar!!)
                 }
-                14 ->{
-                    minusWeight *= -30
-                 //   Log.d(SAFEROUTE, "-20/FT/지하보도");
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                14 ->{          //지하보도
                     saftyScore.underPasses = saftyScore.underPasses?.plus(1)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
+                    saftyScore.score = saftyScore.score?.plus(tw!! * pf.awft_noCar!!)
+
                 }
-                17->{
-                    minusWeight *= -30
-                //    Log.d(SAFEROUTE, "-20/FT/계단");
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                17->{           //계단
                     saftyScore.stairs = saftyScore.stairs?.plus(1)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
+                    saftyScore.score = saftyScore.score?.plus(tw!! * pf.awft_noCar!!)
                 }
 
 
-                16 -> {
-                    minusWeight *= -80
-                //    Log.d(SAFEROUTE, "-100/FT/대형시설물이동통로");
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                //완전위험
+                16 -> {     //대형시설물이동통로: 고정값
                     saftyScore.largeFacilitypassage = saftyScore.largeFacilitypassage?.plus(1)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
+                    saftyScore.score = saftyScore.score?.plus(tw!! *-80)
+
                 }
 
-                15 ->{
-                    minusWeight *= (dist * 10)
-
-                //    Log.d(SAFEROUTE, "횡단보도 * " + "${dist}");
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
-                    saftyScore.crossWalkLength = saftyScore.crossWalkLength?.plus(dist)
+                15 ->{      //횡단보도 : 거리비례
+                    saftyScore.crossWalkLength = saftyScore.crossWalkLength?.plus(distance!!)
                     saftyScore.crossWalkCount = saftyScore.crossWalkCount?.plus(1)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
+                    saftyScore.score = saftyScore.score?.plus(tw!! * distance!! * pf.awcrossWalk!!)
                 }
-                //distance: 구간거리 (단위:m)
             }
         }
 
@@ -181,39 +129,26 @@ object SafeRoute {
         if (roadType != null) {
             //도로타입정보
             when (roadType) {
-                21 -> {
-                    minusWeight += (dist * .2)
-                //    Log.d(SAFEROUTE, "2/RT/21번도로 *  "+ "${dist}")
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
-                    saftyScore.roadTypeLength1 = saftyScore.roadTypeLength1?.plus(dist)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
-                }
-                //차도와 인도가 분리, 정해진 횡단구역으로만 횡단 가능
-                22 -> {
-                    minusWeight += (dist * .1)
-                //    Log.d(SAFEROUTE, "1/RT/22번도로 *  " + "${dist}")
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
-                    saftyScore.roadTypeLength2 = saftyScore.roadTypeLength2?.plus(dist)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
-                }
-                //차도 인도 분리 X || 보행자 횡단에 제약 X 보행자도로
-                23 -> {
-                    minusWeight += (dist * .4)
-                  //  Log.d(SAFEROUTE, "0.5/RT/23번도로 *  " + "${dist}")
-                  //  Log.d(SAFEROUTE, "추가점수"+"${score}" );
-                    saftyScore.roadTypeLength3 = saftyScore.roadTypeLength3?.plus(dist)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
+                21 -> {//차도와 인도가 분리, 정해진 횡단구역으로만 횡단 가능
+                    saftyScore.roadTypeLength1 = saftyScore.roadTypeLength1?.plus(distance!!)
+                    saftyScore.score = saftyScore.score?.plus(distance!!*.3)
                 }
 
-                //차량 통행 불가 보행자 도로
-                24 -> {
-                    minusWeight -= (dist * .1)
-                //    Log.d(SAFEROUTE, "0.5/RT/24번도로 *  " + "${dist}")
-                //    Log.d(SAFEROUTE, "추가점수"+"${score}" );
-                    saftyScore.roadTypeLength4 = saftyScore.roadTypeLength4?.plus(dist)
-                    saftyScore.score = saftyScore.score?.plus(minusWeight)
+                22 -> {//차도 인도 분리 X || 보행자 횡단에 제약 X 보행자도로
+                    saftyScore.roadTypeLength2 = saftyScore.roadTypeLength2?.plus(distance!!)
+                    saftyScore.score = saftyScore.score?.plus(distance!!*.1)
                 }
-                //쾌적 X 도로
+
+                23 -> {//차량 통행 불가 보행자 도로
+                    saftyScore.roadTypeLength2 = saftyScore.roadTypeLength2?.plus(distance!!)
+                    saftyScore.score = saftyScore.score?.plus(distance!!*.5)
+                }
+
+                24 -> {//쾌적 X 도로
+                    saftyScore.roadTypeLength2 = saftyScore.roadTypeLength2?.plus(distance!!)
+                    saftyScore.score = saftyScore.score?.plus(distance!!*.1)
+                }
+
                 else -> {
 
                 }

@@ -9,5 +9,5 @@ object Preference {   //도착지 도착 후 선호도 평가 데이터 베이�
     var awft_car: Double? = null       //FT_Car 가중치 : 교량, 터널, 고가도로
     var awft_noCar: Double? = null       //FT_noCar 가중치 : 육교, 지하보도, 계단
 
-    var awtableWeight: Double? = null      //알고리즘 마이너스 점수 테이블 전체의 가중치
+    var tableWeight: Double? = null      //알고리즘 마이너스 점수 테이블 전체의 가중치
 }
