@@ -19,6 +19,7 @@ import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
 import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import model.DoRetrofitData
 import model.NaviData
@@ -40,6 +41,7 @@ class MainActivity : Activity() {
 
     //FireBase관련
     private var auth : FirebaseAuth? = null     //FireBase Auth
+    var firestore : FirebaseFirestore? = null
     private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()     //FireBase RealTime
     private val databaseReference: DatabaseReference = firebaseDatabase.reference       //FireBase RealTime
 
@@ -66,19 +68,18 @@ class MainActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-        Log.d("파이어베이스로그인","로그인 시도"+"${auth}")
+
         auth = Firebase.auth
-        Log.d("파이어베이스로그인","로그인 시도2"+"${auth}")
+        firestore = FirebaseFirestore.getInstance()
         auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this){ task->
                 if(task.isSuccessful){
                     Log.d("파이어베이스로그인","로그인 성공"+"${auth}")
-
                 }
                 else{
                     Log.d("파이어베이스로그인","로그인 실패"+"${auth}")
                 }
-            }
-        Log.d("파이어베이스로그인","로그인 시도결과"+"${auth}")
+        }
+
 
 
 
