@@ -17,8 +17,7 @@ import androidx.core.content.ContextCompat.getSystemService
     private var running = false
 
      private var startSteps : Int = 0
-      var resSteps :  Int = 0
-     private var flag = false
+     private var resSteps :  Int = 0
      private var endSteps : Int = 0
 
      fun startSensor(){
@@ -34,9 +33,10 @@ import androidx.core.content.ContextCompat.getSystemService
         }
     }
 
-     fun getSteps(){
+     fun getresSteps() : Int{
          resSteps = endSteps - startSteps
          Log.d("센서로그","총 발걸음 수  : " + resSteps)
+         return resSteps
      }
 
     fun stopSensor(){
@@ -55,7 +55,6 @@ import androidx.core.content.ContextCompat.getSystemService
 
     override fun onSensorChanged(event: SensorEvent?) {
         if (running) {
-            Log.d("센서로그","running 들어옴 ")
             if (startSteps < 1) {
                 // 초기값
                 startSteps = event!!.values[0].toInt();
@@ -63,7 +62,7 @@ import androidx.core.content.ContextCompat.getSystemService
             }
 
                 endSteps = event!!.values[0].toInt()
-                Log.d("센서로그","flag true , endSteps : " + endSteps)
+                Log.d("센서로그","endSteps : " + endSteps)
 
             }
             //totalSteps = event!!.values[0]
