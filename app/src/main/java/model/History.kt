@@ -1,32 +1,32 @@
 package model
 
-data class History ( //히스토리 데이터 클래스 (파이어베이스 저장용)
+object History { //히스토리 데이터 클래스 (파이어베이스 저장용)
 
     //StartingPoint 출발지
-    var spName : String? = null,    //출발지이름
-    var spLat : Double? = null,     //출발지 위도 (x)
-    var spLon : Double? = null,     //출발지 경도 (y)
+    var spName: String? = null    //출발지이름           //얘는 언제받을껀지???
+    var spLat: Double? = null    //출발지 위도 (x)       //Main locationcallback에서 현재위치조정이 완료되었습니다 TTS완료 후 받음
+    var spLon: Double? = null     //출발지 경도 (y)      // 경로 이탈시, 목적지 재검색시 다시 받아야할듯?
 
     //DestinationPoint 도착지
-    var dpName : String? = null,     //도착지이름
-    var dpLat : Double? = null,      //도착지 위도 (x)
-    var dpLon : Double? = null,      //도착지 경도 (y)
+    var dpName: String? = null     //도착지이름용         DoRetrofit  - getPOI() 목적지 로그 찍고 받ㄸ
+    var dpLat: Double? = null      //도착지 위도 (x)     DoRetrofit - getPoi() 중간쯤 목적지 좌표 찍고 받음
+    var dpLon: Double? = null      //도착지 경도 (y)     DoRetrofit - getPoi() 중간쯤 목적지 좌표 찍고 받음
 
-    //TimeInfor 시간정보   YYYYMMDD.HHTT 형식 ( ex) 2022-07-21 15:45 = 20220721.1545)
-    var departureTime : Double? = null,  //출발시간
-    var arrivedTime : Double ? = null,   //도착시간
-    var expectedTime : Double ? = null,  //예상 소요 시간
+    //TimeInfor 시간정보  "yyyy-MM-dd HH:mm:ss"
+    var departureTime: String? = null  //출발시간용      Main아래 ~로 길안내를 시작합니다 TTS이후 받음
+    var arrivedTime: String? = null   //도착시간        Main아래 도착로그 찍고 TTS찍기 직전 받음
+    var expectedTime: Int? = null  //예상 소요 시간트      RetrofitManager에서 경로 불러올 때마다 업데이트, 최종으로 알고리즘 선택된 경로의 값이 들어감
 
     //Biometric Infor 생체성보
-    var heartRateAverage : Int? = null,  //평균 심박
-    var heartRateMax : Int? = null,      //최대 심박
-    var stepNum : Int? = null,           //발걸음 수
-    var kcal : Double? = null,           //소요 칼로리
+    var heartRateAverage: Int? = null  //평균 심박
+    var heartRateMax: Int? = null      //최대 심박
+    var stepNum: Int? = null           //발걸음 수
+    var kcal: Double? = null           //소요 칼로리
 
     //RouteInfor 루트 정보 (exp = existPoint: 경로 이탈 부분)
-    var rootNum : Int? = null,           //이용했던 경로 번호
-    var expTurnPoint : Int? = null,      //분기점에서 이탈한 횟수
-    var expFacility : Int? = null,       //FT 이탈 횟수
-    var expLineWay : Int? = null,        // 직선길 이탈 횟수
-    var expTotal : Int? = null           //총 이탈 횟수
-)
+    var routNum: Int? = null           //이용했던 경로 번호용. DoRetrofit에서 인덱스 결정 후 받음
+    var expTurnPoint: Int? = null      //분기점에서 이탈한 횟수
+    var expFacility: Int? = null       //FT 이탈 횟수
+    var expLineWay: Int? = null        // 직선길 이탈 횟수
+    var expTotal: Int? = null           //총 이탈 횟수
+}

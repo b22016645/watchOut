@@ -10,6 +10,7 @@ import com.example.watchout.MyMqtt
 import com.example.watchout.R
 import com.example.watchout.databinding.ActivityMainBinding
 import com.google.gson.Gson
+import model.History
 import model.NaviData
 import model.SaftyScore
 import retrofit.RetrofitManager
@@ -127,6 +128,7 @@ class DoRetrofitActivity : Activity(){
     private fun getPOI(location : String, lat : Double, lon : Double){
         Log.d(LOG,"DoRetrofit - getPOI호출")
         Log.d(LOG, "DoRetrofit - 목적지 : "+"${location}")
+        History.dpName = location       //DB저장음
 
         //추후에 경로이탈일 때 사용되니깐 그냥 여기에 두면 됨.
         sttResultMsg = location
@@ -156,6 +158,9 @@ class DoRetrofitActivity : Activity(){
                             destinationPoint.add(parsePOIDataArray.get(0).frontLon.toDouble())
                         }
                         Log.d(LOG,"목적지 좌표 : "+"${destinationPoint[0]}"+", "+"${destinationPoint[1]}")
+                        History.dpLat = destinationPoint[0]         //DB저장용
+                        History.dpLon = destinationPoint[1]         //DB저장용
+
 
                         var timercount = 0
                         timer(period = 500,initialDelay = 500){
@@ -282,6 +287,7 @@ class DoRetrofitActivity : Activity(){
                                         ind=i
                                     }
                                 }
+                                History.routNum = ind       //DB저장용
                                 var timercount = 0
                                 timer(period = 500, initialDelay = 500) {
                                     if (timercount == 0) {

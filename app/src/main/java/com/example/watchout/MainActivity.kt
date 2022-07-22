@@ -29,6 +29,8 @@ import model.NaviData
 import model.Preference
 import route.SafeRoute
 import utils.Constant.API.LOG
+import java.time.LocalDateTime
+import java.time.format.DateTimeFormatter
 import java.util.*
 
 class MainActivity : Activity() {
@@ -71,8 +73,7 @@ class MainActivity : Activity() {
     //여기서부터 onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-
-
+       // LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
         auth = Firebase.auth
         firestore = FirebaseFirestore.getInstance()
         auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this) { task ->
@@ -104,7 +105,7 @@ class MainActivity : Activity() {
             .addOnSuccessListener { result ->
                 for (document in result) {
                     Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
-                    Log.d("특정 데이터 가져오는 예시","${document.data.get("score")}")
+                    //Log.d("특정 데이터 가져오는 예시","${document.data.get("score")}")
                     Preference.awcrossWalk = "${document.data.get("awcrossWalk")}".toDouble()
                     Preference.awft_car= "${document.data.get("awft_car")}".toDouble()
                     Preference.awft_noCar= "${document.data.get("awft_noCar")}".toDouble()
@@ -206,6 +207,8 @@ class MainActivity : Activity() {
                     }
 
                     Log.d(LOG,"MainActivity - 현재위치 : ["+"${lat}"+", "+"${lon}"+"]")
+                    History.spLat = lat     //DB 저장용
+                    History.spLon = lon     // DB저장용
 
                     var nowBuilder = StringBuilder()
                     nowBuilder.append(lat.toString()).append(",").append(lon.toString())
@@ -275,6 +278,7 @@ class MainActivity : Activity() {
                 var des = naviData.destination
                 ttsSpeak("${des}"+", 으로 안내합니다.")
                 publish("topic","길 안내를 시작합니다")
+                History.departureTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))      //DB저장용
 
 //                //중간지점 알려줌
 //                var midString = "37.58217852030164,127.01152516595631"
@@ -296,6 +300,7 @@ class MainActivity : Activity() {
             if (resultCode == 0 ) {//목적지 도착했을 때
 //                publish("topic","목적지에 도착하였습니다")
                 Log.d(LOG, "도착")
+                History.arrivedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))      //DB저장용
                 ttsSpeak("목적지에 도착했습니다. 목적지를 즐겨찾기에 등록하려면 아래버튼을 두번 이상 눌러주세요.")
                 //finish()
             }
@@ -434,5 +439,8 @@ class MainActivity : Activity() {
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
+
+
+
 
 }

@@ -18,6 +18,7 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import com.google.android.gms.location.*
 import model.DirectionItem
+import model.History
 import route.DetailRoute
 import utils.Constant.API.LOG
 import java.io.IOException
@@ -189,23 +190,7 @@ class NavigationActivity : Activity(), LocationListener {
                         }
                         //도착
                         else if (midPointNum == midpointList.size-1 && sppoint == 0) {
-                            vibe(1500,100)
-                            publish("topic","목적지에 도착하였습니다")
-                            Log.d(LOG,"안내완료")
-
-                            //히스토리 저장용 (발걸음 수)
-                            val historySteps = mySensor.getresSteps()
-
-                            //히스토리 저장용 (출발 위경도 -> 주소)
-                            val historyAddr = getAddress(midpointList[0][0],midpointList[0][1])
-
-
-
-                            clear()
-                            mySensor.stopSensor()
-                            val returnIntent = Intent()
-                            setResult(0,returnIntent)
-                            finish()
+                            endOfRoute()
                         }
                         else {
                             //분기점일때
@@ -299,6 +284,39 @@ class NavigationActivity : Activity(), LocationListener {
                 }
             }
         }
+    }
+
+    private fun endOfRoute() {
+        vibe(1500, 100)
+        publish("topic", "목적지에 도착하였습니다")
+        Log.d(LOG, "안내완료")
+
+        //히스토리 저장용 (발걸음 수)
+        val historySteps = mySensor.getresSteps()
+
+        //히스토리 저장용 (출발 위경도 -> 주소)
+        val historyAddr = getAddress(midpointList[0][0], midpointList[0][1])
+
+        //이제 여기에 히스토리,즐겨찾기 담아 데베로 넘긴다
+        /*
+     //Firbase 저장 예시입니다
+     var preference = Preference()
+     //history.arrivedTime = 11111111.1322
+     firestore?.collection("Preference")?.document("AlgorithmWeight")?.set(preference)
+     Log.d("파이어베이스 데이터 저장","${preference}")
+*/
+
+
+
+
+
+
+
+        clear()
+        mySensor.stopSensor()
+        val returnIntent = Intent()
+        setResult(0, returnIntent)
+        finish()
     }
 
 //    override fun onDestroy() {
