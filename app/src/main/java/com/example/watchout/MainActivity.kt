@@ -50,7 +50,6 @@ class MainActivity : Activity() {
     private val databaseReference: DatabaseReference = firebaseDatabase.reference       //FireBase RealTime
     private var uid : String? = null
 
-
     //mqtt관련
     private lateinit var myMqtt: MyMqtt
     val sub_topic = "android"
@@ -69,6 +68,15 @@ class MainActivity : Activity() {
 
     //진동관련
     lateinit var vibrator: Vibrator
+
+    //클릭 이벤트 시간 저장할 변수
+    private var clickTime: Long = 0
+
+    //클릭 중복 방지 변수
+    private var clickNum = 0
+
+    //도착시 즐겨찾기 등록 활성화
+    private var dofavor = false
 
     //여기서부터 onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -242,8 +250,22 @@ class MainActivity : Activity() {
     //물리버튼을 눌러 STT를 실행
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if(keyCode== KeyEvent.KEYCODE_BACK){
-            startSTT()
+            // 두번 클릭시 즐겨찾기 등록
+            if (SystemClock.elapsedRealtime() - clickTime < 500 && dofavor == true) {
+                clickNum = 2
+                Log.d(LOG,"즐겨찾기 등록 코드 여기에 쓰면 돼용")
+                overridePendingTransition(0, 0)
+            }
+            else {
+                clickNum = 1
+            }
+            Handler().postDelayed(java.lang.Runnable {
+                if (clickNum == 1){
+                    startSTT()
+                }
+            },500)
 
+            clickTime = SystemClock.elapsedRealtime()
             return true
         }
         return super.onKeyDown(keyCode, event)
@@ -300,6 +322,7 @@ class MainActivity : Activity() {
             if (resultCode == 0 ) {//목적지 도착했을 때
 //                publish("topic","목적지에 도착하였습니다")
                 Log.d(LOG, "도착")
+                dofavor = true
                 History.arrivedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))      //DB저장용
                 ttsSpeak("목적지에 도착했습니다. 목적지를 즐겨찾기에 등록하려면 아래버튼을 두번 이상 눌러주세요.")
                 //finish()
