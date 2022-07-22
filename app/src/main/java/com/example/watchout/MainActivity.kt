@@ -325,6 +325,13 @@ class MainActivity : Activity() {
                 dofavor = true
                 History.arrivedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))      //DB저장용
                 ttsSpeak("목적지에 도착했습니다. 목적지를 즐겨찾기에 등록하려면 아래버튼을 두번 이상 눌러주세요.")
+                addFavorite()       //즐겨찾기 추가함수
+                 /*         //데이터 베잇 에 히스토리 넘기기
+                firestore?.collection("History")?.document("${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}")?.set(History)
+                Log.d("파이어베이스에 히스토리 저장","${History}")
+
+                 */
+
                 //finish()
             }
             else if (resultCode == 2) {//navi에서 뒤로가기 버튼을 눌렀을 때
@@ -345,6 +352,8 @@ class MainActivity : Activity() {
             }
         }
     }
+
+
 
 
     //사용자 권한, 바꿀거 없음.
@@ -464,6 +473,10 @@ class MainActivity : Activity() {
     }
 
 
+    private fun addFavorite() {     //즐겨찾기 추가함수
+        TODO("Not yet implemented")
+        ttsSpeak("즐겨찾기에 등록할 별명을 말해주세요")
 
+    }
 
 }
