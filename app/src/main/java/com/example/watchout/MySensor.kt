@@ -10,65 +10,69 @@ import android.widget.TextView
 import android.widget.Toast
 import androidx.core.content.ContextCompat.getSystemService
 
- class MySensor(val context: Context) : SensorEventListener {
+class MySensor(val context: Context) : SensorEventListener {
     private var sensorManager: SensorManager = context.getSystemService(Context.SENSOR_SERVICE) as SensorManager
 
-    // variable gives the running status
-    private var running = false
+    //발걸음 변수
+    private val stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
+    private var startSteps : Int = 0
+    private var resSteps :  Int = 0
+    private var endSteps : Int = 0
 
-     private var startSteps : Int = 0
-     private var resSteps :  Int = 0
-     private var endSteps : Int = 0
 
-     fun startSensor(){
-        running = true
-       // startSteps = 0
-        val stepSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_STEP_COUNTER)
-        if (stepSensor == null) {
-            Log.d("센서로그","디바이스에 스텝센서가 없습니다")
-        } else {
-            Log.d("센서로그","시작합니당")
-            sensorManager?.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_GAME)
+    //심박수 변수
+    private val heartSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_HEART_RATE)
+    var heartRate : Int = 0
 
+    fun startSensor(){
+        if (stepSensor != null && heartSensor != null) {
+            sensorManager?.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_FASTEST)
+            sensorManager?.registerListener(this, heartSensor, SensorManager.SENSOR_DELAY_NORMAL)
+        }
+        else{
+            Log.d("센서로그","startSensor : 센서 없음 ")
         }
     }
 
-     fun getresSteps() : Int{
-         resSteps = endSteps - startSteps
-         Log.d("센서로그","총 발걸음 수  : " + resSteps)
-         return resSteps
-     }
-
     fun stopSensor(){
-        running = false
-        Log.d("센서로그","종료 : " + resSteps)
+        Log.d("센서로그","종료 Steps : " + resSteps)
         sensorManager?.unregisterListener(this)
         startSteps = 0
         resSteps = 0
         endSteps = 0
     }
 
+    //총발걸음수
+    fun getresSteps() : Int{
+        resSteps = endSteps - startSteps
+        Log.d("센서로그","총 발걸음 수  : " + resSteps)
+        return resSteps
+    }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
         Log.d("센서로그","onAccuracyChanged: Sensor: $sensor; accuracy: $accuracy")
     }
 
     override fun onSensorChanged(event: SensorEvent?) {
-        if (running) {
+        //StepCounter
+        if(event!!.sensor.type == Sensor.TYPE_STEP_COUNTER){
             if (startSteps < 1) {
                 // 초기값
                 startSteps = event!!.values[0].toInt();
                 Log.d("센서로그","startSteps<1  : " + startSteps)
             }
+            endSteps = event!!.values[0].toInt()
+            Log.d("센서로그","endSteps : " + endSteps)
+        }
 
-                endSteps = event!!.values[0].toInt()
-                Log.d("센서로그","endSteps : " + endSteps)
-
-            }
-            //totalSteps = event!!.values[0]
-
-            //val cSteps = totalSteps.toInt()
+        //HeartRate
+        if(event!!.sensor.type == Sensor.TYPE_HEART_RATE){
+            val heartRateFloat = event!!.values[0]
+            heartRate = heartRateFloat.toInt()
+            //Log.d("센서로그","심박수  : " +heartRate.toString())
         }
     }
+
+}
 
 
