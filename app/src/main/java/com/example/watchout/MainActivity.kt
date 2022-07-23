@@ -39,6 +39,7 @@ class MainActivity : Activity() {
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest:LocationRequest
     private val REQUEST_PERMISSION_LOCATION = 10
+    val ACTIVITY_RECOGNITION_REQUEST_CODE = 100
 
     //FireBase관련
     private var auth : FirebaseAuth? = null     //FireBase Auth
@@ -386,53 +387,82 @@ class MainActivity : Activity() {
             }
         }
 
-
-
-        if (ActivityCompat.checkSelfPermission(
+        if(ContextCompat.checkSelfPermission(
                 this,
-                Manifest.permission.ACCESS_FINE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-            && ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.ACCESS_COARSE_LOCATION
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            //권한이 없을 경우 최초 권한 요청 또는 사용자에 의한 재요청 확인
-            if (ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) &&
-                ActivityCompat.shouldShowRequestPermissionRationale(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                )
-            ) {
-                // 권한 재요청
+                Manifest.permission.BODY_SENSORS
+            ) != PackageManager.PERMISSION_GRANTED){
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
                 ActivityCompat.requestPermissions(
                     this,
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    ),
+                    arrayOf(Manifest.permission.BODY_SENSORS),
                     100
                 )
-                return
-            } else {
-                ActivityCompat.requestPermissions(
-                    this,
-                    arrayOf(
-                        Manifest.permission.ACCESS_FINE_LOCATION,
-                        Manifest.permission.ACCESS_COARSE_LOCATION
-                    ),
-                    100
-                )
-                return
+            }
+        }
+
+
+
+//        if (ActivityCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.ACCESS_FINE_LOCATION
+//            ) != PackageManager.PERMISSION_GRANTED
+//            && ActivityCompat.checkSelfPermission(
+//                this,
+//                Manifest.permission.ACCESS_COARSE_LOCATION
+//            ) != PackageManager.PERMISSION_GRANTED
+//        ) {
+//            //권한이 없을 경우 최초 권한 요청 또는 사용자에 의한 재요청 확인
+//            if (ActivityCompat.shouldShowRequestPermissionRationale(
+//                    this,
+//                    Manifest.permission.ACCESS_FINE_LOCATION
+//                ) &&
+//                ActivityCompat.shouldShowRequestPermissionRationale(
+//                    this,
+//                    Manifest.permission.ACCESS_COARSE_LOCATION
+//                )
+//            ) {
+//                // 권한 재요청
+//                ActivityCompat.requestPermissions(
+//                    this,
+//                    arrayOf(
+//                        Manifest.permission.ACCESS_FINE_LOCATION,
+//                        Manifest.permission.ACCESS_COARSE_LOCATION
+//                    ),
+//                    100
+//                )
+//                return
+//            } else {
+//                ActivityCompat.requestPermissions(
+//                    this,
+//                    arrayOf(
+//                        Manifest.permission.ACCESS_FINE_LOCATION,
+//                        Manifest.permission.ACCESS_COARSE_LOCATION
+//                    ),
+//                    100
+//                )
+//                return
+//            }
+//        }
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        when (requestCode) {
+            ACTIVITY_RECOGNITION_REQUEST_CODE -> {
+                if ((grantResults.isNotEmpty() &&
+                            grantResults[0] == PackageManager.PERMISSION_GRANTED)
+                ) {
+                }
             }
         }
     }
 
 
-    // 위치 권한이 있는지 확인하는 메서드 seul
+    // 위치 권한
     private fun checkPermissionForLocation(context: Context): Boolean {
         // Android 6.0 Marshmallow 이상에서는 위치 권한에 추가 런타임 권한이 필요
         return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
