@@ -23,10 +23,7 @@ import com.google.firebase.database.DatabaseReference
 import com.google.firebase.database.FirebaseDatabase
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
-import model.DoRetrofitData
-import model.History
-import model.NaviData
-import model.Preference
+import model.*
 import route.SafeRoute
 import utils.Constant.API.LOG
 import java.time.LocalDateTime
@@ -218,6 +215,7 @@ class MainActivity : Activity() {
                     History.spLat = lat     //DB 저장용
                     History.spLon = lon     // DB저장용
 
+
                     var nowBuilder = StringBuilder()
                     nowBuilder.append(lat.toString()).append(",").append(lon.toString())
                     var now = nowBuilder.toString()
@@ -254,6 +252,7 @@ class MainActivity : Activity() {
             if (SystemClock.elapsedRealtime() - clickTime < 500 && dofavor == true) {
                 clickNum = 2
                 Log.d(LOG,"즐겨찾기 등록 코드 여기에 쓰면 돼용")
+                addFavorite()       //즐겨찾기 추가함수
                 overridePendingTransition(0, 0)
             }
             else {
@@ -325,12 +324,7 @@ class MainActivity : Activity() {
                 dofavor = true
                 History.arrivedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))      //DB저장용
                 ttsSpeak("목적지에 도착했습니다. 목적지를 즐겨찾기에 등록하려면 아래버튼을 두번 이상 눌러주세요.")
-                addFavorite()       //즐겨찾기 추가함수
-                 /*         //데이터 베잇 에 히스토리 넘기기
-                firestore?.collection("History")?.document("${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}")?.set(History)
-                Log.d("파이어베이스에 히스토리 저장","${History}")
 
-                 */
 
                 //finish()
             }
@@ -476,6 +470,15 @@ class MainActivity : Activity() {
     private fun addFavorite() {     //즐겨찾기 추가함수
         TODO("Not yet implemented")
         ttsSpeak("즐겨찾기에 등록할 별명을 말해주세요")
+        var nickname = "여기에 tts값 넣는 코드 작성 부탁드려용"
+        firestore?.collection("Favorites")?.document("${Favorites.nickname}")?.set(History)
+
+        //즐겨찾기 저장시 고려사항
+        //1. 저장시 즐겨찾기에 저장할 '주소' -> 중복 방지
+        //2. 저장시 즐겨찾기에 저장할 '이름'을 대표로 저장이 됨 -> 만약 이미 있는 이름이면 그 값이 업데이트됨
+        //ex) '우리집'이 이미 등록된 즐겨찾기면 그 값을 업데이트함 (중복x)
+        //두개 다 중복방지하기엔 너무 까다로우니 우선 필드를 닉네임으로 통일후 고치는것으로..
+
 
     }
 

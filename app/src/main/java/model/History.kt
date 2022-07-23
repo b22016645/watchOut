@@ -3,7 +3,7 @@ package model
 object History { //히스토리 데이터 클래스 (파이어베이스 저장용)
 
     //StartingPoint 출발지
-    var spName: String? = null    //출발지이름           //얘는 언제받을껀지???
+    var spName: String? = null    //출발지이름           //NavigationActivity - endOfRoute()에서
     var spLat: Double? = null    //출발지 위도 (x)       //Main locationcallback에서 현재위치조정이 완료되었습니다 TTS완료 후 받음
     var spLon: Double? = null     //출발지 경도 (y)      // 경로 이탈시, 목적지 재검색시 다시 받아야할듯?
 

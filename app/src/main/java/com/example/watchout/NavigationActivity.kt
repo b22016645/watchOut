@@ -293,9 +293,13 @@ class NavigationActivity : Activity(), LocationListener {
 
         //히스토리 저장용 (발걸음 수)
         val historySteps = mySensor.getresSteps()
+        //History.stepNum= historySteps         //발걸음수 확정되면 주석 풀어서 히스토리에 넘겨주세요
 
         //히스토리 저장용 (출발 위경도 -> 주소)
-        val historyAddr = getAddress(midpointList[0][0], midpointList[0][1])
+        (History.spLat)?:midpointList[0][0]
+        (History.spLon)?:midpointList[0][1]
+        History.spName = getAddress(History.spLat!!, History.spLon!!)
+
 
         //이제 여기에 히스토리,즐겨찾기 담아 데베로 넘긴다
         /*
