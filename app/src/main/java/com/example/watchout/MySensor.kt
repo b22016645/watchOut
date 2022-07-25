@@ -75,4 +75,3 @@ class MySensor(val context: Context) : SensorEventListener {
 
 }
 
-
