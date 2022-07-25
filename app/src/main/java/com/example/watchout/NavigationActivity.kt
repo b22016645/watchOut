@@ -316,13 +316,10 @@ class NavigationActivity : Activity(), LocationListener {
 
 
 
-
-
-
         clear()
         mySensor.stopSensor()
         val returnIntent = Intent()
-        setResult(0, returnIntent)
+        setResult(RESULT_OK, returnIntent)
         finish()
     }
 

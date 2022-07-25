@@ -113,7 +113,16 @@ class DoRetrofitActivity : Activity(){
         instance.requestStt(byteAudioData) { responseState, sttResultMsg ->
             when (responseState) {
                 Constant.RESPONSE_STATE.OKAY -> {  //만약 STATE가 OKEY라면
-                    getPOI(sttResultMsg, lat, lon)
+                    if (lat == 1.1 && lon == 1.1){ //즐겨찾기 등록시
+                        Favorites.nickname = sttResultMsg
+                        Log.d(LOG,"nickname ="+"${sttResultMsg}")
+                        val returnintent = Intent()
+                        setResult(0,returnintent)
+                        finish()
+                    }
+                    else {
+                        getPOI(sttResultMsg, lat, lon)
+                    }
                 }
                 Constant.RESPONSE_STATE.FAIL -> {
                     Log.d(LOG,"DoRetrofit - 잘못된 음성으로 main으로 돌아감.")
@@ -495,7 +504,7 @@ class DoRetrofitActivity : Activity(){
 
                         var naviData = NaviData(midpointList, turnTypeList, sttResultMsg, turnPoint)
                         //받아서 retrunMain호출함수호출
-                        retrunMain(naviData)
+                        returnMain(naviData)
 
                     }
                     Constant.RESPONSE_STATE.ERROR403 -> {
@@ -508,8 +517,8 @@ class DoRetrofitActivity : Activity(){
     }
 
 
-    //retrunMain 호출함수다
-    private fun retrunMain(naviDataItem : NaviData ) {
+    //returnMain 호출함수다
+    private fun returnMain(naviDataItem : NaviData ) {
         Log.d(LOG,"DoRetrofit - retrunMain호출")
         val returnintent = Intent()
         returnintent.putExtra("naviData",naviDataItem)

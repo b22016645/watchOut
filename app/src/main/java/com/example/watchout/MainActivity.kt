@@ -229,27 +229,15 @@ class MainActivity : Activity() {
         },1000)
     }
 
-    private fun startSTT(){
-        //SpeechToTextActivity 실행
-        if(modified<3){
-            ttsSpeak("위치 조정 중")
-        }
-        else {
-            ttsSpeak("버튼을 눌러 목적지를 말하세요.")
-            publish("topic", "목적지 입력을 시작했습니다")
-            val intent = Intent(this, SpeechToTextActivity::class.java)
-            startActivityForResult(intent, 0)
-        }
-    }
-
     //물리버튼을 눌러 STT를 실행
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if(keyCode== KeyEvent.KEYCODE_BACK){
             // 두번 클릭시 즐겨찾기 등록
-            if (SystemClock.elapsedRealtime() - clickTime < 500 && dofavor == true) {
+            if (SystemClock.elapsedRealtime() - clickTime < 500 ) {
                 clickNum = 2
-                Log.d(LOG,"즐겨찾기 등록 코드 여기에 쓰면 돼용")
-                addFavorite()       //즐겨찾기 추가함수
+                ttsSpeak("즐겨찾기에 등록할 별명을 말해주세요")
+                Log.d(LOG,"즐겨찾기 등록 시작")
+                startSTT(10)
                 overridePendingTransition(0, 0)
             }
             else {
@@ -257,7 +245,9 @@ class MainActivity : Activity() {
             }
             Handler().postDelayed(java.lang.Runnable {
                 if (clickNum == 1){
-                    startSTT()
+                    ttsSpeak("버튼을 눌러 목적지를 말하세요.")
+                    publish("topic", "목적지 입력을 시작했습니다")
+                    startSTT(0)
                 }
             },500)
 
@@ -267,19 +257,42 @@ class MainActivity : Activity() {
         return super.onKeyDown(keyCode, event)
     }
 
+    private fun startSTT(intentNum:Int){
+        //SpeechToTextActivity 실행
+        if (intentNum == 0) { //목적지입력시
+            if (modified < 3) {
+                ttsSpeak("위치 조정 중")
+            } else {
+                val intent = Intent(this, SpeechToTextActivity::class.java)
+                startActivityForResult(intent, 0)
+            }
+        }
+        else{ //즐겨찾기등록시
+            val intent = Intent(this, SpeechToTextActivity::class.java)
+            startActivityForResult(intent, 10)
+        }
+    }
+
     //다른 Activity로부터 결과값 받기
     override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
         super.onActivityResult(requestCode, resultCode, data)
 
         //SpeechToTextActivity에서 받음
-        if (requestCode == 0 ) {
+        if (requestCode == 0 || requestCode == 10) {
             if (resultCode == RESULT_OK) {
                 var byteAudioData: ByteArray? = null
                 byteAudioData = data?.getByteArrayExtra("byteAudioData")
 
                 if (byteAudioData != null) { //아무것도 입력하지 않아도 null값은 아니다.
-                    publish("topic","목적지를 입력하였습니다")
-                    var doRrtrofitData = DoRetrofitData(byteAudioData,"",lat,lon)
+                    var doRrtrofitData: DoRetrofitData? = null
+                    if(requestCode == 10) { //즐겨찾기 등록시
+                        publish("topic","즐겨찾기 등록 시작")
+                        doRrtrofitData = DoRetrofitData(byteAudioData,"",1.1,1.1)
+                    }
+                    else {
+                        publish("topic","목적지를 입력하였습니다")
+                        doRrtrofitData = DoRetrofitData(byteAudioData,"",lat,lon)
+                    }
                     val intent = Intent(this, DoRetrofitActivity::class.java)
                     intent.putExtra("doRrtrofitData",doRrtrofitData)
                     //DoRetrofit 실행
@@ -298,37 +311,35 @@ class MainActivity : Activity() {
                 publish("topic","길 안내를 시작합니다")
                 History.departureTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))      //DB저장용
 
-//                //중간지점 알려줌
-//                var midString = "37.58217852030164,127.01152516595631"
-//                publish("now",midString)
-
                 val intent = Intent(this, NavigationActivity::class.java)
                 intent.putExtra("naviData",naviData)
                 startActivityForResult(intent, 1)
             }
+            else if (resultCode == 0){
+                addFavorite()
+            }
             else if (resultCode == RESULT_CANCELED) { //음성이 이상할 때 혹은 204에러 때 다시 stt호출
                 publish("topic","목적지를 다시 입력해주세요")
-                startSTT()
+                startSTT(0)
             }
         }
 
 
         //NavigationActivity에서 받음
         if ( requestCode == 1 ) {
-            if (resultCode == 0 ) {//목적지 도착했을 때
+            if (resultCode == RESULT_OK ) {//목적지 도착했을 때
 //                publish("topic","목적지에 도착하였습니다")
                 Log.d(LOG, "도착")
                 dofavor = true
                 History.arrivedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))      //DB저장용
                 ttsSpeak("목적지에 도착했습니다. 목적지를 즐겨찾기에 등록하려면 아래버튼을 두번 이상 눌러주세요.")
 
-
                 //finish()
             }
             else if (resultCode == 2) {//navi에서 뒤로가기 버튼을 눌렀을 때
 //                publish("topic","reSTT2")
                 Log.d(LOG, "뒤로가기 버튼 누름 : Navigation -> Main")
-                startSTT()
+                startSTT(0)
             }
 
             else if (resultCode == 3) {//경로이탈일 때
@@ -494,9 +505,13 @@ class MainActivity : Activity() {
 
 
     private fun addFavorite() {     //즐겨찾기 추가함수
-        TODO("Not yet implemented")
-        ttsSpeak("즐겨찾기에 등록할 별명을 말해주세요")
-        var nickname = "여기에 tts값 넣는 코드 작성 부탁드려용"
+
+//        ttsSpeak("즐겨찾기에 등록할 별명을 말해주세요")
+//        val intent = Intent(this, SpeechToTextActivity::class.java)
+//        startActivityForResult(intent, 0)
+//        var nickname = "여기에 tts값 넣는 코드 작성 부탁드려용"
+        ttsSpeak("즐겨찾기 등록 완료")
+        Log.d(LOG,"즐겨찾기 등록 완료")
         firestore?.collection("Favorites")?.document("${Favorites.nickname}")?.set(History)
 
         //즐겨찾기 저장시 고려사항
