@@ -217,10 +217,6 @@ class MainActivity : Activity() {
                     History.spLon = lon     // DB저장용
 
 
-                    var nowBuilder = StringBuilder()
-                    nowBuilder.append(lat.toString()).append(",").append(lon.toString())
-                    var now = nowBuilder.toString()
-                    publish("now",now)
                 }
             }
         }

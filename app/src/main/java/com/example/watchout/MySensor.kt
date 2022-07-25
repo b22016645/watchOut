@@ -69,7 +69,7 @@ class MySensor(val context: Context) : SensorEventListener {
         if(event!!.sensor.type == Sensor.TYPE_HEART_RATE){
             val heartRateFloat = event!!.values[0]
             heartRate = heartRateFloat.toInt()
-            //Log.d("센서로그","심박수  : " +heartRate.toString())
+           // Log.d("센서로그","심박수  : " +heartRate.toString())
         }
     }
 

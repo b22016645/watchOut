@@ -169,9 +169,12 @@ class NavigationActivity : Activity(), LocationListener {
                         Log.d(LOG,"==========================================================================================================")
                         Log.d(LOG,"midpointNum : ["+"${midPointNum}"+"/"+"${midpointList.size-1}"+"] " + "현재위치 : ["+"${lat}"+", "+"${lon}"+"] "  + "다음위치 : ["+"${midpointList[midPointNum][0]}"+", "+"${midpointList[midPointNum][1]}"+"]" )
 
-                        var nowBuilder = StringBuilder()
-                        nowBuilder.append(lat.toString()).append(",").append(lon.toString())
+                        var myHeartRate = mySensor.heartRate
+                        //현재심박수같이보냄냄
+                       var nowBuilder = StringBuilder()
+                        nowBuilder.append(lat.toString()).append(",").append(lon.toString()).append(",").append(myHeartRate.toString())
                         var now = nowBuilder.toString()
+                        Log.d("센서로그","now : " + now)
                         publish("now",now)
 
                         //UI에서 보이는 거리 -> 현재 위치에서부터 가장 가까운 분기점까지
