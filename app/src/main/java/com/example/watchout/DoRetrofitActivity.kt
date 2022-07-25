@@ -121,6 +121,7 @@ class DoRetrofitActivity : Activity(){
                         finish()
                     }
                     else {
+                        //여기에 즐겨찾기 목록에서 찾는 코드 쓰면 돼용
                         getPOI(sttResultMsg, lat, lon)
                     }
                 }
