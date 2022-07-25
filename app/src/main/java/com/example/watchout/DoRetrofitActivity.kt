@@ -347,7 +347,7 @@ class DoRetrofitActivity : Activity(){
         for(i in 0..3) {
             scoreBuilder.append(scoreList[i].toString())
             if (i < 3) {
-                scoreBuilder.append(",")
+                scoreBuilder.append("!")
             }
         }
         var scoreStr = scoreBuilder.toString()
