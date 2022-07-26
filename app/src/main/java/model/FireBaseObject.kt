@@ -1,4 +1,4 @@
-package model;
+package model
 // DB관련 싱글톤객체 모음
 
 object History { //히스토리 데이터 클래스 (파이어베이스 저장용)
@@ -46,10 +46,10 @@ object Preference {   //도착지 도착 후 선호도 평가 데이터 베이�
 
 object Favorites  { //즐겨찾기 데이터 클래스 (파이어베이스 저장용)
         var dat = mutableMapOf<String,Any?>(
-                "address" to null,                  //DoRetrofit - getPoi()
-                "lat" to null,                      //DoRetrofit - getPoi()
-                "lon" to null,                      //DoRetrofit - getPoi()
-                "nickname" to null,                 //id값       DoRetrofit - requestStt
-                "frequency" to null                 //검색횟수     호출즉시+1
+                "address" to "주소",                  //DoRetrofit - getPoi()
+                "lat" to "위도",                      //DoRetrofit - getPoi()
+                "lon" to "경도",                      //DoRetrofit - getPoi()
+                "nickname" to "즐겨찾기저장이름",                 //id값       DoRetrofit - requestStt
+                "frequency" to 0                 //검색횟수     호출즉시+1
         )
 }
