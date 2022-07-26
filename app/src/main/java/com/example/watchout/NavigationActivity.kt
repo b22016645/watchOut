@@ -304,6 +304,7 @@ class NavigationActivity : Activity(), LocationListener {
         History.spName = getAddress(History.spLat!!, History.spLon!!)
 
 
+
         //이제 여기에 히스토리,즐겨찾기 담아 데베로 넘긴다
         /*
      //Firbase 저장 예시입니다

@@ -85,10 +85,13 @@ class MainActivity : Activity() {
         auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
                 Log.d("파이어베이스로그인", "로그인 성공" + "${auth}")
+                Log.d("시간",LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
             } else {
                 Log.d("파이어베이스로그인", "로그인 실패" + "${auth}")
             }
         }
+
+
 
    /*
         //Firbase 저장 예시입니다
@@ -103,23 +106,21 @@ class MainActivity : Activity() {
         uid = FirebaseAuth.getInstance().currentUser?.uid
         firestore = FirebaseFirestore.getInstance()
 
-        val docRef = firestore!!.collection("AlgorithmWeight").document("${uid}")
         var snapshotData :Map<String,Any>
-        docRef.get()
-            .addOnSuccessListener { document ->
-                if (document != null) {
-                    Log.d("알고리즘 가중치값 DB에서 불러오기", "DocumentSnapshot data: ${document.data}")
-                    snapshotData = document.data as Map<String, Any>
-                    //Log.d("이렇게 하나하나 갖고오는거보단 한번에 데이타스냅샷으로 DB에서 가져온 후 내부에서 잘라서 저장하는게 효율적","${snapshotData.get("score")}, ${document.data?.get("score")}")
-                    Preference.awcrossWalk = "${snapshotData.get("awcrossWalk")}".toDouble()
-                    Preference.awft_car= "${snapshotData.get("awft_car")}".toDouble()
-                    Preference.awft_noCar= "${snapshotData.get("awft_noCar")}".toDouble()
-                    Preference.tableWeight= "${snapshotData.get("tableWeight")}".toDouble()
-                    Preference.awturnPoint= "${snapshotData.get("awturnPoint")}".toDouble()
-                    Preference.score= "${snapshotData.get("score")}".toInt()
-                } else {
-                    Log.d("알고리즘 가중치값 DB에서 불러오기", "No such document")
-                }
+        val dbData = firestore!!.collection("PersonalData").document("${uid}")
+        dbData.get()
+            .addOnSuccessListener { doc ->
+            if (doc != null) {
+                snapshotData = doc.data as Map<String, Any>
+                Preference.awcrossWalk = "${snapshotData.get("crossWalk")}".toDouble()
+                Preference.awft_car= "${snapshotData.get("ft_car")}".toDouble()
+                Preference.awft_noCar= "${snapshotData.get("ft_noCar")}".toDouble()
+                Preference.tableWeight= "${snapshotData.get("tableWeight")}".toDouble()
+                Preference.awturnPoint= "${snapshotData.get("turnPoint")}".toDouble()
+                Preference.score= "${snapshotData.get("score")}".toInt()
+            } else {
+                Log.d("알고리즘 가중치값 DB에서 불러오기", "No such document")
+            }
             }
             .addOnFailureListener { exception ->
                 Log.d("알고리즘 가중치값 DB에서 불러오기", "get failed with ", exception)
@@ -203,7 +204,6 @@ class MainActivity : Activity() {
 
                     x.setText(lon.toString())
                     y.setText(lat.toString())
-                    Log.d("Test", "Latitude: $lat, Longitude: $lon")
 
                     modified++
                     if(modified==3){
@@ -463,14 +463,9 @@ class MainActivity : Activity() {
 
     private fun addFavorite() {     //즐겨찾기 추가함수
 
-//        ttsSpeak("즐겨찾기에 등록할 별명을 말해주세요")
-//        val intent = Intent(this, SpeechToTextActivity::class.java)
-//        startActivityForResult(intent, 0)
-//        var nickname = "여기에 tts값 넣는 코드 작성 부탁드려용"
+        firestore?.collection("Favorites")?.document("${uid}+${Favorites.nickname}")?.set(Favorites)
         ttsSpeak("즐겨찾기 등록 완료")
         Log.d(LOG,"즐겨찾기 등록 완료")
-        firestore?.collection("Favorites")?.document("${Favorites.nickname}")?.set(History)
-
         //즐겨찾기 저장시 고려사항
         //1. 저장시 즐겨찾기에 저장할 '주소' -> 중복 방지
         //2. 저장시 즐겨찾기에 저장할 '이름'을 대표로 저장이 됨 -> 만약 이미 있는 이름이면 그 값이 업데이트됨

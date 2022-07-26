@@ -273,11 +273,11 @@ class DoRetrofitActivity : Activity(){
                             errorcount = 0
                             getPOI(sttResultMsg, lat, lon)
                         } else {
-                            Log.d(SCORE_SAFEROUTE, "나누기전 스코어" + "${saftyScore?.score}")
-                            Log.d(SCORE_SAFEROUTE, "나누기전 토탈디스탄스" + "${saftyScore?.totalDistance}")
+                          //  Log.d(SCORE_SAFEROUTE, "나누기전 스코어" + "${saftyScore?.score}")
+                          //  Log.d(SCORE_SAFEROUTE, "나누기전 토탈디스탄스" + "${saftyScore?.totalDistance}")
                             saftyScore?.score = floor((saftyScore?.score!! / saftyScore.totalDistance!!) *1000)
                             Log.d(SCORE_SAFEROUTE, "나누고 스코어" + "${saftyScore?.score}")
-                            Log.d(SCORE_SAFEROUTE, "나누고 토탈디스탄스" + "${saftyScore?.totalDistance}")
+                          //  Log.d(SCORE_SAFEROUTE, "나누고 토탈디스탄스" + "${saftyScore?.totalDistance}")
 
                             scoreList.add(saftyScore)
                             Log.d(SCORE_SAFEROUTE, "scoreList : " + "${saftyScore}")
@@ -289,7 +289,7 @@ class DoRetrofitActivity : Activity(){
                                 var routeString = routeBuilder.toString()
                                 publish("route",routeString)
 
-                                Log.d(SCORE_SAFEROUTE, "ㅁㅁㅁㅁㅁㅁ"+"${saftyScore}" )
+                                Log.d(SCORE_SAFEROUTE, ""+"${saftyScore}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 다 추가 되면 한번 불림
 
                                 var max = scoreList[0]?.score!!
