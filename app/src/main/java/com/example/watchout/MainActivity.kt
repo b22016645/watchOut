@@ -99,29 +99,30 @@ class MainActivity : Activity() {
 */
 
 
-        //FireBase에서 알고리즘 가중치를 불러와 pf에 저장.
-        // 처음 앱 실행하고 한번만 불러오고 도중에 바꿀 필요 없기 때문에 싱글톤 객체 Prefrence사용
-        // 파이어베이스에서 데이터를 가져오는데 시간이 걸리기 때문에 바로 Preference가 업데이트 되지는 않지만
-        // SafeRoute 실행 전까지는 충분히 데이터를 가져올 수 있기 때문에 미리 앱 시작하자마자 받아오려고 onCreate에 작성
-        // 수정사항>> 데이터를 하나하나씩 가져오지 말고 스냅샷으로 찍어서 한번에 가져올 수 있는 방법 찾기
+        //FireBase에서 알고리즘 가중치를 불러와 데이터스냅샷 형태로 저장후 잘라서 싱글톤객체 Preference에 저장.
         uid = FirebaseAuth.getInstance().currentUser?.uid
         firestore = FirebaseFirestore.getInstance()
-        firestore!!.collection("Preference")
-            .get()
-            .addOnSuccessListener { result ->
-                for (document in result) {
-                    Log.d(ContentValues.TAG, "${document.id} => ${document.data}")
-                    //Log.d("특정 데이터 가져오는 예시","${document.data.get("score")}")
-                    Preference.awcrossWalk = "${document.data.get("awcrossWalk")}".toDouble()
-                    Preference.awft_car= "${document.data.get("awft_car")}".toDouble()
-                    Preference.awft_noCar= "${document.data.get("awft_noCar")}".toDouble()
-                    Preference.tableWeight= "${document.data.get("tableWeight")}".toDouble()
-                    Preference.awturnPoint= "${document.data.get("awturnPoint")}".toDouble()
-                    Preference.score= "${document.data.get("score")}".toInt()
+
+        val docRef = firestore!!.collection("AlgorithmWeight").document("${uid}")
+        var snapshotData :Map<String,Any>
+        docRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    Log.d("알고리즘 가중치값 DB에서 불러오기", "DocumentSnapshot data: ${document.data}")
+                    snapshotData = document.data as Map<String, Any>
+                    //Log.d("이렇게 하나하나 갖고오는거보단 한번에 데이타스냅샷으로 DB에서 가져온 후 내부에서 잘라서 저장하는게 효율적","${snapshotData.get("score")}, ${document.data?.get("score")}")
+                    Preference.awcrossWalk = "${snapshotData.get("awcrossWalk")}".toDouble()
+                    Preference.awft_car= "${snapshotData.get("awft_car")}".toDouble()
+                    Preference.awft_noCar= "${snapshotData.get("awft_noCar")}".toDouble()
+                    Preference.tableWeight= "${snapshotData.get("tableWeight")}".toDouble()
+                    Preference.awturnPoint= "${snapshotData.get("awturnPoint")}".toDouble()
+                    Preference.score= "${snapshotData.get("score")}".toInt()
+                } else {
+                    Log.d("알고리즘 가중치값 DB에서 불러오기", "No such document")
                 }
             }
             .addOnFailureListener { exception ->
-                Log.w(ContentValues.TAG, "Error getting documents.", exception)
+                Log.d("알고리즘 가중치값 DB에서 불러오기", "get failed with ", exception)
             }
 
 
