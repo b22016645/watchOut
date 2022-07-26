@@ -119,12 +119,32 @@ class MainActivity : Activity() {
                 Preference.awturnPoint= "${snapshotData.get("turnPoint")}".toDouble()
                 Preference.score= "${snapshotData.get("score")}".toInt()
             } else {
-                Log.d("알고리즘 가중치값 DB에서 불러오기", "No such document")
-            }
+                Log.d("알고리즘 가중치값 DB에서 불러오기", "No such document") }
             }
             .addOnFailureListener { exception ->
                 Log.d("알고리즘 가중치값 DB에서 불러오기", "get failed with ", exception)
             }
+
+        //즐겨찾기에서 먼저 검색하는 코드입니다
+        var fav : Map<String,Any>
+        var destinationName = "영심이네"     //음성파일을 string형으로 변환한 데이터 ( 목적지)
+        var favFromDB = firestore!!.collection("PersonalData").document("${uid}").collection("Favorites").document("${destinationName}")
+        favFromDB.get()
+            .addOnSuccessListener { dat ->
+                if(dat!= null){
+                    fav = dat.data as Map<String,Any>
+                    Log.d("즐겨찾기를 맵형태로 불러온다","${fav}")
+                    Log.d("즐겨찾기에서 특정 데이터를 불러오는 코드","${fav.get("address")}")
+                }
+                else{
+                    Log.d("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ","즐겨찾기 등록은 되어있으나 데이터가 없음")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ", "즐겨찾기에 등록되어 있지 않은 주소")
+            }
+
+
 
 
 
@@ -301,6 +321,8 @@ class MainActivity : Activity() {
                 }
             }
         }
+
+
 
 
         //DoRetrofit에서 받음
