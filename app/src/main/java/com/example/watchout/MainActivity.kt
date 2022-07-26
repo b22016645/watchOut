@@ -2,7 +2,6 @@ package com.example.watchout
 
 import android.Manifest
 import android.app.Activity
-import android.content.ContentValues
 import android.content.Context
 import android.content.Intent
 import android.content.pm.PackageManager
@@ -16,15 +15,14 @@ import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import com.example.watchout.databinding.ActivityMainBinding
 import com.google.android.gms.location.*
-import com.google.firebase.auth.AuthResult
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.auth.ktx.auth
-import com.google.firebase.database.DatabaseReference
-import com.google.firebase.database.FirebaseDatabase
+//import com.google.firebase.database.DatabaseReference
+//import com.google.firebase.database.FirebaseDatabase
+import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.ktx.Firebase
 import model.*
-import route.SafeRoute
 import utils.Constant.API.LOG
 import java.time.LocalDateTime
 import java.time.format.DateTimeFormatter
@@ -44,8 +42,8 @@ class MainActivity : Activity() {
     //FireBase관련
     private var auth : FirebaseAuth? = null     //FireBase Auth
     var firestore : FirebaseFirestore? = null
-    private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()     //FireBase RealTime
-    private val databaseReference: DatabaseReference = firebaseDatabase.reference       //FireBase RealTime
+    // private val firebaseDatabase: FirebaseDatabase = FirebaseDatabase.getInstance()     //FireBase RealTime
+    // private val databaseReference: DatabaseReference = firebaseDatabase.reference       //FireBase RealTime
     private var uid : String? = null
 
     //mqtt관련
@@ -106,6 +104,8 @@ class MainActivity : Activity() {
         uid = FirebaseAuth.getInstance().currentUser?.uid
         firestore = FirebaseFirestore.getInstance()
 
+        addFavorite()
+
         var snapshotData :Map<String,Any>
         val dbData = firestore!!.collection("PersonalData").document("${uid}")
         dbData.get()
@@ -133,15 +133,19 @@ class MainActivity : Activity() {
             .addOnSuccessListener { dat ->
                 if(dat!= null){
                     fav = dat.data as Map<String,Any>
+                    favFromDB.update("frequency",FieldValue.increment(1)).addOnSuccessListener {
+                        Log.d("DB_Favorites_Frequency","+1업데이트완료")
+                    }
                     Log.d("즐겨찾기를 맵형태로 불러온다","${fav}")
                     Log.d("즐겨찾기에서 특정 데이터를 불러오는 코드","${fav.get("address")}")
+
                 }
                 else{
-                    Log.d("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ","즐겨찾기 등록은 되어있으나 데이터가 없음")
+                    Log.d("DB_Favorites_ERROR","즐겨찾기 등록은 되어있으나 데이터가 없음")
                 }
             }
             .addOnFailureListener { exception ->
-                Log.d("ㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋㅋ", "즐겨찾기에 등록되어 있지 않은 주소")
+                Log.d("DB_Favorites_ERROR", "즐겨찾기에 등록되어 있지 않은 주소, 일반검색으로 넘어갑니다.")
             }
 
 
@@ -158,7 +162,7 @@ class MainActivity : Activity() {
                 }
                 Log.d("로그","TTS 세팅 성공")
             }else{
-                Log.d("로그","TTS 세텅 실패")
+                Log.d("로그","TTS 세팅 실패")
             }
         }
 
@@ -177,7 +181,7 @@ class MainActivity : Activity() {
 
         //mqtt관련
         myMqtt = MyMqtt(this)
-        myMqtt.connect(arrayOf<String>(sub_topic))
+//        myMqtt.connect(arrayOf<String>(sub_topic))
 
         //진동관련
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
@@ -481,20 +485,16 @@ class MainActivity : Activity() {
     private fun stopLocationUpdates() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
-
-
     private fun addFavorite() {     //즐겨찾기 추가함수
-
-        firestore?.collection("Favorites")?.document("${uid}+${Favorites.nickname}")?.set(Favorites)
-        ttsSpeak("즐겨찾기 등록 완료")
-        Log.d(LOG,"즐겨찾기 등록 완료")
-        //즐겨찾기 저장시 고려사항
-        //1. 저장시 즐겨찾기에 저장할 '주소' -> 중복 방지
-        //2. 저장시 즐겨찾기에 저장할 '이름'을 대표로 저장이 됨 -> 만약 이미 있는 이름이면 그 값이 업데이트됨
-        //ex) '우리집'이 이미 등록된 즐겨찾기면 그 값을 업데이트함 (중복x)
-        //두개 다 중복방지하기엔 너무 까다로우니 우선 필드를 닉네임으로 통일후 고치는것으로..
-
-
+        firestore!!.collection("PersonalData").document("${uid}").collection("Favorites").document("${Favorites.dat.get("nickname")}").set(Favorites.dat)
+        .addOnSuccessListener {
+                    Log.d("즐겨찾기 저장값입니다", Favorites.dat.toString())
+                    Log.d(LOG, "즐겨찾기 등록 완료")
+            //        ttsSpeak("즐겨찾기 등록 완료")
+            //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
+                }
+            .addOnFailureListener { exception ->
+                Log.d("즐겨찾기 저장 실패", exception.toString())
+            }
     }
-
-}
+    }
