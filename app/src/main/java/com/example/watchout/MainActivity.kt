@@ -74,114 +74,39 @@ class MainActivity : Activity() {
     //도착시 즐겨찾기 등록 활성화
     private var dofavor = false
 
+
+
     //여기서부터 onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-       // LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+
+        //FireBase환경세팅
         auth = Firebase.auth
         firestore = FirebaseFirestore.getInstance()
-        auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this) { task ->
-            if (task.isSuccessful) {
-                Log.d("파이어베이스로그인", "로그인 성공" + "${auth}")
-                Log.d("시간",LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-            } else {
-                Log.d("파이어베이스로그인", "로그인 실패" + "${auth}")
-            }
-        }
-
-
-
-   /*
-        //Firbase 저장 예시입니다
-        var preference = Preference()
-        //history.arrivedTime = 11111111.1322
-        firestore?.collection("Preference")?.document("AlgorithmWeight")?.set(preference)
-        Log.d("파이어베이스 데이터 저장","${preference}")
-*/
-
-
-        //FireBase에서 알고리즘 가중치를 불러와 데이터스냅샷 형태로 저장후 잘라서 싱글톤객체 Preference에 저장.
+        firebaseLogin()                         //파이어베이스 로그인
         uid = FirebaseAuth.getInstance().currentUser?.uid
-        firestore = FirebaseFirestore.getInstance()
-
-        addHistory()
-
-        var snapshotData :Map<String,Any>
-        val dbData = firestore!!.collection("PersonalData").document("${uid}")
-        dbData.get()
-            .addOnSuccessListener { doc ->
-            if (doc != null) {
-                snapshotData = doc.data as Map<String, Any>
-                Preference.awcrossWalk = "${snapshotData.get("crossWalk")}".toDouble()
-                Preference.awft_car= "${snapshotData.get("ft_car")}".toDouble()
-                Preference.awft_noCar= "${snapshotData.get("ft_noCar")}".toDouble()
-                Preference.tableWeight= "${snapshotData.get("tableWeight")}".toDouble()
-                Preference.awturnPoint= "${snapshotData.get("turnPoint")}".toDouble()
-                Preference.score= "${snapshotData.get("score")}".toInt()
-            } else {
-                Log.d("알고리즘 가중치값 DB에서 불러오기", "No such document") }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("알고리즘 가중치값 DB에서 불러오기", "get failed with ", exception)
-            }
-
-        //즐겨찾기에서 먼저 검색하는 코드입니다
-        var fav : Map<String,Any>
-        var destinationName = "영심이네"     //음성파일을 string형으로 변환한 데이터 ( 목적지)
-        var favFromDB = firestore!!.collection("PersonalData").document("${uid}").collection("Favorites").document("${destinationName}")
-        favFromDB.get()
-            .addOnSuccessListener { dat ->
-                if(dat!= null){
-                    fav = dat.data as Map<String,Any>
-                    favFromDB.update("frequency",FieldValue.increment(1)).addOnSuccessListener {
-                        Log.d("DB_Favorites_Frequency","+1업데이트완료")
-                    }
-                    Log.d("즐겨찾기를 맵형태로 불러온다","${fav}")
-                    Log.d("즐겨찾기에서 특정 데이터를 불러오는 코드","${fav.get("address")}")
-
-                }
-                else{
-                    Log.d("DB_Favorites_ERROR","즐겨찾기 등록은 되어있으나 데이터가 없음")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("DB_Favorites_ERROR", "즐겨찾기에 등록되어 있지 않은 주소, 일반검색으로 넘어갑니다.")
-            }
+        algorithmWeightFromDB()                 //파이어베이스에서 알고리즘가중치값 읽어와서 세팅
 
 
-
-
-
-        // TTS를 생성하고 OnInitListener로 초기화 한다.
-        tts= TextToSpeech(this){
-            if(it==TextToSpeech.SUCCESS){
-                val result = tts?.setLanguage(Locale.KOREAN)
-                if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
-                    Log.d("로그","지원하지 않은 언어")
-                    return@TextToSpeech
-                }
-                Log.d("로그","TTS 세팅 성공")
-            }else{
-                Log.d("로그","TTS 세팅 실패")
-            }
-        }
+        setTTS()        //TTS세팅 및 초기화
 
 
         //화면이 꺼지지 않게
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
-
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_main)
 
+
+        //레이아웃 세팅
         x = findViewById<TextView>(R.id.x)
         y = findViewById<TextView>(R.id.y)
-
         x.setText(lon.toString())
         y.setText(lat.toString())
 
+
         //mqtt관련
         myMqtt = MyMqtt(this)
-//        myMqtt.connect(arrayOf<String>(sub_topic))
+        //myMqtt.connect(arrayOf<String>(sub_topic))
 
         //진동관련
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
@@ -486,14 +411,95 @@ class MainActivity : Activity() {
         fusedLocationClient.removeLocationUpdates(locationCallback)
     }
 
+    fun setTTS(){
+        // TTS를 생성하고 OnInitListener로 초기화 한다.
+        tts= TextToSpeech(this){
+            if(it==TextToSpeech.SUCCESS){
+                val result = tts?.setLanguage(Locale.KOREAN)
+                if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+                    Log.d("로그","지원하지 않은 언어")
+                    return@TextToSpeech
+                }
+                Log.d("로그","TTS 세팅 성공")
+            }else{
+                Log.d("로그","TTS 세팅 실패")
+            }
+        }
+    }
+
+
+    /////////////////////////////////////////////////////////////////////////////
+    //                            FIREBASE(DB) 관련 함수                         //
+    /////////////////////////////////////////////////////////////////////////////
+    fun firebaseLogin(){
+        auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                Log.d("파이어베이스로그인", "로그인 성공" + "${auth}")
+                Log.d("시간",LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+            } else {
+                Log.d("파이어베이스로그인", "로그인 실패" + "${auth}")
+            }
+        }
+    }
+
+    fun algorithmWeightFromDB() {
+        //FireBase에서 알고리즘 가중치를 불러와 데이터스냅샷 형태로 저장후 잘라서 싱글톤객체 Preference에 저장.
+        var snapshotData: Map<String, Any>
+        val dbData = firestore!!.collection("PersonalData").document("${uid}")
+        dbData.get()
+            .addOnSuccessListener { doc ->
+                if (doc != null) {
+                    snapshotData = doc.data as Map<String, Any>
+                    Preference.awcrossWalk = "${snapshotData.get("crossWalk")}".toDouble()
+                    Preference.awft_car = "${snapshotData.get("ft_car")}".toDouble()
+                    Preference.awft_noCar = "${snapshotData.get("ft_noCar")}".toDouble()
+                    Preference.tableWeight = "${snapshotData.get("tableWeight")}".toDouble()
+                    Preference.awturnPoint = "${snapshotData.get("turnPoint")}".toDouble()
+                    Preference.score = "${snapshotData.get("score")}".toInt()
+                } else {
+                    Log.d("알고리즘 가중치값 DB에서 불러오기", "No such document")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("알고리즘 가중치값 DB에서 불러오기", "get failed with ", exception)
+            }
+    }
+
+    fun serchFromDB() {
+        //즐겨찾기에서 먼저 검색하는 코드입니다
+        var fav: Map<String, Any>
+        var destinationName = "영심이네"     //음성파일을 string형으로 변환한 데이터 ( 목적지)
+        var favFromDB =
+            firestore!!.collection("PersonalData").document("${uid}").collection("Favorites")
+                .document("${destinationName}")
+        favFromDB.get()
+            .addOnSuccessListener { dat ->
+                if (dat != null) {
+                    fav = dat.data as Map<String, Any>
+                    favFromDB.update("frequency", FieldValue.increment(1))
+                        .addOnSuccessListener {
+                            Log.d("DB_Favorites_Frequency", "+1업데이트완료")
+                        }
+                    Log.d("즐겨찾기를 맵형태로 불러온다", "${fav}")
+                    Log.d("즐겨찾기에서 특정 데이터를 불러오는 코드", "${fav.get("address")}")
+
+                } else {
+                    Log.d("DB_Favorites_ERROR", "즐겨찾기 등록은 되어있으나 데이터가 없음")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("DB_Favorites_ERROR", "즐겨찾기에 등록되어 있지 않은 주소, 일반검색으로 넘어갑니다.")
+            }
+    }
+
     private fun addFavorite() {     //즐겨찾기 추가함수
         firestore!!.collection("PersonalData").document("${uid}").collection("Favorites").document("${Favorites.dat.get("nickname")}").set(Favorites.dat)
-        .addOnSuccessListener {
-                    Log.d("즐겨찾기 저장값입니다", Favorites.dat.toString())
-                    Log.d(LOG, "즐겨찾기 등록 완료")
-            //        ttsSpeak("즐겨찾기 등록 완료")
-            //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
-                }
+            .addOnSuccessListener {
+                Log.d("즐겨찾기 저장값입니다", Favorites.dat.toString())
+                Log.d(LOG, "즐겨찾기 등록 완료")
+                //        ttsSpeak("즐겨찾기 등록 완료")
+                //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
+            }
             .addOnFailureListener { exception ->
                 Log.d("즐겨찾기 저장 실패", exception.toString())
             }
@@ -512,4 +518,6 @@ class MainActivity : Activity() {
                 Log.d("히스토리 저장 실패", exception.toString())
             }
     }
-    }
+
+
+}
