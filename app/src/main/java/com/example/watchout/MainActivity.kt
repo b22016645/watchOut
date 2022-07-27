@@ -106,7 +106,7 @@ class MainActivity : Activity() {
 
         //mqtt관련
         myMqtt = MyMqtt(this)
-        //myMqtt.connect(arrayOf<String>(sub_topic))
+        myMqtt.connect(arrayOf<String>(sub_topic))
 
         //진동관련
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
