@@ -47,7 +47,7 @@ class MainActivity : Activity() {
     private var uid : String? = null
 
     //mqtt관련
-    private lateinit var myMqtt: MyMqtt
+    lateinit var myMqtt: MyMqtt
     val sub_topic = "android"
 
     //음성출력관련
@@ -58,6 +58,8 @@ class MainActivity : Activity() {
     private var lon: Double = 0.0
 //    private var lat: Double = 37.58217852030164
 //    private var lon: Double = 127.01152516595631
+    var dpLat:Double = 0.0
+    var dpLon:Double = 0.0
 
     //현재위치조정완료
     private var modified = 0
@@ -255,7 +257,7 @@ class MainActivity : Activity() {
 
 
         //DoRetrofit에서 받음
-        if ( requestCode == 100 ) {
+        if ( requestCode == 100 || requestCode ==99 ||requestCode ==89) {
             if (resultCode == RESULT_OK) { //getRoute까지 정상적으로 호출되었을 때
                 val naviData = data?.getSerializableExtra("naviData") as NaviData
                 var des = naviData.destination
@@ -273,6 +275,30 @@ class MainActivity : Activity() {
             else if (resultCode == RESULT_CANCELED) { //음성이 이상할 때 혹은 204에러 때 다시 stt호출
                 publish("topic","목적지를 다시 입력해주세요")
                 startSTT(0)
+            }
+            else if (resultCode == 77){
+
+                val stringData = data?.getStringExtra("sttResult")
+                Log.d("인텐트객체가왔을까요","${stringData}")
+
+                if (stringData != null) {
+                    getDestinationPoint(stringData)
+                }else{
+                    Log.d("Stringdata NULL","에러")
+                }
+
+                Log.d("getPOI까지 다 하고 메인으로 넘어옴","${dpLat} + ${dpLon}")
+                //여기까지 하면 목적지의 좌표가 메인의 dpLat,dpLon에 저장된 상태
+                //이제 얘를 Intent에 담아서 DoRetrofit으로 보낼꺼임.
+
+                val intent = Intent(this, DoRetrofitActivity::class.java)
+                intent.putExtra("spLat",lat)
+                intent.putExtra("spLon",lon)
+                intent.putExtra("dpLon",dpLon)
+                intent.putExtra("dpLat",dpLat)
+
+                //DoRetrofit 실행
+//                startActivityForResult(intent, 44,)
             }
         }
 
@@ -465,16 +491,19 @@ class MainActivity : Activity() {
             }
     }
 
-    fun serchFromDB() {
-        //즐겨찾기에서 먼저 검색하는 코드입니다
+    fun getDestinationPoint(destinationName : String) {
+        //입력 : 목적지이름또는별명(string) -> 출력 : 목적지 좌표 (main의 dpLat,dpLon에 저장)
+        //DB에서 먼저 검색 후 없으면 DoRetrofitManager의 getPOI로 좌표 알아냄
+        //알아낸 좌표는 DoRetrofit의 get4RoutScore로 넘겨줌
+        Log.d("111111111111", "+1업데이트완료")
         var fav: Map<String, Any>
-        var destinationName = "영심이네"     //음성파일을 string형으로 변환한 데이터 ( 목적지)
+        //var destinationName = "영심이네"     //음성파일을 string형으로 변환한 데이터 ( 목적지)
         var favFromDB =
             firestore!!.collection("PersonalData").document("${uid}").collection("Favorites")
                 .document("${destinationName}")
         favFromDB.get()
             .addOnSuccessListener { dat ->
-                if (dat != null) {
+                if (dat.data != null) {
                     fav = dat.data as Map<String, Any>
                     favFromDB.update("frequency", FieldValue.increment(1))
                         .addOnSuccessListener {
@@ -482,13 +511,49 @@ class MainActivity : Activity() {
                         }
                     Log.d("즐겨찾기를 맵형태로 불러온다", "${fav}")
                     Log.d("즐겨찾기에서 특정 데이터를 불러오는 코드", "${fav.get("address")}")
+                    dpLat = fav.get("lat") as Double
+                    dpLon = fav.get("lon") as Double
+                    Log.d("즐찾","${dpLat}")
+                    Log.d("즐찾","${dpLon}")
+
+
+                    val intent = Intent(this, DoRetrofitActivity::class.java)
+                    intent.putExtra("spLat",lat)
+                    intent.putExtra("spLon",lon)
+                    intent.putExtra("dpLon",dpLon)
+                    intent.putExtra("dpLat",dpLat)
+                    Log.d("즐찾","${destinationName},${lat},${lon}")
+                    //DoRetrofit 실행
+
+                    var doRrtrofitData = DoRetrofitData(null,destinationName,lat,lon)
+                    intent.putExtra("doRrtrofitData",doRrtrofitData)
+                    startActivityForResult(intent, 99)
+                 //   DoRetrofitActivity().get4RoutScore(lat, lon, dpLat,dpLon, "startname", "endname")
+
 
                 } else {
                     Log.d("DB_Favorites_ERROR", "즐겨찾기 등록은 되어있으나 데이터가 없음")
+                    //여기서 getPOI로 목적지 좌표 알아내야함
+                   // DoRetrofitActivity().getPOI(destinationName,lat,lon)
+
+                    val intent = Intent(this, DoRetrofitActivity::class.java)
+                    intent.putExtra("spLat",lat)
+                    intent.putExtra("spLon",lon)
+                    intent.putExtra("destination",destinationName)
+                    Log.d("dddd","${destinationName},${lat},${lon}")
+                    var doRrtrofitData = DoRetrofitData(null,destinationName,lat,lon)
+                    intent.putExtra("doRrtrofitData",doRrtrofitData)
+                    //DoRetrofit 실행
+                    startActivityForResult(intent, 89)
+
+                    //아님 즐찾 등록 안되어잇으면 일로옴
+
                 }
             }
             .addOnFailureListener { exception ->
                 Log.d("DB_Favorites_ERROR", "즐겨찾기에 등록되어 있지 않은 주소, 일반검색으로 넘어갑니다.")
+                //여기서 getPOI로 목적지 좌표 알아내야함
+                DoRetrofitActivity().getPOI(destinationName,lat,lon)
             }
     }
 
