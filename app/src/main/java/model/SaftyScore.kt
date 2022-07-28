@@ -2,11 +2,11 @@ package model
 
 import java.io.Serializable
 
-data class SaftyScore(var score:Double?, var turnPoint:Int?, var elevator:Int?,
-                      var crossWalkCount:Int?, var crossWalkLength:Double?,
-                      var roadTypeLength1:Double?, var roadTypeLength2:Double?, var roadTypeLength3:Double?, var roadTypeLength4:Double?,
+data class SaftyScore(var score:Double?, var turnPoint:Int?, var elevator:Int?,var crossWalkCount:Int?,
                       var bridge:Int?, var turnnels:Int?, var highroad:Int?,
                       var overPasses:Int?, var underPasses:Int?, var stairs:Int?,
+                       var crossWalkLength:Double?,
+                      var roadTypeLength1:Double?, var roadTypeLength2:Double?, var roadTypeLength3:Double?, var roadTypeLength4:Double?,
                       var largeFacilitypassage:Int?, var totalDistance: Int?
 ): Serializable {
     init{

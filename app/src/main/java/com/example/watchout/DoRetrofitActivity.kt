@@ -178,7 +178,7 @@ class DoRetrofitActivity : Activity(){
         //추후에 경로이탈일 때 사용되니깐 그냥 여기에 두면 됨.
         sttResultMsg = location
 
-//        publish("des",sttResultMsg)
+        publish("des",sttResultMsg)
 
         //목적지 좌표
         var destinationPoint = arrayListOf<Double>() //[0]=>lat, [1]=>lon
@@ -343,7 +343,7 @@ class DoRetrofitActivity : Activity(){
                             if (scoreList.size ==4)  {
 
                                 var routeString = routeBuilder.toString()
-//                                publish("route",routeString)
+                                publish("route",routeString)
 
                                 Log.d(SCORE_SAFEROUTE, ""+"${saftyScore}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 다 추가 되면 한번 불림
@@ -407,6 +407,7 @@ class DoRetrofitActivity : Activity(){
             }
         }
         var scoreStr = scoreBuilder.toString()
+       // Log.d(LOG,"SaftyScore : "+scoreStr)
         publish("saftyScore",scoreStr)
 
         scoreList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화

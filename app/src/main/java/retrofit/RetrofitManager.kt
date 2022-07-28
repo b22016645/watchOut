@@ -126,9 +126,9 @@ class RetrofitManager {
                             var score = 0.0
                             var totalDistance : Int? = 0
                             val features=body.getAsJsonArray("features")
-                            var saftyScore = SaftyScore(.0,0,0,0,.0,
-                                .0,.0,.0,.0,
-                                0,0,0,0,0,0,0,0)
+                            var saftyScore = SaftyScore(.0,0,0,0,0,
+                                0,0,0,0,
+                                0,.0,.0,.0,.0,.0,0,0)
 
 
 
