@@ -236,6 +236,7 @@ class DoRetrofitActivity : Activity(){
         startname: String,
         endname: String
     ) {
+        Log.d(LOG,"get4routescore")
         var timercount = 0
         timer(period = 500, initialDelay = 500) {
             if (timercount != 4) {
@@ -249,7 +250,6 @@ class DoRetrofitActivity : Activity(){
                     safeList[timercount],
                     timercount
                 )
-
                 timercount++
                 getscorecount++
             } else {
@@ -323,9 +323,6 @@ class DoRetrofitActivity : Activity(){
                             routeBuilder.append("!")
                         }
 
-                        var routeString = routeBuilder.toString()
-                        publish("route",routeString)
-
                         if (getscorecount == 4 && errorcount != 0) {  // 4번 돌았는데 403에러가 1개라도 있었다면
                             Log.d(LOG, "DoRetrofit - ROUTE API 403에러 - getScore")
                             scoreList.clear()
@@ -345,6 +342,9 @@ class DoRetrofitActivity : Activity(){
                             //경로 배열에 경로의 모든 정보 추가함수, 경로 하나 추가시 마다 호출
 
                             if (scoreList.size ==4)  {
+
+                                var routeString = routeBuilder.toString()
+                                publish("route",routeString)
 
                                 Log.d(SCORE_SAFEROUTE, ""+"${saftyScore}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 다 추가 되면 한번 불림

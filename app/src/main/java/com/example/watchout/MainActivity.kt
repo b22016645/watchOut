@@ -187,8 +187,6 @@ class MainActivity : Activity() {
             // 두번 클릭시 즐겨찾기 등록
             if (SystemClock.elapsedRealtime() - clickTime < 500 ) {
                 clickNum = 2
-                ttsSpeak("즐겨찾기에 등록할 별명을 말해주세요")
-                Log.d(LOG,"즐겨찾기 등록 시작")
                 startSTT(10)
                 overridePendingTransition(0, 0)
             }
@@ -197,8 +195,6 @@ class MainActivity : Activity() {
             }
             Handler().postDelayed(java.lang.Runnable {
                 if (clickNum == 1){
-                    ttsSpeak("버튼을 눌러 목적지를 말하세요.")
-                    publish("topic", "목적지 입력을 시작했습니다")
                     startSTT(0)
                 }
             },500)
@@ -215,11 +211,15 @@ class MainActivity : Activity() {
             if (modified < 3) {
                 ttsSpeak("위치 조정 중")
             } else {
+                ttsSpeak("버튼을 눌러 목적지를 말하세요.")
+                publish("topic", "목적지 입력을 시작했습니다")
                 val intent = Intent(this, SpeechToTextActivity::class.java)
                 startActivityForResult(intent, 0)
             }
         }
         else{ //즐겨찾기등록시
+            ttsSpeak("즐겨찾기에 등록할 별명을 말해주세요")
+            Log.d(LOG,"즐겨찾기 등록 시작")
             val intent = Intent(this, SpeechToTextActivity::class.java)
             startActivityForResult(intent, 10)
         }
@@ -317,6 +317,7 @@ class MainActivity : Activity() {
             else if (resultCode == 2) {//navi에서 뒤로가기 버튼을 눌렀을 때
 //                publish("topic","reSTT2")
                 Log.d(LOG, "뒤로가기 버튼 누름 : Navigation -> Main")
+                modified = 4
                 startSTT(0)
             }
 
