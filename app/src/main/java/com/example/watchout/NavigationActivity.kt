@@ -462,12 +462,14 @@ class NavigationActivity : Activity(), LocationListener {
     override fun onPause() {
         super.onPause()
         stopLocationUpdates()
+        mySensor.pauseManager()//센서종료
     }
 
     override fun onResume() {
         super.onResume()
         //if (requestingLocationUpdates)
         startLocationUpdates()
+        mySensor.resumeManager() //sensor다시부착
     }
 
 

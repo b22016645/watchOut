@@ -42,6 +42,15 @@ class MySensor(val context: Context) : SensorEventListener {
         endSteps = 0
     }
 
+    fun pauseManager(){
+        sensorManager?.unregisterListener(this)
+    }
+
+    fun resumeManager(){
+        sensorManager?.registerListener(this, stepSensor, SensorManager.SENSOR_DELAY_FASTEST)
+        sensorManager?.registerListener(this, heartSensor, SensorManager.SENSOR_DELAY_NORMAL)
+    }
+
     //총발걸음수
     fun getresSteps() : Int{
         resSteps = endSteps - startSteps
