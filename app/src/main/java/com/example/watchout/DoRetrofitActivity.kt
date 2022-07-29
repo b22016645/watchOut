@@ -147,6 +147,7 @@ class DoRetrofitActivity : Activity(){
                     }
                     else {
                         //여기에 즐겨찾기 목록에서 찾는 코드 쓰면 돼용
+                        //만약 즐겨찾기 목록에 있으면 밑에 들어가는ㄴ 이름->
                         getPOI(sttResultMsg, lat, lon)
                     }
                     */
@@ -322,6 +323,9 @@ class DoRetrofitActivity : Activity(){
                             routeBuilder.append("!")
                         }
 
+                        var routeString = routeBuilder.toString()
+                        publish("route",routeString)
+
                         if (getscorecount == 4 && errorcount != 0) {  // 4번 돌았는데 403에러가 1개라도 있었다면
                             Log.d(LOG, "DoRetrofit - ROUTE API 403에러 - getScore")
                             scoreList.clear()
@@ -341,9 +345,6 @@ class DoRetrofitActivity : Activity(){
                             //경로 배열에 경로의 모든 정보 추가함수, 경로 하나 추가시 마다 호출
 
                             if (scoreList.size ==4)  {
-
-                                var routeString = routeBuilder.toString()
-                                publish("route",routeString)
 
                                 Log.d(SCORE_SAFEROUTE, ""+"${saftyScore}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 다 추가 되면 한번 불림
@@ -478,31 +479,31 @@ class DoRetrofitActivity : Activity(){
                         }
 
 
-                        //routeRes 보냄
-
-                        var routeResBuilder = StringBuilder()
-
-                        // x좌표 다 넣기
-                        for (i in rawRouteRes.indices) {
-                            routeResBuilder.append(rawRouteRes[i][1].toString())
-                            if (i < rawRouteRes.size-1){
-                                routeResBuilder.append(",")
-                            }
-                        }
-
-                        //y좌표 다 스트링으로 만듬
-                        routeResBuilder.append("/")
-                        for (i in rawRouteRes.indices) {
-                            routeResBuilder.append(rawRouteRes[i][0].toString())
-                            if (i < rawRouteRes.size-1){
-                                routeResBuilder.append(",")
-                            }
-                        }
-
-                        var routeResString = routeResBuilder.toString()
-
-                        publish("route_res",routeResString)
-                        Log.d(LOG,"routeRes : "+"${routeResString}")
+//                        //routeRes 보냄
+//
+//                        var routeResBuilder = StringBuilder()
+//
+//                        // x좌표 다 넣기
+//                        for (i in rawRouteRes.indices) {
+//                            routeResBuilder.append(rawRouteRes[i][1].toString())
+//                            if (i < rawRouteRes.size-1){
+//                                routeResBuilder.append(",")
+//                            }
+//                        }
+//
+//                        //y좌표 다 스트링으로 만듬
+//                        routeResBuilder.append("/")
+//                        for (i in rawRouteRes.indices) {
+//                            routeResBuilder.append(rawRouteRes[i][0].toString())
+//                            if (i < rawRouteRes.size-1){
+//                                routeResBuilder.append(",")
+//                            }
+//                        }
+//
+//                        var routeResString = routeResBuilder.toString()
+//
+//                        publish("route_res",routeResString)
+//                        Log.d(LOG,"routeRes : "+"${routeResString}")
 
                         var size=0
 
