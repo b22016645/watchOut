@@ -11,10 +11,6 @@ import com.example.watchout.R
 import com.example.watchout.databinding.ActivityMainBinding
 import com.google.gson.Gson
 import model.*
-import model.History.dpLat
-import model.History.dpLon
-import model.History.spLat
-import model.History.spLon
 import retrofit.RetrofitManager
 import route.DetailRoute
 import utils.Constant
@@ -76,15 +72,15 @@ class DoRetrofitActivity : Activity(){
         myMqtt = MyMqtt(this)
         myMqtt.connect(arrayOf<String>(sub_topic))
 
-        var doRrtrofitData = intent.getSerializableExtra("doRrtrofitData") as model.DoRetrofitData?
+        val doRrtrofitData = intent.getSerializableExtra("doRrtrofitData") as model.DoRetrofitData
 
         Log.d(LOG,"DoRetrofit - doRrtrofitData : "+"${doRrtrofitData}")
 
         routeBuilder.clear()
 
-        var byteAudioData = doRrtrofitData?.byteAudioData
-        lat = doRrtrofitData?.lat!!
-        lon = doRrtrofitData?.lon
+        var byteAudioData = doRrtrofitData.byteAudioData
+        lat = doRrtrofitData.lat
+        lon = doRrtrofitData.lon
         sttResultMsg = doRrtrofitData.destination
 
         Handler().postDelayed(java.lang.Runnable {
@@ -110,35 +106,11 @@ class DoRetrofitActivity : Activity(){
         myMqtt.publish(topic, data)
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
-        super.onActivityResult(requestCode, resultCode, data)
-
-        //Main에서 받음
-        if (requestCode == 99) {        //즐겨찾기에서 넘어온 경우
-            spLat = data?.getDoubleExtra("spLat",0.0)
-            spLon = data?.getDoubleExtra("spLon",0.0)
-            dpLat = data?.getDoubleExtra("dpLat",0.0)
-            dpLon = data?.getDoubleExtra("spLon",0.0)
-
-            get4RoutScore(spLat!!, spLon!!, dpLat!!,dpLon!!, "startname", "endname")
-        }
-        if (requestCode == 89) {        //일반에서 넘어온 경우
-            spLat = data?.getDoubleExtra("spLat",0.0)
-            spLon = data?.getDoubleExtra("spLon",0.0)
-            var dest = data?.getStringExtra("destinationName")
-            getPOI(dest!!, spLat!!, spLon!!)
-
-
-            get4RoutScore(spLat!!, spLon!!, dpLat!!,dpLon!!, "startname", "endname")
-        }
-    }
-
-
     private fun requestStt(byteAudioData : ByteArray){
         instance.requestStt(byteAudioData) { responseState, sttResultMsg ->
             when (responseState) {
                 Constant.RESPONSE_STATE.OKAY -> {  //만약 STATE가 OKEY라면
-                  /*  if (lat == 1.1 && lon == 1.1){ //즐겨찾기 등록시
+                    if (lat == 1.1 && lon == 1.1){ //즐겨찾기 등록시
                         Favorites.dat.replace("nickname", sttResultMsg)
                         Log.d(LOG,"nickname ="+"${sttResultMsg}")
                         val returnintent = Intent()
@@ -149,13 +121,6 @@ class DoRetrofitActivity : Activity(){
                         //여기에 즐겨찾기 목록에서 찾는 코드 쓰면 돼용
                         getPOI(sttResultMsg, lat, lon)
                     }
-                    */
-                    val returnintent = Intent()
-                    returnintent.putExtra("sttResult", sttResultMsg)
-                    setResult(77,returnintent)
-                    finish()        //stringData를 메인으로 보냄
-
-
                 }
                 Constant.RESPONSE_STATE.FAIL -> {
                     Log.d(LOG,"DoRetrofit - 잘못된 음성으로 main으로 돌아감.")
@@ -165,11 +130,10 @@ class DoRetrofitActivity : Activity(){
                 }
             }
         }
-
     }
 
 
-    public fun getPOI(location : String, lat : Double, lon : Double){
+    private fun getPOI(location : String, lat : Double, lon : Double){
         Log.d(LOG,"DoRetrofit - getPOI호출")
         Log.d(LOG, "DoRetrofit - 목적지 : "+"${location}")
         History.dpName = location       //DB저장음(히스토리)
@@ -206,14 +170,21 @@ class DoRetrofitActivity : Activity(){
                         History.dpLat = destinationPoint[0]         //DB저장용
                         History.dpLon = destinationPoint[1]         //DB저장용
                         Favorites.dat.replace("lat",destinationPoint[0])  //즐겨찾기 저장용
-                        Favorites.dat.replace("lon",destinationPoint[1])  //즐겨찾기 저장용
-                        MainActivity().dpLat = destinationPoint[0]
-                        MainActivity().dpLon = destinationPoint[1]
-                        Log.d("getPOI","${MainActivity().dpLat}")
-                        Log.d("getPOI","${MainActivity().dpLon}")
+                        Favorites.dat.replace("lon",destinationPoint[0])  //즐겨찾기 저장용
 
 
-                        get4RoutScore(lat, lon, destinationPoint[0],destinationPoint[1], startname, endname)
+                        var timercount = 0
+                        timer(period = 500,initialDelay = 500){
+                            if(timercount!=4){
+                                getScore(lon,lat,destinationPoint[1],destinationPoint[0],startname,endname,safeList[timercount],timercount)
+
+                                timercount++
+                                getscorecount++
+                            }
+                            else{
+                                cancel()
+                            }
+                        }
                     }
                 }
                 Constant.RESPONSE_STATE.NO_CONTENT->{//204에러면 main으로 갔다가 stt로 보냄
@@ -225,36 +196,6 @@ class DoRetrofitActivity : Activity(){
                 }
             }
         })
-    }
-
-    fun get4RoutScore(
-        spLon: Double,
-        spLat: Double,
-        dpLon: Double,
-        dpLat:Double,
-        startname: String,
-        endname: String
-    ) {
-        var timercount = 0
-        timer(period = 500, initialDelay = 500) {
-            if (timercount != 4) {
-                getScore(       //순서가 위도(lat)->경도(lon) 임
-                    spLat,
-                    spLon,
-                    dpLat,
-                    dpLon,
-                    startname,
-                    endname,
-                    safeList[timercount],
-                    timercount
-                )
-
-                timercount++
-                getscorecount++
-            } else {
-                cancel()
-            }
-        }
     }
 
 
