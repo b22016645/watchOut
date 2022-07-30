@@ -347,7 +347,6 @@ class NavigationActivity : Activity(), LocationListener {
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if(keyCode== KeyEvent.KEYCODE_BACK){
-            Log.d("navigation-onKeyDown","뒤로가기")
             publish("topic","목적지를 재 입력합니다")
             publish("route","restart")
             clear()
@@ -463,12 +462,14 @@ class NavigationActivity : Activity(), LocationListener {
     override fun onPause() {
         super.onPause()
         stopLocationUpdates()
+        mySensor.pauseManager()//센서종료
     }
 
     override fun onResume() {
         super.onResume()
         //if (requestingLocationUpdates)
         startLocationUpdates()
+        mySensor.resumeManager() //sensor다시부착
     }
 
 
