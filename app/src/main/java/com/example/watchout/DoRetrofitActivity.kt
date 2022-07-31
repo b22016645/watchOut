@@ -236,8 +236,10 @@ class DoRetrofitActivity : Activity(){
         endname: String
     ) {
         var timercount = 0
+        var routeBuilderFlag = false
         timer(period = 500, initialDelay = 500) {
             if (timercount != 4) {
+                if (timercount == 3) routeBuilderFlag = true
                 getScore(       //순서가 위도(lat)->경도(lon) 임
                     spLat,
                     spLon,
@@ -246,7 +248,8 @@ class DoRetrofitActivity : Activity(){
                     startname,
                     endname,
                     safeList[timercount],
-                    timercount
+                    timercount,
+                    routeBuilderFlag
                 )
 
                 timercount++
@@ -258,7 +261,7 @@ class DoRetrofitActivity : Activity(){
     }
 
 
-    private fun getScore(startx : Double, starty : Double, endx : Double, endy : Double, startname : String, endname : String, searchOption: Int, tcount: Int) {
+    private fun getScore(startx : Double, starty : Double, endx : Double, endy : Double, startname : String, endname : String, searchOption: Int, tcount: Int, routeBuilderFlag:Boolean) {
         Log.d(LOG,"DoRetrofit - getScore호출")
 
         //api를 통해 얻은 JSON을 파싱해서 가져온 이중배열 좌표
@@ -343,7 +346,7 @@ class DoRetrofitActivity : Activity(){
                             if (scoreList.size ==4)  {
 
                                 var routeString = routeBuilder.toString()
-//                                publish("route",routeString)
+                                publish("route",routeString)
 
                                 Log.d(SCORE_SAFEROUTE, ""+"${saftyScore}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 다 추가 되면 한번 불림

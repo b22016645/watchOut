@@ -522,10 +522,10 @@ class MainActivity : Activity() {
                     intent.putExtra("spLon",lon)
                     intent.putExtra("dpLon",dpLon)
                     intent.putExtra("dpLat",dpLat)
-                    Log.d("즐찾","${destinationName},${lat},${lon}")
+                    Log.d("즐찾","${destinationName},${dpLat},${dpLon}")
                     //DoRetrofit 실행
 
-                    var doRrtrofitData = DoRetrofitData(null,destinationName,lat,lon)
+                    var doRrtrofitData = DoRetrofitData(null, fav.get("address") as String,lat,lon)
                     intent.putExtra("doRrtrofitData",doRrtrofitData)
                     startActivityForResult(intent, 99)
                  //   DoRetrofitActivity().get4RoutScore(lat, lon, dpLat,dpLon, "startname", "endname")
