@@ -422,31 +422,31 @@ class DoRetrofitActivity : Activity(){
                         }
 
 
-//                        //routeRes 보냄
-//
-//                        var routeResBuilder = StringBuilder()
-//
-//                        // x좌표 다 넣기
-//                        for (i in rawRouteRes.indices) {
-//                            routeResBuilder.append(rawRouteRes[i][1].toString())
-//                            if (i < rawRouteRes.size-1){
-//                                routeResBuilder.append(",")
-//                            }
-//                        }
-//
-//                        //y좌표 다 스트링으로 만듬
-//                        routeResBuilder.append("/")
-//                        for (i in rawRouteRes.indices) {
-//                            routeResBuilder.append(rawRouteRes[i][0].toString())
-//                            if (i < rawRouteRes.size-1){
-//                                routeResBuilder.append(",")
-//                            }
-//                        }
-//
-//                        var routeResString = routeResBuilder.toString()
-//
-//                        publish("route_res",routeResString)
-//                        Log.d(LOG,"routeRes : "+"${routeResString}")
+                        //routeRes 보냄
+
+                        var routeResBuilder = StringBuilder()
+
+                        // x좌표 다 넣기
+                        for (i in rawRouteRes.indices) {
+                            routeResBuilder.append(rawRouteRes[i][1].toString())
+                            if (i < rawRouteRes.size-1){
+                                routeResBuilder.append(",")
+                            }
+                        }
+
+                        //y좌표 다 스트링으로 만듬
+                        routeResBuilder.append("/")
+                        for (i in rawRouteRes.indices) {
+                            routeResBuilder.append(rawRouteRes[i][0].toString())
+                            if (i < rawRouteRes.size-1){
+                                routeResBuilder.append(",")
+                            }
+                        }
+
+                        var routeResString = routeResBuilder.toString()
+
+                        publish("route_res",routeResString)
+                        Log.d(LOG,"routeRes : "+"${routeResString}")
 
                         var size=0
 
@@ -477,31 +477,31 @@ class DoRetrofitActivity : Activity(){
                             }
                         }
 
-                        //midpointList 보냄
-
-                        var midpointBuilder = StringBuilder()
-
-                        // x좌표 다 넣기
-                        for (i in midpointList.indices) {
-                            midpointBuilder.append(midpointList[i][0].toString())
-                            if (i < midpointList.size-1){
-                                midpointBuilder.append(",")
-                            }
-                        }
-
-                        //y좌표 다 스트링으로 만듬
-                        midpointBuilder.append("/")
-                        for (i in midpointList.indices) {
-                            midpointBuilder.append(midpointList[i][1].toString())
-                            if (i < midpointList.size-1){
-                                midpointBuilder.append(",")
-                            }
-                        }
-
-                        var midpointString = midpointBuilder.toString()
-
-                        publish("midpoint",midpointString)
-                        Log.d(LOG,"midpoint : "+"${midpointString}")
+//                        //midpointList 보냄
+//
+//                        var midpointBuilder = StringBuilder()
+//
+//                        // x좌표 다 넣기
+//                        for (i in midpointList.indices) {
+//                            midpointBuilder.append(midpointList[i][0].toString())
+//                            if (i < midpointList.size-1){
+//                                midpointBuilder.append(",")
+//                            }
+//                        }
+//
+//                        //y좌표 다 스트링으로 만듬
+//                        midpointBuilder.append("/")
+//                        for (i in midpointList.indices) {
+//                            midpointBuilder.append(midpointList[i][1].toString())
+//                            if (i < midpointList.size-1){
+//                                midpointBuilder.append(",")
+//                            }
+//                        }
+//
+//                        var midpointString = midpointBuilder.toString()
+//
+//                        publish("midpoint",midpointString)
+//                        Log.d(LOG,"midpoint : "+"${midpointString}")
 
 
                         var naviData = NaviData(midpointList, turnTypeList, sttResultMsg, turnPoint)
