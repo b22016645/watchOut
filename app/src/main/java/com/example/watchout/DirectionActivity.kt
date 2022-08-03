@@ -107,7 +107,7 @@ class DirectionActivity : Activity(), SensorEventListener {
                 midpointList[midPointNum + 1][0],
                 midpointList[midPointNum + 1][1]
             )
-            var trueDir = startDirection - endDirection
+            var trueDir = endDirection - startDirection
 
             if (abs(trueDir)>180f) {
                 if (trueDir<0f) {
