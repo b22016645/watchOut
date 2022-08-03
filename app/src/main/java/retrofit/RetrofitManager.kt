@@ -144,13 +144,12 @@ class RetrofitManager {
                                 var roadType : Int? = properties.get("roadType")?.asInt
                                 var distance : Int? = properties.get("distance")?.asInt
                                 var facilityType : Int? = properties.get("facility")?.asInt
-                                var totalTime : Int? = properties.get("totalTime")?.asInt       //총소요시간, 단위:초
-                                History.expectedTime = totalTime                            //DB저장용. 알고리즘 내내 업데이트 되고 마지막엔 결국 선택된 길의 토탈타임으로 업데이트
-                               //지금여기서 totalTime이 널값으로 나옴 ㅜㅜ
 
 
                                 if (totalDistance==0){
                                     totalDistance = properties.get("totalDistance")?.asInt      //경로 총 길이: 단위(m)
+                                    var totalTime : Int? = properties.get("totalTime")?.asInt
+                                    //History.expectedTime = totalTime
                                 }
                                 saftyScore.totalDistance = totalDistance
 
