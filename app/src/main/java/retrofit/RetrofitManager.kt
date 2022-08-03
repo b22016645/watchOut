@@ -148,8 +148,8 @@ class RetrofitManager {
 
                                 if (totalDistance==0){
                                     totalDistance = properties.get("totalDistance")?.asInt      //경로 총 길이: 단위(m)
-                                    var totalTime : Int? = properties.get("totalTime")?.asInt
-                                    //History.expectedTime = totalTime
+                                    var totalTime : Int? = properties.get("totalTime")?.asInt //경로 총 시간 : 단위(초)
+                                    History.expectedTime = totalTime
                                 }
                                 saftyScore.totalDistance = totalDistance
 
