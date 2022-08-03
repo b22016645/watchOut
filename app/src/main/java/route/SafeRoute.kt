@@ -38,35 +38,38 @@ object SafeRoute {
                     saftyScore.elevator = saftyScore.elevator?.plus(1)
                     saftyScore.score = saftyScore.score?.plus(-20*tw!!)
                 }
-                in 125..129 -> {
+/*                in 125..129 -> {
                     //육교, 지하보도, 계단진입, 경사로진입, +
                     //facility에서 계산
-                }
-                /* 125->{
+                }*/
+                125->{
                      //육교
-                     Log.d(SAFEROUTE, "0/TT/facility관련" );
-                     Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                    saftyScore.overPasses = saftyScore.overPasses?.plus(1)
+                    saftyScore.score = saftyScore.score?.plus(tw!! * pf.awft_noCar!!)
                  }
                  126 ->{ //지하보도
-                     Log.d(SAFEROUTE, "0/TT/facility관련" );
-                     Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                     saftyScore.underPasses = saftyScore.underPasses?.plus(1)
+                     saftyScore.score = saftyScore.score?.plus(tw!! * pf.awft_noCar!!)
                  }
                  127 ->{ //계단진입
-                     Log.d(SAFEROUTE, "0/TT/facility관련" );
-                     Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                     saftyScore.stairs = saftyScore.stairs?.plus(1)
+                     saftyScore.score = saftyScore.score?.plus(tw!! * pf.awft_noCar!!)
                  }
-                 128 ->{ //경사로진입
-                     Log.d(SAFEROUTE, "0/TT/facility관련" );
-                     Log.d(SAFEROUTE, "추가점수"+"${score}" );
-                 }
-                 129 ->{ //계단 + 경사로 진입
+/*                 128 ->{ //경사로진입
                      Log.d(SAFEROUTE, "0/TT/facility관련" );
                      Log.d(SAFEROUTE, "추가점수"+"${score}" );
                  }*/
+                 129 ->{ //계단 + 경사로 진입
+                     saftyScore.stairs = saftyScore.stairs?.plus(1)
+                     saftyScore.score = saftyScore.score?.plus(tw!! * pf.awft_noCar!!)
+                 }
                 in 211..217 -> {
                     //횡단보도, facility 에서 계산
             //        Log.d(SAFEROUTE, "0/TT/횡단보도" );
             //        Log.d(SAFEROUTE, "추가점수"+"${score}" );
+                    saftyScore.crossWalkLength = saftyScore.crossWalkLength?.plus(distance!!)
+                    saftyScore.crossWalkCount = saftyScore.crossWalkCount?.plus(1)
+                    saftyScore.score = saftyScore.score?.plus(tw!! * distance!! * pf.awcrossWalk!!)
                 }
                 else -> {
 
