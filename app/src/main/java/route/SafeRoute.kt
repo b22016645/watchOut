@@ -67,9 +67,9 @@ object SafeRoute {
                     //횡단보도, facility 에서 계산
             //        Log.d(SAFEROUTE, "0/TT/횡단보도" );
             //        Log.d(SAFEROUTE, "추가점수"+"${score}" );
-                    saftyScore.crossWalkLength = saftyScore.crossWalkLength?.plus(distance!!)
+                //    saftyScore.crossWalkLength = saftyScore.crossWalkLength?.plus(distance!!)
                     saftyScore.crossWalkCount = saftyScore.crossWalkCount?.plus(1)
-                    saftyScore.score = saftyScore.score?.plus(tw!! * distance!! * pf.awcrossWalk!!)
+                  //  saftyScore.score = saftyScore.score?.plus(tw!! * distance!! * pf.awcrossWalk!!)
                 }
                 else -> {
 
