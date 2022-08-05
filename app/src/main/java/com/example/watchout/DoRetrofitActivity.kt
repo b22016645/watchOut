@@ -3,7 +3,6 @@ package com.example.watchout
 import android.app.Activity
 import android.content.Intent
 import android.os.Bundle
-import android.os.Handler
 import android.util.Log
 import android.view.WindowManager
 import com.example.watchout.databinding.ActivityMainBinding
@@ -40,7 +39,7 @@ class DoRetrofitActivity : Activity(){
 
     private var destination : String = ""
 
-    private var getscorecount = 0
+    private var getScoreCount = 0
 
     private var errorcount = 0
 
@@ -65,6 +64,7 @@ class DoRetrofitActivity : Activity(){
         myMqtt.connect(arrayOf<String>(sub_topic))
 
         val doRrtrofitData = intent.getSerializableExtra("doRrtrofitData") as model.DoRetrofitData
+        val num = intent.getIntExtra("name",0)
 
         Log.d(LOG,"DoRetrofit - doRrtrofitData : "+"${doRrtrofitData}")
 
@@ -74,10 +74,12 @@ class DoRetrofitActivity : Activity(){
         lat = doRrtrofitData.lat
         lon = doRrtrofitData.lon
 
-        //먼저 db에서 즐겨찾기가있는지 찾는 함수를 여기에 추가해야함
-        //만약 있다면 db에있던 목적지 이름?주소?를 destination에 넣어야함!
-
-        getPOI(destination, lat, lon)
+        if (num == 1){ //즐겨찾기에 있었다면
+            startScore(lon,lat,"",destination)
+        }
+        else { //없었다면
+            getPOI(destination, lat, lon)
+        }
     }
 
     override fun onDestroy() {
@@ -129,19 +131,7 @@ class DoRetrofitActivity : Activity(){
                         Favorites.dat.replace("lat",destinationPoint[0])  //즐겨찾기 저장용
                         Favorites.dat.replace("lon",destinationPoint[0])  //즐겨찾기 저장용
 
-
-                        var timercount = 0
-                        timer(period = 500,initialDelay = 500){
-                            if(timercount!=4){
-                                getScore(lon,lat,destinationPoint[1],destinationPoint[0],startname,endname,safeList[timercount],timercount)
-
-                                timercount++
-                                getscorecount++
-                            }
-                            else{
-                                cancel()
-                            }
-                        }
+                        startScore(destinationPoint[1],destinationPoint[0],startname,endname)
                     }
                 }
                 Constant.RESPONSE_STATE.NO_CONTENT->{//204에러면 main으로 갔다가 stt로 보냄
@@ -153,6 +143,21 @@ class DoRetrofitActivity : Activity(){
                 }
             }
         })
+    }
+
+    private fun startScore(des1 : Double , des2 : Double, sName: String, eName : String) {
+        var timercount = 0
+        timer(period = 500,initialDelay = 500){
+            if(timercount!=4){
+                getScore(lon,lat,des1,des2,sName,eName,safeList[timercount],timercount)
+
+                timercount++
+                getScoreCount++
+            }
+            else{
+                cancel()
+            }
+        }
     }
 
 
@@ -220,10 +225,10 @@ class DoRetrofitActivity : Activity(){
                             routeBuilder.append("!")
                         }
 
-                        if (getscorecount == 4 && errorcount != 0) {  // 4번 돌았는데 403에러가 1개라도 있었다면
+                        if (getScoreCount == 4 && errorcount != 0) {  // 4번 돌았는데 403에러가 1개라도 있었다면
                             Log.d(LOG, "DoRetrofit - ROUTE API 403에러 - getScore")
                             scoreList.clear()
-                            getscorecount = 0
+                            getScoreCount = 0
                             errorcount = 0
                             getPOI(destination, lat, lon)
                         } else {
@@ -276,9 +281,9 @@ class DoRetrofitActivity : Activity(){
                     }
                     Constant.RESPONSE_STATE.ERROR403 -> {
                         errorcount++
-                        if(getscorecount==4){ //4번째 값이 403에러라면
+                        if(getScoreCount==4){ //4번째 값이 403에러라면
                             Log.d(LOG,"DoRetrofit - ROUTE API 403에러 - getScore")
-                            getscorecount=0
+                            getScoreCount=0
                             errorcount=0
                             scoreList.clear()
                             getPOI(destination,lat,lon)
@@ -309,7 +314,7 @@ class DoRetrofitActivity : Activity(){
 
         scoreList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
 
-        getscorecount = 0
+        getScoreCount = 0
         errorcount = 0
 
         //세분화된 좌표를 저장할 배열

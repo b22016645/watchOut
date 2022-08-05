@@ -241,13 +241,15 @@ class MainActivity : Activity() {
                 else {
                     publish("topic","목적지를 입력하였습니다")
 
-                    var doRrtrofitData = DoRetrofitData(sttResultMsg,lat,lon)
+                    searchFromDB(sttResultMsg!!)
 
-                    val intent = Intent(this, DoRetrofitActivity::class.java)
-                    intent.putExtra("doRrtrofitData",doRrtrofitData)
-
-                    //DoRetrofit 실행
-                    startActivityForResult(intent, 100)
+//                    var doRrtrofitData = DoRetrofitData(sttResultMsg,lat,lon)
+//
+//                    val intent = Intent(this, DoRetrofitActivity::class.java)
+//                    intent.putExtra("doRrtrofitData",doRrtrofitData)
+//
+//                    //DoRetrofit 실행
+//                    startActivityForResult(intent, 100)
                 }
             }
         }
@@ -343,10 +345,10 @@ class MainActivity : Activity() {
             }
     }
 
-    fun serchFromDB() {
+    fun searchFromDB(destinationName : String) {
         //즐겨찾기에서 먼저 검색하는 코드입니다
         var fav: Map<String, Any>
-        var destinationName = "영심이네"     //음성파일을 string형으로 변환한 데이터 ( 목적지)
+        //destinationName = "영심이네"     //음성파일을 string형으로 변환한 데이터 ( 목적지)
         var favFromDB =
             firestore!!.collection("PersonalData").document("${uid}").collection("Favorites")
                 .document("${destinationName}")
@@ -361,12 +363,42 @@ class MainActivity : Activity() {
                     Log.d("즐겨찾기를 맵형태로 불러온다", "${fav}")
                     Log.d("즐겨찾기에서 특정 데이터를 불러오는 코드", "${fav.get("address")}")
 
-                } else {
-                    Log.d("DB_Favorites_ERROR", "즐겨찾기 등록은 되어있으나 데이터가 없음")
+                    var dpLat = fav.get("lat") as Double
+                    var dpLon = fav.get("lon") as Double
+                    Log.d("즐찾","${dpLat}")
+                    Log.d("즐찾","${dpLon}")
+
+                    var doRrtrofitData = DoRetrofitData(destinationName,dpLat,dpLon)
+
+                    val intent = Intent(this, DoRetrofitActivity::class.java)
+                    intent.putExtra("doRrtrofitData",doRrtrofitData).putExtra("num",1)
+
+                    //DoRetrofit 실행
+                    startActivityForResult(intent, 100)
+
+
+                } else { //등록 안되어있을때
+                    Log.d("DB_Favorites_ERROR", "넌 누구냐")
+
+//                    var doRrtrofitData = DoRetrofitData(destinationName,lat,lon)
+//
+//                    val intent = Intent(this, DoRetrofitActivity::class.java)
+//                    intent.putExtra("doRrtrofitData",doRrtrofitData).putExtra("num",0)
+//
+//                    //DoRetrofit 실행
+//                    startActivityForResult(intent, 100)
                 }
             }
             .addOnFailureListener { exception ->
-                Log.d("DB_Favorites_ERROR", "즐겨찾기에 등록되어 있지 않은 주소, 일반검색으로 넘어갑니다.")
+                Log.d("DB_Favorites_ERROR", "즐겨찾기에 등록이 안되어있을때")
+
+                var doRrtrofitData = DoRetrofitData(destinationName,lat,lon)
+
+                val intent = Intent(this, DoRetrofitActivity::class.java)
+                intent.putExtra("doRrtrofitData",doRrtrofitData).putExtra("num",0)
+
+                //DoRetrofit 실행
+                startActivityForResult(intent, 100)
             }
     }
 
