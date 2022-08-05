@@ -49,7 +49,7 @@ object Favorites  { //즐겨찾기 데이터 클래스 (파이어베이스 저�
                 "address" to "주소",                  //DoRetrofit - getPoi()
                 "lat" to "위도",                      //DoRetrofit - getPoi()
                 "lon" to "경도",                      //DoRetrofit - getPoi()
-                "nickname" to "즐겨찾기저장이름",                 //id값       DoRetrofit - requestStt
+                "nickname" to "즐겨찾기저장이름",                 //id값       Main - onActivityResult()
                 "frequency" to 0                 //검색횟수     호출즉시+1
         )
 }

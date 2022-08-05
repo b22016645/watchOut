@@ -6,8 +6,6 @@ import android.os.Bundle
 import android.os.Handler
 import android.util.Log
 import android.view.WindowManager
-import com.example.watchout.MyMqtt
-import com.example.watchout.R
 import com.example.watchout.databinding.ActivityMainBinding
 import com.google.gson.Gson
 import model.*
@@ -26,17 +24,11 @@ class DoRetrofitActivity : Activity(){
     private lateinit var myMqtt: MyMqtt
     val sub_topic = "android"
 
-    //안전한 길 개수
-//    var rawRouteNum = 0
-//    var routeRes : String = ""
-
     //mqtt보낼 route4개저장
     private var routeBuilder = StringBuilder()
 
     //안전할 길 점수 받을 배열
-    //private var scoreList = arrayListOf<Double>()
     private var scoreList = arrayListOf<SaftyScore?>()
-    //private var scoreList = Array<SaftyScore?>(4){null}
 
     //searchOption 목록
     private var safeList = listOf(0,4,10,30)
@@ -46,7 +38,7 @@ class DoRetrofitActivity : Activity(){
     private var lat: Double = 0.0
     private var lon: Double = 0.0
 
-    private var sttResultMsg : String = ""
+    private var destination : String = ""
 
     private var getscorecount = 0
 
@@ -78,19 +70,14 @@ class DoRetrofitActivity : Activity(){
 
         routeBuilder.clear()
 
-        var byteAudioData = doRrtrofitData.byteAudioData
+        destination = doRrtrofitData.destination!!
         lat = doRrtrofitData.lat
         lon = doRrtrofitData.lon
-        sttResultMsg = doRrtrofitData.destination
 
-        Handler().postDelayed(java.lang.Runnable {
+        //먼저 db에서 즐겨찾기가있는지 찾는 함수를 여기에 추가해야함
+        //만약 있다면 db에있던 목적지 이름?주소?를 destination에 넣어야함!
 
-            if (byteAudioData != null) { //정상적으로 들어왔을 때
-                requestStt(byteAudioData)
-            } else if (byteAudioData == null) { //경로이탈로 재검색해서 들어왔을 때
-                getPOI(sttResultMsg, lat, lon)
-            }
-        }, 1000)
+        getPOI(destination, lat, lon)
     }
 
     override fun onDestroy() {
@@ -106,44 +93,13 @@ class DoRetrofitActivity : Activity(){
         myMqtt.publish(topic, data)
     }
 
-    private fun requestStt(byteAudioData : ByteArray){
-        instance.requestStt(byteAudioData) { responseState, sttResultMsg ->
-            when (responseState) {
-                Constant.RESPONSE_STATE.OKAY -> {  //만약 STATE가 OKEY라면
-                    if (lat == 1.1 && lon == 1.1){ //즐겨찾기 등록시
-                        Favorites.dat.replace("nickname", sttResultMsg)
-                        Log.d(LOG,"nickname ="+"${sttResultMsg}")
-                        val returnintent = Intent()
-                        setResult(0,returnintent)
-                        finish()
-                    }
-                    else {
-                        //여기에 즐겨찾기 목록에서 찾는 코드 쓰면 돼용
-                        //만약 즐겨찾기 목록에 있으면 밑에 들어가는ㄴ 이름->
-                        getPOI(sttResultMsg, lat, lon)
-                    }
-                }
-                Constant.RESPONSE_STATE.FAIL -> {
-                    Log.d(LOG,"DoRetrofit - 잘못된 음성으로 main으로 돌아감.")
-                    val returnintent = Intent()
-                    setResult(RESULT_CANCELED,returnintent)
-                    finish()
-                }
-            }
-        }
-    }
-
-
     private fun getPOI(location : String, lat : Double, lon : Double){
         Log.d(LOG,"DoRetrofit - getPOI호출")
         Log.d(LOG, "DoRetrofit - 목적지 : "+"${location}")
         History.dpName = location       //DB저장음(히스토리)
-        Favorites.dat.replace("address",location)   //DB즐겨찾기 추가
 
-        //추후에 경로이탈일 때 사용되니깐 그냥 여기에 두면 됨.
-        sttResultMsg = location
-
-        publish("des",sttResultMsg)
+        //publish를 여기ㅅ 꼭 해야하는지??
+        //publish("des",location)
 
         //목적지 좌표
         var destinationPoint = arrayListOf<Double>() //[0]=>lat, [1]=>lon
@@ -264,15 +220,12 @@ class DoRetrofitActivity : Activity(){
                             routeBuilder.append("!")
                         }
 
-/*                        var routeString = routeBuilder.toString()
-                        publish("route",routeString)*/
-
                         if (getscorecount == 4 && errorcount != 0) {  // 4번 돌았는데 403에러가 1개라도 있었다면
                             Log.d(LOG, "DoRetrofit - ROUTE API 403에러 - getScore")
                             scoreList.clear()
                             getscorecount = 0
                             errorcount = 0
-                            getPOI(sttResultMsg, lat, lon)
+                            getPOI(destination, lat, lon)
                         } else {
                             //  Log.d(SCORE_SAFEROUTE, "나누기전 스코어" + "${saftyScore?.score}")
                             //  Log.d(SCORE_SAFEROUTE, "나누기전 토탈디스탄스" + "${saftyScore?.totalDistance}")
@@ -328,7 +281,7 @@ class DoRetrofitActivity : Activity(){
                             getscorecount=0
                             errorcount=0
                             scoreList.clear()
-                            getPOI(sttResultMsg,lat,lon)
+                            getPOI(destination,lat,lon)
                         }
                     }
                 }
@@ -504,7 +457,7 @@ class DoRetrofitActivity : Activity(){
 //                        Log.d(LOG,"midpoint : "+"${midpointString}")
 
 
-                        var naviData = NaviData(midpointList, turnTypeList, sttResultMsg, turnPoint)
+                        val naviData = NaviData(midpointList, turnTypeList, destination, turnPoint)
                         //받아서 retrunMain호출함수호출
                         returnMain(naviData)
 

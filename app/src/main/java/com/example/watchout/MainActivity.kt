@@ -230,21 +230,22 @@ class MainActivity : Activity() {
         //SpeechToTextActivity에서 받음
         if (requestCode == 0 || requestCode == 10) {
             if (resultCode == RESULT_OK) {
-                var byteAudioData: ByteArray? = null
-                byteAudioData = data?.getByteArrayExtra("byteAudioData")
+                var sttResultMsg = data?.getStringExtra("sttResultMsg")
 
-                if (byteAudioData != null) { //아무것도 입력하지 않아도 null값은 아니다.
-                    var doRrtrofitData: DoRetrofitData? = null
-                    if(requestCode == 10) { //즐겨찾기 등록시
-                        publish("topic","즐겨찾기 등록 시작")
-                        doRrtrofitData = DoRetrofitData(byteAudioData,"",1.1,1.1)
-                    }
-                    else {
-                        publish("topic","목적지를 입력하였습니다")
-                        doRrtrofitData = DoRetrofitData(byteAudioData,"",lat,lon)
-                    }
+                if(requestCode == 10) { //즐겨찾기 등록시
+                    publish("topic","즐겨찾기 등록 시작")
+                    Favorites.dat.replace("nickname",sttResultMsg) //DB즐겨찾기 추가
+
+                    addFavorite()
+                }
+                else {
+                    publish("topic","목적지를 입력하였습니다")
+
+                    var doRrtrofitData = DoRetrofitData(sttResultMsg,lat,lon)
+
                     val intent = Intent(this, DoRetrofitActivity::class.java)
                     intent.putExtra("doRrtrofitData",doRrtrofitData)
+
                     //DoRetrofit 실행
                     startActivityForResult(intent, 100)
                 }
@@ -267,9 +268,6 @@ class MainActivity : Activity() {
                 intent.putExtra("naviData",naviData)
                 startActivityForResult(intent, 1)
             }
-            else if (resultCode == 0){
-                addFavorite()
-            }
             else if (resultCode == RESULT_CANCELED) { //음성이 이상할 때 혹은 204에러 때 다시 stt호출
                 publish("topic","목적지를 다시 입력해주세요")
                 startSTT(0)
@@ -280,7 +278,6 @@ class MainActivity : Activity() {
         //NavigationActivity에서 받음
         if ( requestCode == 1 ) {
             if (resultCode == RESULT_OK ) {//목적지 도착했을 때
-//                publish("topic","목적지에 도착하였습니다")
                 Log.d(LOG, "도착")
                 dofavor = true
                 History.arrivedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))      //DB저장용
@@ -289,7 +286,6 @@ class MainActivity : Activity() {
                 //finish()
             }
             else if (resultCode == 2) {//navi에서 뒤로가기 버튼을 눌렀을 때
-//                publish("topic","reSTT2")
                 Log.d(LOG, "뒤로가기 버튼 누름 : Navigation -> Main")
                 modified = 4
                 startSTT(0)
@@ -299,7 +295,7 @@ class MainActivity : Activity() {
                 ttsSpeak("경로를 이탈하였습니다")
                 publish("route","out")
                 var destination = data.getStringExtra("destination")
-                var doRrtrofitData = DoRetrofitData(null,destination!!,lat,lon)
+                var doRrtrofitData = DoRetrofitData(destination,lat,lon)
                 val intent = Intent(this, DoRetrofitActivity::class.java)
                 intent.putExtra("doRrtrofitData",doRrtrofitData)
                 //DoRetrofit 실행
@@ -310,7 +306,104 @@ class MainActivity : Activity() {
 
 
 
+    /////////////////////////////////////////////////////////////////////////////
+    //                            FIREBASE(DB) 관련 함수                         //
+    /////////////////////////////////////////////////////////////////////////////
+    fun firebaseLogin(){
+        auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this) { task ->
+            if (task.isSuccessful) {
+                Log.d("파이어베이스로그인", "로그인 성공" + "${auth}")
+                Log.d("시간",LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
+            } else {
+                Log.d("파이어베이스로그인", "로그인 실패" + "${auth}")
+            }
+        }
+    }
 
+    fun algorithmWeightFromDB() {
+        //FireBase에서 알고리즘 가중치를 불러와 데이터스냅샷 형태로 저장후 잘라서 싱글톤객체 Preference에 저장.
+        var snapshotData: Map<String, Any>
+        val dbData = firestore!!.collection("PersonalData").document("${uid}")
+        dbData.get()
+            .addOnSuccessListener { doc ->
+                if (doc != null) {
+                    snapshotData = doc.data as Map<String, Any>
+                    Preference.awcrossWalk = "${snapshotData.get("crossWalk")}".toDouble()
+                    Preference.awft_car = "${snapshotData.get("ft_car")}".toDouble()
+                    Preference.awft_noCar = "${snapshotData.get("ft_noCar")}".toDouble()
+                    Preference.tableWeight = "${snapshotData.get("tableWeight")}".toDouble()
+                    Preference.awturnPoint = "${snapshotData.get("turnPoint")}".toDouble()
+                    Preference.score = "${snapshotData.get("score")}".toInt()
+                } else {
+                    Log.d("알고리즘 가중치값 DB에서 불러오기", "No such document")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("알고리즘 가중치값 DB에서 불러오기", "get failed with ", exception)
+            }
+    }
+
+    fun serchFromDB() {
+        //즐겨찾기에서 먼저 검색하는 코드입니다
+        var fav: Map<String, Any>
+        var destinationName = "영심이네"     //음성파일을 string형으로 변환한 데이터 ( 목적지)
+        var favFromDB =
+            firestore!!.collection("PersonalData").document("${uid}").collection("Favorites")
+                .document("${destinationName}")
+        favFromDB.get()
+            .addOnSuccessListener { dat ->
+                if (dat != null) {
+                    fav = dat.data as Map<String, Any>
+                    favFromDB.update("frequency", FieldValue.increment(1))
+                        .addOnSuccessListener {
+                            Log.d("DB_Favorites_Frequency", "+1업데이트완료")
+                        }
+                    Log.d("즐겨찾기를 맵형태로 불러온다", "${fav}")
+                    Log.d("즐겨찾기에서 특정 데이터를 불러오는 코드", "${fav.get("address")}")
+
+                } else {
+                    Log.d("DB_Favorites_ERROR", "즐겨찾기 등록은 되어있으나 데이터가 없음")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d("DB_Favorites_ERROR", "즐겨찾기에 등록되어 있지 않은 주소, 일반검색으로 넘어갑니다.")
+            }
+    }
+
+    private fun addFavorite() {     //즐겨찾기 추가함수
+        firestore!!.collection("PersonalData").document("${uid}").collection("Favorites").document("${Favorites.dat.get("nickname")}").set(Favorites.dat)
+            .addOnSuccessListener {
+                Log.d("즐겨찾기 저장값입니다", Favorites.dat.toString())
+                Log.d(LOG, "즐겨찾기 등록 완료")
+                //        ttsSpeak("즐겨찾기 등록 완료")
+                //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
+            }
+            .addOnFailureListener { exception ->
+                Log.d("즐겨찾기 저장 실패", exception.toString())
+            }
+    }
+
+    private fun addHistory(){
+        History.spName="예시"
+        firestore!!.collection("PersonalData").document("${uid}").collection("History").document("${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}").set(History)
+            .addOnSuccessListener {
+                Log.d("히스토리 저장값입니다", "${History}")
+                Log.d(LOG, "히스토리 등록 완료")
+                //        ttsSpeak("히스토리 등록 완료")
+                //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
+            }
+            .addOnFailureListener { exception ->
+                Log.d("히스토리 저장 실패", exception.toString())
+            }
+    }
+
+
+    /*-----------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------------
+    -------------------------------------------------------------------------------------*/
     //사용자 권한, 바꿀거 없음.
     override fun onStart() {
         super.onStart()
@@ -427,98 +520,4 @@ class MainActivity : Activity() {
             }
         }
     }
-
-
-    /////////////////////////////////////////////////////////////////////////////
-    //                            FIREBASE(DB) 관련 함수                         //
-    /////////////////////////////////////////////////////////////////////////////
-    fun firebaseLogin(){
-        auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this) { task ->
-            if (task.isSuccessful) {
-                Log.d("파이어베이스로그인", "로그인 성공" + "${auth}")
-                Log.d("시간",LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss")))
-            } else {
-                Log.d("파이어베이스로그인", "로그인 실패" + "${auth}")
-            }
-        }
-    }
-
-    fun algorithmWeightFromDB() {
-        //FireBase에서 알고리즘 가중치를 불러와 데이터스냅샷 형태로 저장후 잘라서 싱글톤객체 Preference에 저장.
-        var snapshotData: Map<String, Any>
-        val dbData = firestore!!.collection("PersonalData").document("${uid}")
-        dbData.get()
-            .addOnSuccessListener { doc ->
-                if (doc != null) {
-                    snapshotData = doc.data as Map<String, Any>
-                    Preference.awcrossWalk = "${snapshotData.get("crossWalk")}".toDouble()
-                    Preference.awft_car = "${snapshotData.get("ft_car")}".toDouble()
-                    Preference.awft_noCar = "${snapshotData.get("ft_noCar")}".toDouble()
-                    Preference.tableWeight = "${snapshotData.get("tableWeight")}".toDouble()
-                    Preference.awturnPoint = "${snapshotData.get("turnPoint")}".toDouble()
-                    Preference.score = "${snapshotData.get("score")}".toInt()
-                } else {
-                    Log.d("알고리즘 가중치값 DB에서 불러오기", "No such document")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("알고리즘 가중치값 DB에서 불러오기", "get failed with ", exception)
-            }
-    }
-
-    fun serchFromDB() {
-        //즐겨찾기에서 먼저 검색하는 코드입니다
-        var fav: Map<String, Any>
-        var destinationName = "영심이네"     //음성파일을 string형으로 변환한 데이터 ( 목적지)
-        var favFromDB =
-            firestore!!.collection("PersonalData").document("${uid}").collection("Favorites")
-                .document("${destinationName}")
-        favFromDB.get()
-            .addOnSuccessListener { dat ->
-                if (dat != null) {
-                    fav = dat.data as Map<String, Any>
-                    favFromDB.update("frequency", FieldValue.increment(1))
-                        .addOnSuccessListener {
-                            Log.d("DB_Favorites_Frequency", "+1업데이트완료")
-                        }
-                    Log.d("즐겨찾기를 맵형태로 불러온다", "${fav}")
-                    Log.d("즐겨찾기에서 특정 데이터를 불러오는 코드", "${fav.get("address")}")
-
-                } else {
-                    Log.d("DB_Favorites_ERROR", "즐겨찾기 등록은 되어있으나 데이터가 없음")
-                }
-            }
-            .addOnFailureListener { exception ->
-                Log.d("DB_Favorites_ERROR", "즐겨찾기에 등록되어 있지 않은 주소, 일반검색으로 넘어갑니다.")
-            }
-    }
-
-    private fun addFavorite() {     //즐겨찾기 추가함수
-        firestore!!.collection("PersonalData").document("${uid}").collection("Favorites").document("${Favorites.dat.get("nickname")}").set(Favorites.dat)
-            .addOnSuccessListener {
-                Log.d("즐겨찾기 저장값입니다", Favorites.dat.toString())
-                Log.d(LOG, "즐겨찾기 등록 완료")
-                //        ttsSpeak("즐겨찾기 등록 완료")
-                //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
-            }
-            .addOnFailureListener { exception ->
-                Log.d("즐겨찾기 저장 실패", exception.toString())
-            }
-    }
-
-    private fun addHistory(){
-        History.spName="예시"
-        firestore!!.collection("PersonalData").document("${uid}").collection("History").document("${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}").set(History)
-            .addOnSuccessListener {
-                Log.d("히스토리 저장값입니다", "${History}")
-                Log.d(LOG, "히스토리 등록 완료")
-                //        ttsSpeak("히스토리 등록 완료")
-                //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
-            }
-            .addOnFailureListener { exception ->
-                Log.d("히스토리 저장 실패", exception.toString())
-            }
-    }
-
-
 }

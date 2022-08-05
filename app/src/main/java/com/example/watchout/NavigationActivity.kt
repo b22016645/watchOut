@@ -231,14 +231,9 @@ class NavigationActivity : Activity(), LocationListener {
                                 Log.d(LOG,"NavigationActivity 예외 길")
                             }
 
-                            //분기점 다음 좌표에서 직진임을 알려줌
-                            else if (sppoint == 1){
-                                ttsSpeak("다음 안내까지 "+"${distance}"+"m 직진입니다")
-                            }
-
                             var distanceRange = 8.0      //오차범위
 
-                            //경로이탈인지 아닌지 판단 (false 반환시 이탈)
+                            //경로이탈 판단
                             if (!DetailRoute.isRightCource(lat,
                                     lon,
                                     midpointList[midPointNum][0],
@@ -257,6 +252,7 @@ class NavigationActivity : Activity(), LocationListener {
                                         outNum = 0
                                         Log.d(LOG, "NavigationActivity 경로이탈일 때")
                                         clear()
+
                                         val returnIntent = Intent()
                                         returnIntent.putExtra("destination", destination)
                                         setResult(3, returnIntent)
@@ -276,6 +272,10 @@ class NavigationActivity : Activity(), LocationListener {
                                             13, 18, 19 -> ttsSpeak("${distance}"+"m 뒤에 우회전입니다")
                                             else -> Log.d(LOG,"uuuuuuuuuuu턴")
                                         }
+                                    }
+                                    //분기점 다음 좌표에서 직진임을 알려줌
+                                    else if (turnTypeList[midPointNum-1] in 12..19) {
+                                        ttsSpeak("다음 안내까지 "+"${distance}"+"m 직진입니다")
                                     }
                                 }
                             }
