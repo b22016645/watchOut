@@ -171,7 +171,7 @@ class NavigationActivity : Activity(), LocationListener {
 
                         var myHeartRate = mySensor.heartRate
                         //현재심박수같이보냄냄
-                       var nowBuilder = StringBuilder()
+                        var nowBuilder = StringBuilder()
                         nowBuilder.append(lat.toString()).append(",").append(lon.toString()).append(",").append(myHeartRate.toString())
                         var now = nowBuilder.toString()
                         Log.d("센서로그","now : " + now)
