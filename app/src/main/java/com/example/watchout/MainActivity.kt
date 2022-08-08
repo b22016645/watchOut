@@ -285,6 +285,8 @@ class MainActivity : Activity() {
                 Log.d(LOG, "도착")
                 dofavor = true
                 History.arrivedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))      //DB저장용
+                firestore?.collection("${uid}}")?.document("History")?.set("${History.arrivedTime}")
+                Log.d("파이어베이스 히스토리 데이터 저장","${History}")
                 ttsSpeak("목적지에 도착했습니다. 목적지를 즐겨찾기에 등록하려면 아래버튼을 두번 이상 눌러주세요.")
 
                 //finish()
