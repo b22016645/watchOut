@@ -425,16 +425,15 @@ class MainActivity : Activity() {
                 Log.d("즐겨찾기 저장 실패", exception.toString())
             }
     }
+
     private fun addHistory(){
-        History.spName="예시"
         firestore!!.collection("PersonalData").document("${uid}").collection("History").document("${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}").set(History)
-            .addOnSuccessListener {
-                Log.d("히스토리 저장값입니다", "${History}")
-                Log.d(LOG, "히스토리 등록 완료")
+            .addOnSuccessListener{
+                Log.d("History","${History}")
+                Log.d(LOG,"히스토리 등록 완료")
                 //        ttsSpeak("히스토리 등록 완료")
                 //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
-            }
-            .addOnFailureListener { exception ->
+            }.addOnFailureListener{exception ->
                 Log.d("히스토리 저장 실패", exception.toString())
             }
     }
