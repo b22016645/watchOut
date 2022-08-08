@@ -285,7 +285,8 @@ class MainActivity : Activity() {
                 Log.d(LOG, "도착")
                 dofavor = true
                 History.arrivedTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))      //DB저장용
-                firestore?.collection("${uid}}")?.document("History")?.set("${History.arrivedTime}")
+
+                addHistory()
                 Log.d("파이어베이스 히스토리 데이터 저장","${History}")
                 ttsSpeak("목적지에 도착했습니다. 목적지를 즐겨찾기에 등록하려면 아래버튼을 두번 이상 눌러주세요.")
 
@@ -316,6 +317,7 @@ class MainActivity : Activity() {
     //                            FIREBASE(DB) 관련 함수                         //
     /////////////////////////////////////////////////////////////////////////////
     fun firebaseLogin(){
+        //고정로그인(테스트용)
         auth?.signInWithEmailAndPassword("watch@out.com", "watchout1234")?.addOnCompleteListener(this) { task ->
             if (task.isSuccessful) {
                 Log.d("파이어베이스로그인", "로그인 성공" + "${auth}")
@@ -417,11 +419,12 @@ class MainActivity : Activity() {
                 //        ttsSpeak("즐겨찾기 등록 완료")
                 //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
             }
+
+
             .addOnFailureListener { exception ->
                 Log.d("즐겨찾기 저장 실패", exception.toString())
             }
     }
-
     private fun addHistory(){
         History.spName="예시"
         firestore!!.collection("PersonalData").document("${uid}").collection("History").document("${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}").set(History)
@@ -435,6 +438,8 @@ class MainActivity : Activity() {
                 Log.d("히스토리 저장 실패", exception.toString())
             }
     }
+
+
 
 
     /*-----------------------------------------------------------------------------------
