@@ -306,9 +306,12 @@ class NavigationActivity : Activity(), LocationListener {
         publish("topic", "목적지에 도착하였습니다")
         Log.d(LOG, "안내완료")
 
+        //히스토리 저장용 (심박수)
+        History.heartRateMax = mySensor.maxHeart
+        History.heartRateAverage = mySensor.getAverageHeartRate()
+
         //히스토리 저장용 (발걸음 수)
-        val historySteps = mySensor.getresSteps()
-        History.stepNum= historySteps         //발걸음수 확정되면 주석 풀어서 히스토리에 넘겨주세요
+        History.stepNum= mySensor.getResSteps()      //발걸음수 확정되면 주석 풀어서 히스토리에 넘겨주세요
 
         //히스토리 저장용 (출발 위경도 -> 주소)
         (History.spLat)?:midpointList[0][0]

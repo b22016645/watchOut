@@ -22,7 +22,10 @@ class MySensor(val context: Context) : SensorEventListener {
 
     //심박수 변수
     private val heartSensor = sensorManager?.getDefaultSensor(Sensor.TYPE_HEART_RATE)
+    private var heartList = arrayListOf<Int>()
+    var maxHeart  : Int = 0
     var heartRate : Int = 0
+
 
     fun startSensor(){
         if (stepSensor != null && heartSensor != null) {
@@ -40,6 +43,9 @@ class MySensor(val context: Context) : SensorEventListener {
         startSteps = 0
         resSteps = 0
         endSteps = 0
+        maxHeart = 0
+        heartRate = 0
+        heartList.clear()
     }
 
     fun pauseManager(){
@@ -52,10 +58,18 @@ class MySensor(val context: Context) : SensorEventListener {
     }
 
     //총발걸음수
-    fun getresSteps() : Int{
+    fun getResSteps() : Int{
         resSteps = endSteps - startSteps
         Log.d("센서로그","총 발걸음 수  : " + resSteps)
         return resSteps
+    }
+
+    fun getAverageHeartRate() : Int{
+        var average : Int = 0
+        for (i in heartList.indices){
+            average += heartList[i]
+        }
+        return average/heartList.size
     }
 
     override fun onAccuracyChanged(sensor: Sensor?, accuracy: Int) {
@@ -78,7 +92,11 @@ class MySensor(val context: Context) : SensorEventListener {
         if(event!!.sensor.type == Sensor.TYPE_HEART_RATE){
             val heartRateFloat = event!!.values[0]
             heartRate = heartRateFloat.toInt()
-           // Log.d("센서로그","심박수  : " +heartRate.toString())
+            // Log.d("센서로그","심박수  : " +heartRate.toString())
+            heartList.add(heartRate)
+            if(heartRate > maxHeart){
+                maxHeart = heartRate
+            }
         }
     }
 
