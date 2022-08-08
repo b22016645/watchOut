@@ -81,10 +81,12 @@ class MainActivity : Activity() {
         super.onCreate(savedInstanceState)
 
         //FireBase환경세팅
+        Log.d("firebase","파이어베이스 환경세팅")
         auth = Firebase.auth
         firestore = FirebaseFirestore.getInstance()
         firebaseLogin()                         //파이어베이스 로그인
         uid = FirebaseAuth.getInstance().currentUser?.uid
+        Log.d("firebase","$uid")
         algorithmWeightFromDB()                 //파이어베이스에서 알고리즘가중치값 읽어와서 세팅
 
 
@@ -354,7 +356,9 @@ class MainActivity : Activity() {
                 .document("${destinationName}")
         favFromDB.get()
             .addOnSuccessListener { dat ->
-                if (dat != null) {
+                if (dat.data != null) {
+                    Log.d("firebase dat","${dat}")
+                    Log.d("firebase data","${dat.data}")
                     fav = dat.data as Map<String, Any>
                     favFromDB.update("frequency", FieldValue.increment(1))
                         .addOnSuccessListener {
@@ -378,19 +382,20 @@ class MainActivity : Activity() {
 
 
                 } else { //등록 안되어있을때
-                    Log.d("DB_Favorites_ERROR", "넌 누구냐")
+                    Log.d("firebase data","${dat.data}")
+                    Log.d("DB_Favorites_ERROR", "즐찾에 등록이 안된 목적지임")
 
-//                    var doRrtrofitData = DoRetrofitData(destinationName,lat,lon)
-//
-//                    val intent = Intent(this, DoRetrofitActivity::class.java)
-//                    intent.putExtra("doRrtrofitData",doRrtrofitData).putExtra("num",0)
-//
-//                    //DoRetrofit 실행
-//                    startActivityForResult(intent, 100)
+                    var doRrtrofitData = DoRetrofitData(destinationName,lat,lon)
+
+                    val intent = Intent(this, DoRetrofitActivity::class.java)
+                    intent.putExtra("doRrtrofitData",doRrtrofitData).putExtra("num",0)
+
+                    //DoRetrofit 실행
+                    startActivityForResult(intent, 100)
                 }
             }
             .addOnFailureListener { exception ->
-                Log.d("DB_Favorites_ERROR", "즐겨찾기에 등록이 안되어있을때")
+                Log.d("DB_Favorites_ERROR", "즐겨찾기에 DB 도큐먼트 레퍼런스 불러오지 못하였음")
 
                 var doRrtrofitData = DoRetrofitData(destinationName,lat,lon)
 
