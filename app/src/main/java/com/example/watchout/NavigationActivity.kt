@@ -204,6 +204,9 @@ class NavigationActivity : Activity(), LocationListener {
                                 publish("topic", "분기점을 마주했습니다")
                                 Log.d(LOG, "NavigationActivity 분기점일 때")
                                 doSensor(lat, lon)
+/*                                if (outNum ==15) {
+                                    History.expTurnPoint.plus(1)
+                                }*/
                             }
 
                             //위험요소 (횡단보도, 육교 등)
@@ -211,6 +214,7 @@ class NavigationActivity : Activity(), LocationListener {
                                 watchOut()
                                 publish("topic", "위험요소 앞입니다")
                                 sppoint ++
+
                                 Log.d(LOG, "NavigationActivity 위험요소")
                                 val turnName = when (turnNum) {
                                     125 -> "육교"
@@ -248,6 +252,14 @@ class NavigationActivity : Activity(), LocationListener {
                                     Log.d(LOG, "NavigationActivity " + "${outNum}" + "번 나갔다.")
                                     //15초동안 이탈이면 경로이탈
                                     if (outNum > 15) {
+                                        History.expTotal.plus(1)        //경로이탈 +1
+                                        if (turnNum == 11)          //직선 경로이탈
+                                            History.expLineWay.plus(1)
+                                        else if(turnNum in 12..19)                //분기점 경로이탈
+                                            History.expTurnPoint.plus(1)
+                                        else if ((turnNum in 125..129 || turnNum in 211..217))      //Facility 경로이탈
+                                            History.expFacility.plus(1)
+
                                         youOut()
                                         outNum = 0
                                         Log.d(LOG, "NavigationActivity 경로이탈일 때")
@@ -296,7 +308,7 @@ class NavigationActivity : Activity(), LocationListener {
 
         //히스토리 저장용 (발걸음 수)
         val historySteps = mySensor.getresSteps()
-        //History.stepNum= historySteps         //발걸음수 확정되면 주석 풀어서 히스토리에 넘겨주세요
+        History.stepNum= historySteps         //발걸음수 확정되면 주석 풀어서 히스토리에 넘겨주세요
 
         //히스토리 저장용 (출발 위경도 -> 주소)
         (History.spLat)?:midpointList[0][0]

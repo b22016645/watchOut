@@ -21,15 +21,15 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
         //Biometric Infor 생체성보
         var heartRateAverage: Int? = null  //평균 심박
         var heartRateMax: Int? = null      //최대 심박
-        var stepNum: Int? = null           //발걸음 수
-        var kcal: Double? = null           //소요 칼로리
+        var stepNum: Int? = null           //발걸음 수      Navigation - endOfRoute()
+
 
         //RouteInfor 루트 정보 (exp = existPoint: 경로 이탈 부분)
-        var routNum: Int? = null           //이용했던 경로 번호용. DoRetrofit에서 인덱스 결정 후 받음
-        var expTurnPoint: Int? = null      //분기점에서 이탈한 횟수
-        var expFacility: Int? = null       //FT 이탈 횟수
-        var expLineWay: Int? = null        // 직선길 이탈 횟수
-        var expTotal: Int? = null           //총 이탈 횟수
+        var routNum: Int? = null         //이용했던 경로 번호용. DoRetrofit에서 인덱스 결정 후 받음
+        var expTurnPoint: Int = 0      //분기점에서 이탈한 횟수  Navigation - locationCallBack
+        var expFacility: Int = 0       //FT 이탈 횟수
+        var expLineWay: Int = 0        // 직선길 이탈 횟수
+        var expTotal: Int = 0           //총 이탈 횟수
         }
 
 object Preference {   //도착지 도착 후 선호도 평가 데이터 베이스 (파이어베이스 저장용)
