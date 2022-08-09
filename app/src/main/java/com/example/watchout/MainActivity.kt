@@ -233,6 +233,7 @@ class MainActivity : Activity() {
         if (requestCode == 0 || requestCode == 10) {
             if (resultCode == RESULT_OK) {
                 var sttResultMsg = data?.getStringExtra("sttResultMsg")
+                publish("des",sttResultMsg!!)
 
                 if(requestCode == 10) { //즐겨찾기 등록시
                     publish("topic","즐겨찾기 등록 시작")
@@ -243,15 +244,8 @@ class MainActivity : Activity() {
                 else {
                     publish("topic","목적지를 입력하였습니다")
 
+                    //우선 db즐찾에서 검색
                     searchFromDB(sttResultMsg!!)
-
-//                    var doRrtrofitData = DoRetrofitData(sttResultMsg,lat,lon)
-//
-//                    val intent = Intent(this, DoRetrofitActivity::class.java)
-//                    intent.putExtra("doRrtrofitData",doRrtrofitData)
-//
-//                    //DoRetrofit 실행
-//                    startActivityForResult(intent, 100)
                 }
             }
         }

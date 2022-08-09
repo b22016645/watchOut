@@ -9,7 +9,7 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
         var spLon: Double? = null     //출발지 경도 (y)      // 경로 이탈시, 목적지 재검색시 다시 받아야할듯?
 
         //DestinationPoint 도착지
-        var dpName: String? = null     //도착지이름용         DoRetrofit  - getPOI() 목적지 로그 찍고 받ㄸ
+        var dpName: String? = null     //도착지이름용         DoRetrofit  - getPOI() 중간쯤 목적지 좌표 찍고 받음
         var dpLat: Double? = null      //도착지 위도 (x)     DoRetrofit - getPoi() 중간쯤 목적지 좌표 찍고 받음
         var dpLon: Double? = null      //도착지 경도 (y)     DoRetrofit - getPoi() 중간쯤 목적지 좌표 찍고 받음
 

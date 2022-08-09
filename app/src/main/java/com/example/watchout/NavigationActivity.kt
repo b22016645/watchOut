@@ -314,9 +314,9 @@ class NavigationActivity : Activity(), LocationListener {
         History.stepNum= mySensor.getResSteps()      //발걸음수 확정되면 주석 풀어서 히스토리에 넘겨주세요
 
         //히스토리 저장용 (출발 위경도 -> 주소)
-        (History.spLat)?:midpointList[0][0]
-        (History.spLon)?:midpointList[0][1]
-        History.spName = getAddress(History.spLat!!, History.spLon!!)
+//        (History.spLat)?:midpointList[0][0]
+//        (History.spLon)?:midpointList[0][1]
+//        History.spName = getAddress(History.spLat!!, History.spLon!!)
 
 
 

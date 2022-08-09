@@ -98,7 +98,6 @@ class DoRetrofitActivity : Activity(){
     private fun getPOI(location : String, lat : Double, lon : Double){
         Log.d(LOG,"DoRetrofit - getPOI호출")
         Log.d(LOG, "DoRetrofit - 목적지 : "+"${location}")
-        History.dpName = location       //DB저장음(히스토리)
 
         //publish를 여기ㅅ 꼭 해야하는지??
         //publish("des",location)
@@ -114,20 +113,23 @@ class DoRetrofitActivity : Activity(){
                 responseState, parsePOIDataArray ->
             when(responseState){
                 Constant.RESPONSE_STATE.OKAY->{  //만약 STATE가 OKEY라면
-
+                    val poiArray : POI
                     if (parsePOIDataArray != null) {
                         //목적지가 ㅇㅇ역일 때 두번째값 = n번출구
                         if (parsePOIDataArray.get(0).name.contains("역") == true ){
-                            destinationPoint.add(parsePOIDataArray.get(1).frontLat.toDouble())
-                            destinationPoint.add(parsePOIDataArray.get(1).frontLon.toDouble())
+                            poiArray = parsePOIDataArray.get(1)
                         }//아닐때 걍 목적지
                         else {
-                            destinationPoint.add(parsePOIDataArray.get(0).frontLat.toDouble())
-                            destinationPoint.add(parsePOIDataArray.get(0).frontLon.toDouble())
+                            poiArray = parsePOIDataArray.get(0)
                         }
+                        destinationPoint.add(poiArray.frontLat.toDouble())
+                        destinationPoint.add(poiArray.frontLon.toDouble())
+
                         Log.d(LOG,"목적지 좌표 : "+"${destinationPoint[0]}"+", "+"${destinationPoint[1]}")
+
                         History.dpLat = destinationPoint[0]         //DB저장용
                         History.dpLon = destinationPoint[1]         //DB저장용
+                        History.dpName = poiArray.address           //DB저장용 (목적지주소)
                         Favorites.dat.replace("lat",destinationPoint[0])  //즐겨찾기 저장용
                         Favorites.dat.replace("lon",destinationPoint[0])  //즐겨찾기 저장용
 

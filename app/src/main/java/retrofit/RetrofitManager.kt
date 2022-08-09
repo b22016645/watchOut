@@ -74,12 +74,21 @@ class RetrofitManager {
                                 val frontLat= poiItemObject.get("frontLat").asString
                                 val frontLon= poiItemObject.get("frontLon").asString
 
-                                val POIItem = POI(
-                                    name=name,
-                                    frontLat=frontLat,
-                                    frontLon=frontLon
-                                )
-                                parsePOIDataArray.add(POIItem)
+                                val newAddressList = poiItemObject.get("newAddressList").asJsonObject
+                                val newAddress = newAddressList.getAsJsonArray("newAddress")
+
+                                newAddress.forEach { address -> //목적지 주소 저장
+                                    val addressObject = address.asJsonObject
+                                    val address = addressObject.get("fullAddressRoad").asString
+
+                                    val POIItem = POI(
+                                        name=name,
+                                        frontLat=frontLat,
+                                        frontLon=frontLon,
+                                        address=address
+                                    )
+                                    parsePOIDataArray.add(POIItem)
+                                }
                             }
                             completion(Constant.RESPONSE_STATE.OKAY,parsePOIDataArray)
                         }
@@ -130,9 +139,6 @@ class RetrofitManager {
                                 0,0,0,0,
                                 0,.0,.0,.0,.0,.0,0,0)
 
-
-
-
                             features.forEach { featuresItem->
                                 val featureObject = featuresItem.asJsonObject
                                 val geometry=featureObject.get("geometry").asJsonObject
@@ -155,11 +161,8 @@ class RetrofitManager {
 
 
                                 //얘는 점수 하나 추가될 때마다 계속불리는 함수
-                                SafeRoute.calcPartialScore(facilityType,distance,roadType,turnType, saftyScore
-                                )
+                                SafeRoute.calcPartialScore(facilityType,distance,roadType,turnType, saftyScore)
                                 //Log.d(Constant.API.SCORE_SAFEROUTE, "FFFFFFFFFFFFFFF" + "${saftyScore}")
-
-
 
 
                                 var RouteItem = Route(
