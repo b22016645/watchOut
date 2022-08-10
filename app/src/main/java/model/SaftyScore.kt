@@ -1,4 +1,5 @@
 package model
+//이건 루트인포로 대체함
 
 import java.io.Serializable
 

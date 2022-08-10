@@ -1,8 +1,13 @@
 package model
+//이건 경로의 모든 정보를 담고있는 데이타클래스,
+//웹에 퍼블리쉬할 함수도 만들어야함 (스트링으로 붙이는 함수)
 
 import java.io.Serializable
 
-data class RouteInfor (var searchOption : Int ) : Serializable{
+data class RouteInfor (var searchOption : Int )
+    : Serializable{
+
+    var distance :Double = 0.0
 
     /////////////////////////////////////SCORE /////////////////////////////////////
     var routeScore : Int = 0        //경로별 최종 점수
