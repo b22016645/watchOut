@@ -10,6 +10,7 @@ import com.google.gson.Gson
 import model.*
 import retrofit.RetrofitManager
 import route.DetailRoute
+import route.SafeRoute
 import utils.Constant
 import utils.Constant.API.LOG
 import utils.Constant.API.SCORE_SAFEROUTE
@@ -28,6 +29,7 @@ class DoRetrofitActivity : Activity(){
 
     //안전할 길 점수 받을 배열
     private var scoreList = arrayListOf<SaftyScore?>()
+    private var routeList = arrayListOf<RouteInfor?>()
 
     //searchOption 목록
     private var safeList = listOf(0,4,10,30)
@@ -178,7 +180,7 @@ class DoRetrofitActivity : Activity(){
             startname = startname,
             endname = endname,
             searchOption = searchOption,
-            completion = { responseState, parseRouteDataArray, saftyScore ->
+            completion = { responseState, parseRouteDataArray, routeInfor ->
                 when (responseState) {
                     Constant.RESPONSE_STATE.OKAY -> {  //만약 STATE가 OKEY라면
 
@@ -236,20 +238,25 @@ class DoRetrofitActivity : Activity(){
                         } else {
                             //  Log.d(SCORE_SAFEROUTE, "나누기전 스코어" + "${saftyScore?.score}")
                             //  Log.d(SCORE_SAFEROUTE, "나누기전 토탈디스탄스" + "${saftyScore?.totalDistance}")
-                            saftyScore?.score = floor((saftyScore?.score!! / saftyScore.totalDistance!!) *1000)
-                            Log.d(SCORE_SAFEROUTE, "나누고 스코어" + "${saftyScore?.score}")
+                                //saftyScore?.score = floor((saftyScore?.score!! / saftyScore.totalDistance!!) *1000)
+                                //Log.d(SCORE_SAFEROUTE, "나누고 스코어" + "${saftyScore?.score}")
                             //  Log.d(SCORE_SAFEROUTE, "나누고 토탈디스탄스" + "${saftyScore?.totalDistance}")
 
-                            scoreList.add(saftyScore)
-                            Log.d(SCORE_SAFEROUTE, "scoreList : " + "${saftyScore}")
-
+                            //scoreList.add(saftyScore)
+                            routeList.add(routeInfor)
+                            Log.d(SCORE_SAFEROUTE, "routeList : " + "${routeInfor}")
                             //경로 배열에 경로의 모든 정보 추가함수, 경로 하나 추가시 마다 호출
 
                             if (scoreList.size ==4)  {
                                 var routeString = routeBuilder.toString()
                                 publish("route",routeString)
 
-                                Log.d(SCORE_SAFEROUTE, ""+"${saftyScore}" )
+                                //여기까지 오면 루트 4개가 모두 모인 상태.
+                                //이제 여기서 점수를 내야함
+
+                                SafeRoute.nomalizeDangerScore(routeList)
+
+                                Log.d(SCORE_SAFEROUTE, ""+"${routeInfor}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 다 추가 되면 한번 불림
 
                                 var max = scoreList[0]?.score!!

@@ -3,10 +3,7 @@ package retrofit
 
 import android.util.Log
 import com.google.gson.JsonElement
-import model.History
-import model.POI
-import model.Route
-import model.SaftyScore
+import model.*
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
 import okhttp3.ResponseBody
@@ -104,7 +101,7 @@ class RetrofitManager {
 
 
     //경로탐색 api호출
-    fun searchRoute(startX:Double, startY:Double, endX:Double, endY:Double, startname:String, endname:String, searchOption:Int, completion: (Constant.RESPONSE_STATE, ArrayList<Route>?,SaftyScore?) -> Unit){
+    fun searchRoute(startX:Double, startY:Double, endX:Double, endY:Double, startname:String, endname:String, searchOption:Int, completion: (Constant.RESPONSE_STATE, ArrayList<Route>?,RouteInfor?) -> Unit){
         val iRetrofitRoute : IRetrofit? = RouteRetrofitClient.getRouteClient(Constant.API.BASE_URL)?.create(IRetrofit::class.java)
         val startX=startX
         val startY=startY
@@ -135,9 +132,11 @@ class RetrofitManager {
                             var score = 0.0
                             var totalDistance : Int? = 0
                             val features=body.getAsJsonArray("features")
-                            var saftyScore = SaftyScore(.0,0,0,0,0,
+                       /*     var saftyScore = SaftyScore(.0,0,0,0,0,
                                 0,0,0,0,
                                 0,.0,.0,.0,.0,.0,0,0)
+                           */
+                            var routeInfor = RouteInfor(searchOption)
 
                             features.forEach { featuresItem->
                                 val featureObject = featuresItem.asJsonObject
@@ -157,13 +156,16 @@ class RetrofitManager {
                                     var totalTime : Int? = properties.get("totalTime")?.asInt //경로 총 시간 : 단위(초)
                                     History.expectedTime = totalTime
                                 }
-                                saftyScore.totalDistance = totalDistance
-
+                                //saftyScore.totalDistance = totalDistance
+                                routeInfor.distance = totalDistance
 
                                 //얘는 점수 하나 추가될 때마다 계속불리는 함수
+/*
                                 SafeRoute.calcPartialScore(facilityType,distance,roadType,turnType, saftyScore)
                                 //Log.d(Constant.API.SCORE_SAFEROUTE, "FFFFFFFFFFFFFFF" + "${saftyScore}")
-
+*/
+                                SafeRoute.gatherRouteInfor(facilityType,distance,roadType,turnType,routeInfor)
+                                // 파싱된 데이터 하나 올 때마다 경로 정보 저장하는 함수.
 
                                 var RouteItem = Route(
                                     coordinates = coordinates,
@@ -171,7 +173,7 @@ class RetrofitManager {
                                 )
                                 parseRouteDataArray.add(RouteItem)
                             }
-                            completion(Constant.RESPONSE_STATE.OKAY,parseRouteDataArray,saftyScore)
+                            completion(Constant.RESPONSE_STATE.OKAY,parseRouteDataArray,routeInfor)
                         }
                     }
                     403->{

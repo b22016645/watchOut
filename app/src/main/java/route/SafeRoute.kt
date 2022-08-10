@@ -16,7 +16,7 @@ import utils.Constant.API.SAFEROUTE
 
 
 
-object SafeRoute {
+object SafeRoute {           //End Of object SafeRoute
     var tw = Preference.tableWeight
     var pf = Preference
 
@@ -92,7 +92,16 @@ object SafeRoute {
         }
     }       //End Of gatherRouteInfor()
 
-}           //End Of object SafeRoute
+    //2. 위험요소 초안을 ㅇ아서 정규화 하는 함수
+    fun nomalizeDangerScore(routeList: ArrayList<RouteInfor?>) {
+        //input : RouteInfor 4개 배열
+        //return값 : 없음
+        //output: 인자로 들어온 데이터클래스에 0~50값으로 정규화 된 DangerScore 4개를 넣는다
+
+    }//End of nomalizeDangerScore()
+
+
+}
 
 
 

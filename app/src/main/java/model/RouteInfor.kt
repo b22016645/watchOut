@@ -7,7 +7,7 @@ import java.io.Serializable
 data class RouteInfor (var searchOption : Int )
     : Serializable{
 
-    var distance :Double = 0.0
+    var distance :Int? = 0
 
     /////////////////////////////////////SCORE /////////////////////////////////////
     var routeScore : Int = 0        //경로별 최종 점수
