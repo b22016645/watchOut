@@ -330,11 +330,11 @@ class MainActivity : Activity() {
             .addOnSuccessListener { doc ->
                 if (doc != null) {
                     snapshotData = doc.data as Map<String, Any>
-                    Preference.awcrossWalk = "${snapshotData.get("crossWalk")}".toDouble()
-                    Preference.awft_car = "${snapshotData.get("ft_car")}".toDouble()
-                    Preference.awft_noCar = "${snapshotData.get("ft_noCar")}".toDouble()
+                    Preference.algorithmWeight_crossWalk = "${snapshotData.get("crossWalk")}".toDouble()
+                    Preference.algorithmWeight_facilityCar = "${snapshotData.get("ft_car")}".toDouble()
+                    Preference.algorithmWeight_facilityNoCar = "${snapshotData.get("ft_noCar")}".toDouble()
                     Preference.tableWeight = "${snapshotData.get("tableWeight")}".toDouble()
-                    Preference.awturnPoint = "${snapshotData.get("turnPoint")}".toDouble()
+                    Preference.algorithmWeight_turnPoint = "${snapshotData.get("turnPoint")}".toDouble()
                     Preference.score = "${snapshotData.get("score")}".toInt()
                 } else {
                     Log.d("알고리즘 가중치값 DB에서 불러오기", "No such document")
