@@ -14,7 +14,6 @@ import route.SafeRoute
 import utils.Constant
 import utils.Constant.API.LOG
 import kotlin.concurrent.timer
-import kotlin.math.floor
 
 
 class DoRetrofitActivity : Activity(){
@@ -27,11 +26,11 @@ class DoRetrofitActivity : Activity(){
     private var routeBuilder = StringBuilder()
 
     //안전할 길 점수 받을 배열
-    private var scoreList = arrayListOf<SaftyScore?>()
+   // private var scoreList = arrayListOf<SaftyScore?>()
     private var routeList = arrayListOf<RouteInfor?>()
 
     //searchOption 목록
-    private var safeList = listOf(0,4,10,30)
+    private var searchOptionList = listOf(0,4,10,30)
 
     //private var lat: Double = 37.58217852030164
     //private var lon: Double = 127.01152516595631
@@ -152,7 +151,7 @@ class DoRetrofitActivity : Activity(){
         var timercount = 0
         timer(period = 500,initialDelay = 500){
             if(timercount!=4){
-                getScore(lon,lat,des1,des2,sName,eName,safeList[timercount],timercount)
+                getScore(lon,lat,des1,des2,sName,eName,searchOptionList[timercount],timercount)
 
                 timercount++
                 getScoreCount++
@@ -230,7 +229,7 @@ class DoRetrofitActivity : Activity(){
 
                         if (getScoreCount == 4 && errorcount != 0) {  // 4번 돌았는데 403에러가 1개라도 있었다면
                             Log.d(LOG, "DoRetrofit - ROUTE API 403에러 - getScore")
-                            scoreList.clear()
+                            routeList.clear()
                             getScoreCount = 0
                             errorcount = 0
                             getPOI(destination, lat, lon)
@@ -247,7 +246,7 @@ class DoRetrofitActivity : Activity(){
                             //경로 배열에 경로의 모든 정보 추가함수, 경로 하나 추가시 마다 호출
 
                             if (routeList.size ==4)  {
-                                Log.d("여긴 넘어오나?","ㅋㅋㅋ")
+                                Log.d("DoRetrofitActivity-getScore() :","routeList Size = 4")
                                 var routeString = routeBuilder.toString()
                                 publish("route",routeString)
 
@@ -282,7 +281,7 @@ class DoRetrofitActivity : Activity(){
                                             endy,
                                             startname,
                                             endname,
-                                            safeList[ind]
+                                            searchOptionList[ind]
                                         )
                                         timercount++
                                         cancel()
@@ -297,7 +296,7 @@ class DoRetrofitActivity : Activity(){
                             Log.d(LOG,"DoRetrofit - ROUTE API 403에러 - getScore")
                             getScoreCount=0
                             errorcount=0
-                            scoreList.clear()
+                            routeList.clear()
                             getPOI(destination,lat,lon)
                         }
                     }
@@ -322,9 +321,10 @@ class DoRetrofitActivity : Activity(){
         }
         var scoreStr = scoreBuilder.toString()
         // Log.d(LOG,"SaftyScore : "+scoreStr)
+        Log.d("퍼블리쉬 ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ",scoreStr)
         publish("saftyScore",scoreStr)
 
-        scoreList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
+        routeList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
 
         getScoreCount = 0
         errorcount = 0
