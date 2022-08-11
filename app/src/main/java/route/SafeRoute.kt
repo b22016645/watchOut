@@ -114,22 +114,29 @@ object SafeRoute {           //End Of object SafeRoute
 
         //1.RoadScore Nomalize
         //경로별 도로점수를 각 총거리로 나눠준다
+        Log.d("SafeRoute-nomalizeScore()","RoadScore 평준화 시작")
+        Log.d("SafeRoute-nomalizeScore()","roadScoreFinal = roadScoreDraft / totalDistance")
         routeList.forEach{
             if (it != null) {
                 it.roadScore_final = it.roadScore_draft / it.totalDistance
+                Log.d("SafeRoute-nomalizeScore()","${it.roadScore_final} = ${it.roadScore_draft} / ${it.totalDistance}")
             }
             else {
                 Log.d("SafeRoute-nomalizeScore()","RouteInfor is null :: ERROR")
             }
         }
+        Log.d("SafeRoute-nomalizeScore()","RoadScore 평준화 완료")
 
         //2.DangerScore Nomalize
         //각 경로의 위험점수 : 총 4가지를 모아서 1~50 사이로 정규화
+        Log.d("SafeRoute-nomalizeScore()","DangerScore 평준화 시작")
         if ( (routeList[0]?.searchOption==routeList[1]?.searchOption) ||
             (routeList[0]?.searchOption==routeList[2]?.searchOption) ||
             (routeList[0]?.searchOption==routeList[3]?.searchOption) ){
-            routeList.forEach { it?.DangerScore_final = -25 }
+            routeList.forEach { it?.DangerScore_final = -25
+            Log.d("SafeRoute-namalizeScore() - ","한가지 루트만 존재함 : 평준화결과 :  ${it?.DangerScore_final}")}
         }else{
+            Log.d("SafeRoute-nomalizeScore() -","서로 다른 루트 입니다. 평준화 시작")
             //1.최대/최소 구하기
             var min = routeList[0]!!.DangerScore_draft
             var max = routeList[0]!!.DangerScore_draft
@@ -145,13 +152,26 @@ object SafeRoute {           //End Of object SafeRoute
                     minIndex = i
                 }
             }
+            Log.d("SafeRoute-nomalizeScore() -","min(Index) : ${min}(${minIndex}) / max(Index) : ${max}(${maxIndex}) ")
+            Log.d("SafeRoute-nomalizeScore() -","X' = (X-min) / (max-min) * (-50)")
 
             //2. 평준화 : X-min/max-min * (-50)
             routeList.forEach{
                 it?.DangerScore_final = (it?.DangerScore_draft!!- min)/(max-min) * -50
+                Log.d("SafeRoute-nomalizeScore() -","${it?.DangerScore_final} = (${it?.DangerScore_draft}- $min)/($max-$min) * -50")
             }
         }
+        Log.d("SafeRoute-nomalizeScore() -","DangerScore 평준화 완료")
     }//End of nomalizeDangerScore()
+
+    fun makeFinalScore(routeList: ArrayList<RouteInfor?>) {
+        routeList.forEach{
+            if (it!= null){
+                it.routeScore = it.roadScore_final+it.DangerScore_final
+                Log.d("SafeRoute-makeFinalScore() - ","(RoadScore:)${it.roadScore_final} + (DanferScore:)${it.DangerScore_final} = ${it.routeScore}")
+            }
+        }
+    }//End of makeFinalScore()
 
 
 }

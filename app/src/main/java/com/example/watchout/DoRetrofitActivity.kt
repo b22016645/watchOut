@@ -254,7 +254,9 @@ class DoRetrofitActivity : Activity(){
                                 //여기까지 오면 루트 4개가 모두 모인 상태.
                                 //이제 여기서 점수를 내야함
 
-                                SafeRoute.nomalizeScore(routeList)
+                                SafeRoute.nomalizeScore(routeList)  //점수 정규화
+                                SafeRoute.makeFinalScore(routeList)
+
 
                                 Log.d(SCORE_SAFEROUTE, ""+"${routeInfor}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 다 추가 되면 한번 불림
