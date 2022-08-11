@@ -255,6 +255,8 @@ class DoRetrofitActivity : Activity(){
 
                                 SafeRoute.nomalizeScore(routeList)  //점수 정규화
                                 SafeRoute.makeFinalScore(routeList)     //최종 점수 합성
+                                //여기서 퍼블리쉬할 스트링 만드는 함수 호출
+                                SafeRoute.makeRouteInfor_forPublish(routeList)      //pub할 스트링 데이타 만들기
 
 
                                 Log.d("DoRetrofitActivity-getScore() :최종 경로 4가지 모음", ""+"${routeInfor}" )
@@ -303,7 +305,7 @@ class DoRetrofitActivity : Activity(){
                 }
             }
         )
-    }
+   }
 
 
     private fun getRoute(startx : Double, starty : Double, endx : Double, endy : Double, startname : String, endname : String, searchOption: Int) {
@@ -314,15 +316,18 @@ class DoRetrofitActivity : Activity(){
         //Safey data 4개 pub
         var scoreBuilder = StringBuilder()
         for(i in 0..3) {
-            scoreBuilder.append(routeList[i].toString())
+            scoreBuilder.append(routeList[i]?.routeInforStringData)
+            //여기서 routeInfor에 만들어놓은 퍼블리쉬할 스트링 모두 이어붙이기
             if (i < 3) {
                 scoreBuilder.append("!")
             }
         }
-        var scoreStr = scoreBuilder.toString()
+        var routeData = scoreBuilder.toString()
         // Log.d(LOG,"SaftyScore : "+scoreStr)
-        Log.d("퍼블리쉬 ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ",scoreStr)
-        publish("saftyScore",scoreStr)
+        Log.d("퍼블리쉬 ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ",routeData)
+        publish("saftyScore",routeData)
+
+       // 여기서 퍼블리쉬
 
         routeList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
 

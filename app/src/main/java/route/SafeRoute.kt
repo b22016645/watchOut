@@ -10,7 +10,8 @@ import model.Preference
 import model.RouteInfor
 
 
-object SafeRoute {           //End Of object SafeRoute
+object SafeRoute {//End of object SafeRoute
+    //End Of object SafeRoute
     var tw = Preference.tableWeight
     var pf = Preference
 
@@ -173,8 +174,30 @@ object SafeRoute {           //End Of object SafeRoute
         }
     }//End of makeFinalScore()
 
+    fun makeRouteInfor_forPublish(routeList: ArrayList<RouteInfor?>) {
+        var inforBuilder = StringBuilder()
+        routeList.forEach{
+            if (it!= null){
+                inforBuilder.append(it.routeScore)
+                inforBuilder.append(",")
+                inforBuilder.append(it.roadScore_final)
+                inforBuilder.append(",")
+                inforBuilder.append(it.DangerScore_final)
+                inforBuilder.append(",")
+                inforBuilder.append(it.crossWalk)
+                inforBuilder.append(",")
+                inforBuilder.append(it.turnPoint)
+                //inforBuilder.append(",")
+                //inforBuilder.append(it.totalDistance)
+                it.routeInforStringData = inforBuilder.toString()
+                Log.d("SafeRoute-makeRouteInfor_forPublish() : ","${it.routeInforStringData}")
+            }
+        }
 
-}//End of object SafeRoute
+    }//End of makeRouteInfor_forPublish()
+
+
+}
 
 
 

@@ -8,6 +8,7 @@ data class RouteInfor (var searchOption : Int )
     : Serializable{
 
     var totalDistance :Int = 0
+    var routeInforStringData : String? = null       //publish할 정보를 담고있는 string
 
     /////////////////////////////////////SCORE /////////////////////////////////////
     var routeScore : Int = 0        //경로별 최종 점수
