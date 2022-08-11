@@ -243,10 +243,10 @@ class DoRetrofitActivity : Activity(){
 
                             //scoreList.add(saftyScore)
                             routeList.add(routeInfor)
-                            Log.d("DoRetrofitActivity-getScore() :", "routeList : " + "${routeList}")
+                            Log.d("DoRetrofitActivity-getScore() :", "!!routeList : " + "${routeList}")
                             //경로 배열에 경로의 모든 정보 추가함수, 경로 하나 추가시 마다 호출
 
-                            if (scoreList.size ==4)  {
+                            if (routeList.size ==4)  {
                                 Log.d("여긴 넘어오나?","ㅋㅋㅋ")
                                 var routeString = routeBuilder.toString()
                                 publish("route",routeString)
@@ -288,8 +288,8 @@ class DoRetrofitActivity : Activity(){
                                         cancel()
                                     }
                                 }
-                            }
-                        }
+                            }//end of if (scoreList.size ==4)
+                        }//
                     }
                     Constant.RESPONSE_STATE.ERROR403 -> {
                         errorcount++
