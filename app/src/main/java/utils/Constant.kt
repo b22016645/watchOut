@@ -16,8 +16,6 @@ object Constant {
         const val SEARCH_ROUTE : String = "routes/pedestrian"
 
         const val LOG : String = "로그"
-        const val SAFEROUTE : String ="안전한길"
-        const val SCORE_SAFEROUTE : String ="경로안전점수"
 
 
         /* 카카오 음성 REST API 변수 */

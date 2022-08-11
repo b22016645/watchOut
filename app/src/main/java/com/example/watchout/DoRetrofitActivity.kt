@@ -13,7 +13,6 @@ import route.DetailRoute
 import route.SafeRoute
 import utils.Constant
 import utils.Constant.API.LOG
-import utils.Constant.API.SCORE_SAFEROUTE
 import kotlin.concurrent.timer
 import kotlin.math.floor
 
@@ -166,7 +165,7 @@ class DoRetrofitActivity : Activity(){
 
 
     private fun getScore(startx : Double, starty : Double, endx : Double, endy : Double, startname : String, endname : String, searchOption: Int, tcount: Int) {
-        Log.d(LOG,"DoRetrofit - getScore호출")
+        Log.d(LOG,"DoRetrofitActivity - getScore()시작")
 
         //api를 통해 얻은 JSON을 파싱해서 가져온 이중배열 좌표
         var rawRoute = arrayListOf<List<Double>>() //[0]=>lon, [1]=>lat
@@ -244,10 +243,11 @@ class DoRetrofitActivity : Activity(){
 
                             //scoreList.add(saftyScore)
                             routeList.add(routeInfor)
-                            Log.d(SCORE_SAFEROUTE, "routeList : " + "${routeInfor}")
+                            Log.d("DoRetrofitActivity-getScore() :", "routeList : " + "${routeList}")
                             //경로 배열에 경로의 모든 정보 추가함수, 경로 하나 추가시 마다 호출
 
                             if (scoreList.size ==4)  {
+                                Log.d("여긴 넘어오나?","ㅋㅋㅋ")
                                 var routeString = routeBuilder.toString()
                                 publish("route",routeString)
 
@@ -258,8 +258,8 @@ class DoRetrofitActivity : Activity(){
                                 SafeRoute.makeFinalScore(routeList)     //최종 점수 합성
 
 
-                                Log.d(SCORE_SAFEROUTE, ""+"${routeInfor}" )
-                                //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 다 추가 되면 한번 불림
+                                Log.d("DoRetrofitActivity-getScore() :최종 경로 4가지 모음", ""+"${routeInfor}" )
+                                //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 4가지 모두 추가되면 한 번
 
                                 var max = routeList[0]?.routeScore!!
                                 
