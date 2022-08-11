@@ -315,7 +315,7 @@ class DoRetrofitActivity : Activity(){
         //Safey data 4개 pub
         var scoreBuilder = StringBuilder()
         for(i in 0..3) {
-            scoreBuilder.append(scoreList[i].toString())
+            scoreBuilder.append(routeList[i].toString())
             if (i < 3) {
                 scoreBuilder.append("!")
             }
