@@ -175,9 +175,10 @@ object SafeRoute {//End of object SafeRoute
     }//End of makeFinalScore()
 
     fun makeRouteInfor_forPublish(routeList: ArrayList<RouteInfor?>) {
-        var inforBuilder = StringBuilder()
+
         routeList.forEach{
             if (it!= null){
+                var inforBuilder = StringBuilder()
                 inforBuilder.append(it.routeScore)
                 inforBuilder.append(",")
                 inforBuilder.append(it.roadScore_final)
