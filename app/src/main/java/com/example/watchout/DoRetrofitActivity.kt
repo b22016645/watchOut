@@ -255,18 +255,19 @@ class DoRetrofitActivity : Activity(){
                                 //이제 여기서 점수를 내야함
 
                                 SafeRoute.nomalizeScore(routeList)  //점수 정규화
-                                SafeRoute.makeFinalScore(routeList)
+                                SafeRoute.makeFinalScore(routeList)     //최종 점수 합성
 
 
                                 Log.d(SCORE_SAFEROUTE, ""+"${routeInfor}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 다 추가 되면 한번 불림
 
-                                var max = scoreList[0]?.score!!
+                                var max = routeList[0]?.routeScore!!
+                                
 
                                 var ind = 0
                                 for (i in 1..3) {
-                                    if (scoreList[i]?.score!! > max) {
-                                        max = scoreList[i]?.score!!
+                                    if (routeList[i]?.routeScore!! > max) {
+                                        max = routeList[i]?.routeScore!!
                                         ind=i
                                     }
                                 }
@@ -348,7 +349,7 @@ class DoRetrofitActivity : Activity(){
             startname = startname,
             endname = endname,
             searchOption = searchOption,
-            completion = { responseState, parseRouteDataArray, saftyScore ->
+            completion = { responseState, parseRouteDataArray, routeInfor ->
                 when (responseState) {
                     Constant.RESPONSE_STATE.OKAY -> {  //만약 STATE가 OKEY라면
                         if (parseRouteDataArray != null) {

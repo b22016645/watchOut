@@ -157,7 +157,7 @@ class RetrofitManager {
                                     History.expectedTime = totalTime
                                 }
                                 //saftyScore.totalDistance = totalDistance
-                                routeInfor.totalDistance = totalDistance
+                                routeInfor.totalDistance = totalDistance!!
 
                                 //얘는 점수 하나 추가될 때마다 계속불리는 함수
 /*
