@@ -175,7 +175,6 @@ object SafeRoute {//End of object SafeRoute
     }//End of makeFinalScore()
 
     fun makeRouteInfor_forPublish(routeList: ArrayList<RouteInfor?>) {
-
         routeList.forEach{
             if (it!= null){
                 var inforBuilder = StringBuilder()
@@ -194,8 +193,67 @@ object SafeRoute {//End of object SafeRoute
                 Log.d("SafeRoute-makeRouteInfor_forPublish() : ","${it.routeInforStringData}")
             }
         }
-
     }//End of makeRouteInfor_forPublish()
+
+    fun makeEctInfor_forPublish(routeList: ArrayList<RouteInfor?>){
+        routeList.forEach{
+            if (it!=null){
+                var noEct: Boolean = true
+                var ectBuilder = StringBuilder()
+                if (it.elevator > 0) {
+                    ectBuilder.append("엘리베이터가 ${it.elevator}개 포함된 경로입니다.")
+                    noEct = false
+                }
+                if (it.overPasses > 0) {
+                    if (ectBuilder.length != 0)
+                        ectBuilder.append(",")
+                    ectBuilder.append("육교 ${it.overPasses}개 포함된 경로입니다.")
+                    noEct = false
+                }
+                if (it.underPasses > 0) {
+                    if (ectBuilder.length != 0)
+                        ectBuilder.append(",")
+                    ectBuilder.append("지하보도가 ${it.underPasses}개 포함된 경로입니다.")
+                    noEct = false
+                }
+                if (it.stairs > 0) {
+                    if (ectBuilder.length != 0)
+                        ectBuilder.append(",")
+                    ectBuilder.append("계단이 ${it.stairs}개 포함된 경로입니다.")
+                    noEct = false
+                }
+                if (it.bridge > 0) {
+                    if (ectBuilder.length != 0)
+                        ectBuilder.append(",")
+                    ectBuilder.append("교량이 ${it.bridge}개 포함된 경로입니다.")
+                    noEct = false
+                }
+                if (it.turnnels > 0) {
+                    if (ectBuilder.length != 0)
+                        ectBuilder.append(",")
+                    ectBuilder.append("터널이 ${it.turnnels}개 포함된 경로입니다.")
+                    noEct = false
+                }
+                if (it.highroad > 0) {
+                    if (ectBuilder.length != 0)
+                        ectBuilder.append(",")
+                    ectBuilder.append("고가도로가 ${it.highroad}개 포함된 경로입니다.")
+                    noEct = false
+                }
+                if (it.largeFacilitypassage > 0) {
+                    if (ectBuilder.length != 0)
+                        ectBuilder.append(",")
+                    ectBuilder.append("대형 시설물 이동 통로가 ${it.largeFacilitypassage}개 포함된 경로입니다.")
+                    noEct = false
+                }
+                if (noEct){
+                    ectBuilder.append("특이사항 없음")
+                }
+                it.ectInforStringData = ectBuilder.toString()
+                Log.d("SafeRoute-makeEctInfor_forPublish() : ","${it.ectInforStringData}")
+            }
+        }
+    }//End of makeEctInfor_forPublish()
 
 
 }
