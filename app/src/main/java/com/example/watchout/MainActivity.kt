@@ -335,21 +335,6 @@ class MainActivity : Activity() {
     }//End of preferenceQuestion
 
 
-    private fun updatePreferenceToDB() {        //업데이트된 알고리즘가중치 (Preference) DB에 업데이트
-        Log.d("MainActivity-updatePreferenceToDB() ","업데이트된 알고리즘가중치 (Preference) DB에 업데이트")
-        Preference.score = 9999
-        firestore!!.collection("PersonalData").document("${uid}").set(Preference)
-            .addOnSuccessListener{
-                Log.d("MainActivity-updatePreferenceToDB() ","DB에 알고리즘 가중치 업데이트 완료.")
-                //Log.d("DB에 업데이트 완료: 알고리즘 가중치 결과입니다.",Preference.toString()) ->이렇게 로그로 찍어서 업데이트 내역 보여주는거 추가할것
-
-                //        ttsSpeak("선호도 업데이트 완료")
-                //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
-            }.addOnFailureListener{exception ->
-                Log.d("MainActivity-updatePreferenceToDB(): 알고리즘가중치 업데이트실패", exception.toString())
-            }
-    }//End of updatePreferenceToDB
-
 
     /////////////////////////////////////////////////////////////////////////////
     //                            FIREBASE(DB) 관련 함수                         //
@@ -364,7 +349,7 @@ class MainActivity : Activity() {
                 Log.d("파이어베이스로그인", "로그인 실패" + "${auth}")
             }
         }
-    }
+    }//End of firebaseLogin()
 
     fun algorithmWeightFromDB() {
         //FireBase에서 알고리즘 가중치를 불러와 데이터스냅샷 형태로 저장후 잘라서 싱글톤객체 Preference에 저장.
@@ -390,7 +375,7 @@ class MainActivity : Activity() {
             .addOnFailureListener { exception ->
                 Log.d("에러: 알고리즘 가중치값 DB에서 불러오기", "get failed with ", exception)
             }
-    }
+    }   //End of algorithmWeightFromDB
 
     fun searchFromDB(destinationName : String) {
         //즐겨찾기에서 먼저 검색하는 코드입니다
@@ -450,7 +435,7 @@ class MainActivity : Activity() {
                 //DoRetrofit 실행
                 startActivityForResult(intent, 100)
             }
-    }
+    }   //End of searchFromDB()
 
     private fun addFavorite() {     //즐겨찾기 추가함수
         firestore!!.collection("PersonalData").document("${uid}").collection("Favorites").document("${Favorites.dat.get("nickname")}").set(Favorites.dat)
@@ -460,24 +445,41 @@ class MainActivity : Activity() {
                 //        ttsSpeak("즐겨찾기 등록 완료")
                 //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
             }
-
-
             .addOnFailureListener { exception ->
                 Log.d("즐겨찾기 저장 실패", exception.toString())
             }
-    }
+    }   //End Of addFavorite()
 
-    private fun addHistory(){
-        firestore!!.collection("PersonalData").document("${uid}").collection("History").document("${LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))}").set(History)
-            .addOnSuccessListener{
-                Log.d("History","${History}")
-                Log.d(LOG,"히스토리 등록 완료")
+    private fun addHistory() {
+        firestore!!.collection("PersonalData").document("${uid}").collection("History").document(
+            "${
+                LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))
+            }"
+        ).set(History)
+            .addOnSuccessListener {
+                Log.d("History", "${History}")
+                Log.d(LOG, "히스토리 등록 완료")
                 //        ttsSpeak("히스토리 등록 완료")
                 //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
-            }.addOnFailureListener{exception ->
+            }.addOnFailureListener { exception ->
                 Log.d("히스토리 저장 실패", exception.toString())
             }
-    }
+    }//end Of addHistory()
+
+    private fun updatePreferenceToDB() {        //업데이트된 알고리즘가중치 (Preference) DB에 업데이트
+        Log.d("MainActivity-updatePreferenceToDB() ","업데이트된 알고리즘가중치 (Preference) DB에 업데이트")
+        Preference.score = 9999
+        firestore!!.collection("PersonalData").document("${uid}").set(Preference)
+            .addOnSuccessListener{
+                Log.d("MainActivity-updatePreferenceToDB() ","DB에 알고리즘 가중치 업데이트 완료.")
+                //Log.d("DB에 업데이트 완료: 알고리즘 가중치 결과입니다.",Preference.toString()) ->이렇게 로그로 찍어서 업데이트 내역 보여주는거 추가할것
+
+                //        ttsSpeak("선호도 업데이트 완료")
+                //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
+            }.addOnFailureListener{exception ->
+                Log.d("MainActivity-updatePreferenceToDB(): 알고리즘가중치 업데이트실패", exception.toString())
+            }
+    }//End of updatePreferenceToDB
 
 
 
