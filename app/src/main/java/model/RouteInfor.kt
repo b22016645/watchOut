@@ -9,6 +9,7 @@ data class RouteInfor (var searchOption : Int )
 
     var totalDistance :Int = 0
     var routeInforStringData : String? = null       //publish할 정보를 담고있는 string
+    var ectInforStringData : String? = null         //publish할 기타정보를 담고있는 string
 
     /////////////////////////////////////SCORE /////////////////////////////////////
     var routeScore : Int = 0        //경로별 최종 점수

@@ -256,7 +256,7 @@ class DoRetrofitActivity : Activity(){
                                 SafeRoute.nomalizeScore(routeList)  //점수 정규화
                                 SafeRoute.makeFinalScore(routeList)     //최종 점수 합성
                                 SafeRoute.makeRouteInfor_forPublish(routeList)      //pub할 스트링 데이타 만들기
-
+                                SafeRoute.makeRouteInfor_forPublish(routeList)      //pub할 기타내용 스트링 데이타 만들기
 
                                 Log.d("DoRetrofitActivity-getScore() :최종 경로 4가지 모음", ""+"${routeInfor}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 4가지 모두 추가되면 한 번
@@ -314,16 +314,21 @@ class DoRetrofitActivity : Activity(){
 
         //Safey data 4개 pub
         var scoreBuilder = StringBuilder()
+        var ectBuilder = StringBuilder()
         for(i in 0..3) {
             scoreBuilder.append(routeList[i]?.routeInforStringData)
+            ectBuilder.append(routeList[i]?.ectInforStringData)
             //여기서 routeInfor에 만들어놓은 퍼블리쉬할 스트링 모두 이어붙이기
             if (i < 3) {
                 scoreBuilder.append("!")
+                ectBuilder.append("!")
             }
         }
         var routeData = scoreBuilder.toString()
+        var ectData = ectBuilder.toString()
         // Log.d(LOG,"SaftyScore : "+scoreStr)
-        Log.d("DoRetrofit-getRoute() : 퍼블리쉬할 스트링데이터",routeData)
+        Log.d("DoRetrofit-getRoute() : 퍼블리쉬할 스트링데이터 (전체루트정보)",routeData)
+        Log.d("DoRetrofit-getRoute() : 퍼블리쉬할 스트링데이터 (기타루트정보)",ectData)
         publish("saftyScore",routeData)
        // 여기서 퍼블리쉬
 
