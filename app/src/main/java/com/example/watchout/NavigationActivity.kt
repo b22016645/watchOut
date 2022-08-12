@@ -48,6 +48,9 @@ class NavigationActivity : Activity(), LocationListener {
     //분기점 좌표 저장할 배열
     private var turnTypeList = arrayListOf<Int>()
 
+    //로드타입 저장할 배열
+    private var roadTypeList = arrayListOf<Int>()
+
     //목적지 이름 경로이탈 때 사용
     private var destination = ""
 
@@ -60,6 +63,9 @@ class NavigationActivity : Activity(), LocationListener {
     //UI에서 거리 계산을 위해
     private var turnPoint = arrayListOf<List<Double>>()
     private var turnPointCount = 0
+
+    //db에 경로이탈횟수 저장하기위해
+    private var outList = arrayListOf<List<Int>>()
 
     //진동관련
     lateinit var vibrator: Vibrator

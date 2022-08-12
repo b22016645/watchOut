@@ -341,7 +341,12 @@ class DoRetrofitActivity : Activity(){
         //api를 통해 얻은 JSON을 파싱해서 가져온 분기점 배열 좌표
         var turnTypeList = arrayListOf<Int>()
 
+        //도로타입 배열
+        var roadTypeList = arrayListOf<Int>()
+
         var turnPoint = arrayListOf<List<Double>>()
+
+        var addNum = 0
 
         // 길찾기 호출
         instance.searchRoute(
@@ -374,14 +379,24 @@ class DoRetrofitActivity : Activity(){
                                     rawRouteRes.removeAt(rawRouteRes.size-1)
                                 }
                                 var turnType = jsonarrNext.turnType
-                                if(turnType!=null){
+                                var roadType = jsonarrNext.roadType
+                                if(turnType!=null && roadType==null){
                                     turnTypeList.add(turnType)
+                                    roadTypeList.add(0)
+                                    addNum++
                                 }
-                                else{
-                                    for(x in turnTypeList.size .. rawRouteRes.size-1) {
+                                else if(roadType!=null && turnType==null){
+                                    //var i = addNum
+                                    for(x in addNum .. rawRouteRes.size-1) {
                                         turnTypeList.add(0)
+                                        roadTypeList.add(roadType)
+                                        addNum++
                                     }
                                 }
+                                else{
+                                    Log.d(LOG,"여긴 들어오면 안돼")
+                                }
+                                Log.d(LOG,"addNum:"+"${addNum}"+"! turn:"+"${turnTypeList.size}"+"! road:"+"${roadTypeList.size}")
                             }
                         }
 
@@ -477,7 +492,7 @@ class DoRetrofitActivity : Activity(){
 //                        Log.d(LOG,"midpoint : "+"${midpointString}")
 
 
-                        val naviData = NaviData(midpointList, turnTypeList, destination, turnPoint)
+                        val naviData = NaviData(midpointList, turnTypeList, roadTypeList, destination, turnPoint)
                         //받아서 retrunMain호출함수호출
                         returnMain(naviData)
 

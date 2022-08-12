@@ -169,7 +169,8 @@ class RetrofitManager {
 
                                 var RouteItem = Route(
                                     coordinates = coordinates,
-                                    turnType = turnType
+                                    turnType = turnType,
+                                    roadType = roadType
                                 )
                                 parseRouteDataArray.add(RouteItem)
                             }
