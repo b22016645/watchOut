@@ -256,7 +256,7 @@ class DoRetrofitActivity : Activity(){
                                 SafeRoute.nomalizeScore(routeList)  //점수 정규화
                                 SafeRoute.makeFinalScore(routeList)     //최종 점수 합성
                                 SafeRoute.makeRouteInfor_forPublish(routeList)      //pub할 스트링 데이타 만들기
-                                SafeRoute.makeRouteInfor_forPublish(routeList)      //pub할 기타내용 스트링 데이타 만들기
+                                SafeRoute.makeEctInfor_forPublish(routeList)      //pub할 기타내용 스트링 데이타 만들기
 
                                 Log.d("DoRetrofitActivity-getScore() :최종 경로 4가지 모음", ""+"${routeInfor}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 4가지 모두 추가되면 한 번
