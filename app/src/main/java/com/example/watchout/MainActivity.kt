@@ -335,8 +335,19 @@ class MainActivity : Activity() {
     }//End of preferenceQuestion
 
 
-    private fun updatePreferenceToDB() {        //선호도 조사 결과를 DB에 업데이트
-        TODO("Not yet implemented")
+    private fun updatePreferenceToDB() {        //업데이트된 알고리즘가중치 (Preference) DB에 업데이트
+        Log.d("MainActivity-updatePreferenceToDB() ","업데이트된 알고리즘가중치 (Preference) DB에 업데이트")
+        Preference.score = 9999
+        firestore!!.collection("PersonalData").document("${uid}").set(Preference)
+            .addOnSuccessListener{
+                Log.d("MainActivity-updatePreferenceToDB() ","DB에 알고리즘 가중치 업데이트 완료.")
+                //Log.d("DB에 업데이트 완료: 알고리즘 가중치 결과입니다.",Preference.toString()) ->이렇게 로그로 찍어서 업데이트 내역 보여주는거 추가할것
+
+                //        ttsSpeak("선호도 업데이트 완료")
+                //       ^^얘 자꾸 오류나서 임시로 주석처리해놓았어요^^
+            }.addOnFailureListener{exception ->
+                Log.d("MainActivity-updatePreferenceToDB(): 알고리즘가중치 업데이트실패", exception.toString())
+            }
     }//End of updatePreferenceToDB
 
 
@@ -362,19 +373,22 @@ class MainActivity : Activity() {
         dbData.get()
             .addOnSuccessListener { doc ->
                 if (doc != null) {
+
                     snapshotData = doc.data as Map<String, Any>
-                    Preference.algorithmWeight_crossWalk = "${snapshotData.get("crossWalk")}".toDouble()
-                    Preference.algorithmWeight_facilityCar = "${snapshotData.get("ft_car")}".toDouble()
-                    Preference.algorithmWeight_facilityNoCar = "${snapshotData.get("ft_noCar")}".toDouble()
+                    Log.d("MainActivity-algorithmWeightFromDB()","알고리즘 가중치 DB에서 불러와서 셋팅합니다.")
+                    Preference.algorithmWeight_crossWalk = "${snapshotData.get("algorithmWeight_crossWalk")}".toDouble()
+                    Preference.algorithmWeight_facilityCar = "${snapshotData.get("algorithmWeight_crossWalk")}".toDouble()
+                    Preference.algorithmWeight_facilityNoCar = "${snapshotData.get("algorithmWeight_facilityNoCar")}".toDouble()
                     Preference.tableWeight = "${snapshotData.get("tableWeight")}".toDouble()
-                    Preference.algorithmWeight_turnPoint = "${snapshotData.get("turnPoint")}".toDouble()
+                    Preference.algorithmWeight_turnPoint = "${snapshotData.get("algorithmWeight_turnPoint")}".toDouble()
                     Preference.score = "${snapshotData.get("score")}".toInt()
+
                 } else {
-                    Log.d("알고리즘 가중치값 DB에서 불러오기", "No such document")
+                    Log.d("에러 : 알고리즘 가중치값 DB에서 불러오기", "No such document")
                 }
             }
             .addOnFailureListener { exception ->
-                Log.d("알고리즘 가중치값 DB에서 불러오기", "get failed with ", exception)
+                Log.d("에러: 알고리즘 가중치값 DB에서 불러오기", "get failed with ", exception)
             }
     }
 
