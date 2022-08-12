@@ -329,8 +329,9 @@ class DoRetrofitActivity : Activity(){
         // Log.d(LOG,"SaftyScore : "+scoreStr)
         Log.d("DoRetrofit-getRoute() : 퍼블리쉬할 스트링데이터 (전체루트정보)",routeData)
         Log.d("DoRetrofit-getRoute() : 퍼블리쉬할 스트링데이터 (기타루트정보)",ectData)
+        //웹 내 표에 띄울 데이타들 퍼블리쉬
         publish("saftyScore",routeData)
-       // 여기서 퍼블리쉬
+        publish("ectData",ectData)
 
         routeList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
 
