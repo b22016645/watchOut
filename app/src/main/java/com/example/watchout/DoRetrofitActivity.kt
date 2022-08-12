@@ -255,7 +255,6 @@ class DoRetrofitActivity : Activity(){
 
                                 SafeRoute.nomalizeScore(routeList)  //점수 정규화
                                 SafeRoute.makeFinalScore(routeList)     //최종 점수 합성
-                                //여기서 퍼블리쉬할 스트링 만드는 함수 호출
                                 SafeRoute.makeRouteInfor_forPublish(routeList)      //pub할 스트링 데이타 만들기
 
 
@@ -324,9 +323,8 @@ class DoRetrofitActivity : Activity(){
         }
         var routeData = scoreBuilder.toString()
         // Log.d(LOG,"SaftyScore : "+scoreStr)
-        Log.d("퍼블리쉬 ㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁㅁ",routeData)
+        Log.d("DoRetrofit-getRoute() : 퍼블리쉬할 스트링데이터",routeData)
         publish("saftyScore",routeData)
-
        // 여기서 퍼블리쉬
 
         routeList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
