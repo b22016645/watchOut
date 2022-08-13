@@ -48,8 +48,8 @@ class NavigationActivity : Activity(), LocationListener {
     //분기점 좌표 저장할 배열
     private var turnTypeList = arrayListOf<Int>()
 
-    //로드타입 저장할 배열
-    private var roadTypeList = arrayListOf<Int>()
+    //facilitytype 저장 배열
+    private var facilityTypeList = arrayListOf<Int>()
 
     //목적지 이름 경로이탈 때 사용
     private var destination = ""
@@ -63,9 +63,6 @@ class NavigationActivity : Activity(), LocationListener {
     //UI에서 거리 계산을 위해
     private var turnPoint = arrayListOf<List<Double>>()
     private var turnPointCount = 0
-
-    //db에 경로이탈횟수 저장하기위해
-    private var outList = arrayListOf<List<Int>>()
 
     //진동관련
     lateinit var vibrator: Vibrator
@@ -118,6 +115,7 @@ class NavigationActivity : Activity(), LocationListener {
 
         midpointList = naviData.midPointList
         turnTypeList = naviData.turnTypeList
+        facilityTypeList = naviData.facilityTypeList
         destination = naviData.destination
         turnPoint = naviData.turnPoint
         mContext = this
@@ -188,6 +186,7 @@ class NavigationActivity : Activity(), LocationListener {
                         text.setText("${distance}"+"m")
 
                         var turnNum = turnTypeList[midPointNum]
+                        var facilNum = facilityTypeList[midPointNum]
 
                         //안내시작 일단 0->1을 안내
                         //나침반불러와서
@@ -258,14 +257,18 @@ class NavigationActivity : Activity(), LocationListener {
                                     Log.d(LOG, "NavigationActivity " + "${outNum}" + "번 나갔다.")
                                     //15초동안 이탈이면 경로이탈
                                     if (outNum > 15) {
-                                        History.expTotal.plus(1)        //경로이탈 +1
-                                        if (turnNum == 11)          //직선 경로이탈
-                                            History.expLineWay.plus(1)
-                                        else if(turnNum in 12..19)                //분기점 경로이탈
-                                            History.expTurnPoint.plus(1)
-                                        else if ((turnNum in 125..129 || turnNum in 211..217))      //Facility 경로이탈
-                                            History.expFacility.plus(1)
-
+                                        History.expTotal.plus(1) // 총 경로이탈 +1
+                                        when(turnNum) { //turntype고려
+                                            in 12..19 -> History.expTurnPoint.plus(1) //분기점 경로이탈 +1
+                                            in 211..217 -> History.expCrossWalk.plus(1) //횡단보도 경로이탈 +1
+                                            0,11 -> History.expStraightRoad.plus(1) //직선길 경로이탈 +1
+                                            else -> return
+                                        }
+                                        when(facilNum){ //facilType고려
+                                            in 1..4 -> History.expWithCar.plus(1) //위험시설B 경로이탈 +1
+                                            12,14,17 -> History.expNoCar.plus(1) //위험시설A 경로이탈 +1
+                                            else -> return
+                                        }
                                         youOut()
                                         outNum = 0
                                         Log.d(LOG, "NavigationActivity 경로이탈일 때")
@@ -320,9 +323,9 @@ class NavigationActivity : Activity(), LocationListener {
         History.stepNum= mySensor.getResSteps()      //발걸음수 확정되면 주석 풀어서 히스토리에 넘겨주세요
 
         //히스토리 저장용 (출발 위경도 -> 주소)
-        (History.spLat)?:midpointList[0][0]
-        (History.spLon)?:midpointList[0][1]
-        History.spName = getAddress(History.spLat!!, History.spLon!!)
+        (History.arrivedLat)?:midpointList[0][0]
+        (History.arrivedLon)?:midpointList[0][1]
+        History.arrivedName = getAddress(History.arrivedLat!!, History.arrivedLon!!)
 
 
 
