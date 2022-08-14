@@ -184,7 +184,7 @@ object SafeRoute {//End of object SafeRoute
     fun makeFinalScore(routeList: ArrayList<RouteInfor?>) {
         routeList.forEach{
             if (it!= null){
-                it.routeScore = it.roadScore_final+it.DangerScore_final
+                it.routeScore = (it.roadScore_final+ tw* it.DangerScore_final).toInt()
                 Log.d("SafeRoute-makeFinalScore() - ","(RoadScore:)${it.roadScore_final} + (DanferScore:)${it.DangerScore_final} = ${it.routeScore}")
             }
         }
@@ -270,6 +270,7 @@ object SafeRoute {//End of object SafeRoute
             }
         }
     }//End of makeEctInfor_forPublish()
+
 
 
 }

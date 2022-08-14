@@ -384,12 +384,12 @@ class MainActivity : Activity() {
                     Log.d("Main-preferenceQuestion_turnPoint()","유지")
                     break
                 else if (ans == "직진우선")
-                    //분기점 가중치를 높힌다
-                    setPreference(turnPoint, +1)
+                    //분기점 가중치를 높힌다  ->음수값이 클수록
+                    setPreference(turnPoint, -5)
                     break
                 else if (ans == "최단거리 ")
                     //분기점 가중치를 낮춘다
-                    setPreference(turnPoint, -1)
+                    setPreference(turnPoint, +5)
                     break
                 else
                    "잘못된 음성입니다."
@@ -410,6 +410,45 @@ class MainActivity : Activity() {
 
 
     }//End of preferenceQuestion
+
+    fun setPreference(category :String, value:Int){
+
+        //tableWeight가중치 조절. 클수록 Danger 중요, 작을수록 Road 중요
+        //       tableWeight:     -> 기본값 = 0.5 | min = 0.1 | max = 1)
+        //      roadscore의 범위는 고정 :  50 ~ 100 | 50 ~ 100 | 50 ~ 100
+        //  해당 tw일때 DangerScore 범위 :  0 ~ -25 |  0 ~ -5  | 0 ~ -50
+        //  해당 tw일때 routeScore 범위 :  25 ~ 100 | 45 ~ 100 | 0 ~ 100
+        if (category =="tableWeight"){
+            if (value > 0){
+                if (Preference.tableWeight >=1)
+                    Log.d("Main-setPreference()","tableWeight가 이미 최대치(1)임")
+                else
+                    Preference.tableWeight += 0.1
+                    Log.d("Main-setPreference()","증가된 tableWeight : ${Preference.tableWeight}")
+            }
+            else if (value < 0){
+                if (Preference.tableWeight <=0.1)
+                    Log.d("Main-setPrefernece()","tableWeigt가 이미 최소치(0.1)임")
+                else
+                    Preference.tableWeight -= 0.1
+                Log.d("Main-setPreference()","감소된 tableWeight : ${Preference.tableWeight}")
+            }
+        }
+
+        //분기점 가중치 조정
+        else if (category =="turnPoint")
+            Preference.algorithmWeight_turnPoint?.plus(value)
+
+        else if (category == " crossWalk")
+            Preference.algorithmWeight_crossWalk?.plus(value)
+
+        else if (category =="facilityCar")
+            Preference.algorithmWeight_facilityCar?.plus(value)
+
+        else if (category =="facilityNoCar")
+            Preference.algorithmWeight_facilityNoCar?.plus(value)
+
+    }//End of setPreference()
 
 
 
