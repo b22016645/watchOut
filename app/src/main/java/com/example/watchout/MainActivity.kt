@@ -307,6 +307,12 @@ class MainActivity : Activity() {
             }
         }
     }
+
+
+    ////////////////////////////////////////// /////////////////////////////////////////
+    //                              경로 안내 종료 후 선호도 조사 함수 모음                    //
+    ///////////////////////////////////////// //////////////////////////////////////////
+
     private fun preferenceQuestion() {      //경로 끝나고 선호도 조사하는 함수
 /*        1. 경로 만족도를 1~10사이 숫자로 말씀해주세요
             1-1. 6점 이상인 경우
@@ -314,11 +320,10 @@ class MainActivity : Activity() {
                     * 예 -> 종료
                     *아니오 -> 설문시작
 */
-
            var score = -1
            while (score >10 || score <0){
                ttsSpeak("경로만족도를 0~10사이 숫자로 말씀해주세요")
-               // var score = 사용자가 말한 숫자
+                var score = "사용자가 말한 숫자".toInt()
                if(score > 10 || score <0)
                    ttsSpeak("잘못된 범위입니다.")
            }
@@ -363,9 +368,6 @@ class MainActivity : Activity() {
             : 이용하신 경로에는 (시설물) 이 있었습니다. 향후 (시설물)이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요
 
             :해당 시설물 가중치 조절*
-
-            --> 이부분짜야함
-
  */
         if(History.hasDanger){
             //시설물이 있는 경우에만 시설물 설문 진행
@@ -373,12 +375,16 @@ class MainActivity : Activity() {
                 preferenceQuestion_DangerA()
             }
             if (History.hasDangerB != null){
+                preferenceQuestion_DangerB()
             }
         }
 
-
+        ttsSpeak("선호도 가중치 조절이 완료되었습니다. 향후 경로 안내시 조정된 값으로 경로를 안내합니다.")
 
     }//End of preferenceQuestion
+
+
+
 
     fun preferenceQuestion_DangerA(){
         //순서는 엘리베이터-육교-지하보도-계단으로 각 자리수가 시설물의 개수를 나타냄
@@ -449,6 +455,9 @@ class MainActivity : Activity() {
         setPreference("facilityNoCar", howMuch)
 
     } //End of preferenceQuestion_DangerA()
+
+
+
 
     fun preferenceQuestion_DangerB(){
         //순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
@@ -611,6 +620,11 @@ class MainActivity : Activity() {
             Preference.algorithmWeight_facilityNoCar?.plus(value)
 
     }//End of setPreference()
+
+
+    /////////////////////////////////////////////////////////////////////////////
+    //                            선호도 관련 함수 모음 끝                           //
+    /////////////////////////////////////////////////////////////////////////////
 
 
 
