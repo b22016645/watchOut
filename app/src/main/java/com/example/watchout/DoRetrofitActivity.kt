@@ -272,6 +272,10 @@ class DoRetrofitActivity : Activity(){
                                     }
                                 }
                                 History.routNum = ind       //DB저장용
+                                History.hasDanger = routeList[ind]!!.hasDanger
+                                History.hasDangerA = routeList[ind]!!.hasDangerA
+                                History.hasDangerB = routeList[ind]!!.hasDangerB
+
                                 var timercount = 0
                                 timer(period = 500, initialDelay = 500) {
                                     if (timercount == 0) {

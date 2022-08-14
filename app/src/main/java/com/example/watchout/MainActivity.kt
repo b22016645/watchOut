@@ -365,12 +365,97 @@ class MainActivity : Activity() {
             :해당 시설물 가중치 조절*
 
             --> 이부분짜야함
-            /
+
  */
+        if(History.hasDanger){
+            //시설물이 있는 경우에만 시설물 설문 진행
+            if (History.hasDangerA != null){
+                preferenceQuestion_DangerA()
+            }
+            if (History.hasDangerB != null){
+                //순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
+            }
+        }
 
 
 
     }//End of preferenceQuestion
+
+    fun preferenceQuestion_DangerA(){
+        //순서는 엘리베이터-육교-지하보도-계단으로 각 자리수가 시설물의 개수를 나타냄
+        var DangerA = History.hasDangerA!!
+        var elevator = DangerA .div(1000)
+        DangerA %= 1000
+        var overPasses =DangerA.div(100)
+        DangerA %= 100
+        var underPasses = DangerA.div(10)
+        DangerA %= 10
+        var stairs = DangerA
+
+
+        var howMuch : Int = 0
+        while(elevator != 0) {
+                ttsSpeak(" 이용하신 경로에는 엘리베이터가 ${elevator}개 포함되었습니다. 향후 엘리베이터가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                var ans = "받아온 사용자 대답"
+                if (ans == "유지") {
+                    elevator = 0
+                } else if (ans == "최소화") {
+                    howMuch-=5
+                    elevator = 0
+                }
+                else{
+                    ttsSpeak("잘못된 음성입니다.")
+                }
+        }
+        while(overPasses != 0) {
+            ttsSpeak(" 이용하신 경로에는 육교가 ${overPasses}개 포함되었습니다. 향후 육교 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+            var ans = "받아온 사용자 대답"
+            if (ans == "유지") {
+                overPasses = 0
+            } else if (ans == "최소화") {
+                howMuch-=5
+                overPasses = 0
+            }
+            else{
+                ttsSpeak("잘못된 음성입니다.")
+            }
+        }
+        while(underPasses != 0) {
+            ttsSpeak(" 이용하신 경로에는 지하보도가 ${underPasses}개 포함되었습니다. 향후 지하보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+            var ans = "받아온 사용자 대답"
+            if (ans == "유지") {
+                underPasses = 0
+            } else if (ans == "최소화") {
+                howMuch-=5
+                underPasses = 0
+            }
+            else{
+                ttsSpeak("잘못된 음성입니다.")
+            }
+        }
+        while(stairs != 0) {
+            ttsSpeak(" 이용하신 경로에는 계단이 ${stairs}개 포함되었습니다. 향후 계단이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+            var ans = "받아온 사용자 대답"
+            if (ans == "유지") {
+                stairs = 0
+            } else if (ans == "최소화") {
+                howMuch-=5
+                stairs = 0
+            }
+            else{
+                ttsSpeak("잘못된 음성입니다.")
+            }
+        }
+
+        setPreference("facilityNoCar", howMuch)
+
+    } //End of preferenceQuestion_DangerA()
+
+    fun preferenceQuestion_DangerB(){
+
+    }//End of preferenceQuestion_DangerB()
+
+
 
 
     fun preferenceQuestion_tableWeight(){

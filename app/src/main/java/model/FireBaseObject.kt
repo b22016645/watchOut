@@ -30,7 +30,12 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
         var expFacility: Int = 0       //FT 이탈 횟수
         var expLineWay: Int = 0        // 직선길 이탈 횟수
         var expTotal: Int = 0           //총 이탈 횟수
-        }
+
+        // 선호도 가중치 DB업데이트를 위한 Flag 모음
+        var hasDanger : Boolean = false                 //DangerA,B중 하나라도 있으면 true, 기본값은 False
+        var hasDangerA: Int? = null                 //DangerA중 하나라도 있으면 notNull, 순서는 엘리베이터-육교-지하보도-계단으로 각 자리수가 시설물의 개수를 나타냄
+        var hasDangerB: Int? = null                 //DangerB중 하나라도 있으면 notNull, 순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
+}
 
 object Preference {   //도착지 도착 후 선호도 평가 데이터 베이스 (파이어베이스 저장용)
         var score: Int? = null  //만족도
