@@ -373,7 +373,6 @@ class MainActivity : Activity() {
                 preferenceQuestion_DangerA()
             }
             if (History.hasDangerB != null){
-                //순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
             }
         }
 
@@ -408,7 +407,7 @@ class MainActivity : Activity() {
                 }
         }
         while(overPasses != 0) {
-            ttsSpeak(" 이용하신 경로에는 육교가 ${overPasses}개 포함되었습니다. 향후 육교 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+            ttsSpeak(" 이용하신 경로에는 육교가 ${overPasses}개 포함되었습니다. 향후 육교가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
             var ans = "받아온 사용자 대답"
             if (ans == "유지") {
                 overPasses = 0
@@ -452,7 +451,74 @@ class MainActivity : Activity() {
     } //End of preferenceQuestion_DangerA()
 
     fun preferenceQuestion_DangerB(){
+        //순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
 
+        var DangerB = History.hasDangerB!!
+        var bridge = DangerB .div(1000)
+        DangerB %= 1000
+        var turnnels =DangerB.div(100)
+        DangerB %= 100
+        var highroad = DangerB.div(10)
+        DangerB %= 10
+        var largeFacilitypassage = DangerB
+
+
+        var howMuch : Int = 0
+        while(bridge != 0) {
+            ttsSpeak(" 이용하신 경로에는 교량이 ${bridge}개 포함되었습니다. 향후 교량이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+            var ans = "받아온 사용자 대답"
+            if (ans == "유지") {
+                bridge = 0
+            } else if (ans == "최소화") {
+                //가중치를 높인다 : 음수값을 키운다
+                howMuch-=5
+                bridge = 0
+            }
+            else{
+                ttsSpeak("잘못된 음성입니다.")
+            }
+        }
+        while(turnnels != 0) {
+            ttsSpeak(" 이용하신 경로에는 터널이 ${turnnels}개 포함되었습니다. 향후 터널이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+            var ans = "받아온 사용자 대답"
+            if (ans == "유지") {
+                turnnels = 0
+            } else if (ans == "최소화") {
+                howMuch-=5
+                turnnels = 0
+            }
+            else{
+                ttsSpeak("잘못된 음성입니다.")
+            }
+        }
+        while(highroad != 0) {
+            ttsSpeak(" 이용하신 경로에는 고가도로가 ${highroad}개 포함되었습니다. 향후 고가도로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+            var ans = "받아온 사용자 대답"
+            if (ans == "유지") {
+                highroad = 0
+            } else if (ans == "최소화") {
+                howMuch-=5
+                highroad = 0
+            }
+            else{
+                ttsSpeak("잘못된 음성입니다.")
+            }
+        }
+        while(largeFacilitypassage != 0) {
+            ttsSpeak(" 이용하신 경로에는 대형 시설물 이동통로가 ${largeFacilitypassage}개 포함되었습니다. 향후 대형 시설물 이동 통로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+            var ans = "받아온 사용자 대답"
+            if (ans == "유지") {
+                largeFacilitypassage = 0
+            } else if (ans == "최소화") {
+                howMuch-=5
+                largeFacilitypassage = 0
+            }
+            else{
+                ttsSpeak("잘못된 음성입니다.")
+            }
+        }
+
+        setPreference("facilityCar", howMuch)
     }//End of preferenceQuestion_DangerB()
 
 
