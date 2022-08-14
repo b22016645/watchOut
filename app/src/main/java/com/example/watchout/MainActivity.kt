@@ -314,28 +314,28 @@ class MainActivity : Activity() {
                     * 예 -> 종료
                     *아니오 -> 설문시작
 */
-/*
-           score = -1
+
+           var score = -1
            while (score >10 || score <0){
-               "경로만족도를 0~10사이 숫자로 말씀해주세요"
-               var score = 사용자가 말한 숫자
+               ttsSpeak("경로만족도를 0~10사이 숫자로 말씀해주세요")
+               // var score = 사용자가 말한 숫자
                if(score > 10 || score <0)
-                    "잘못된 범위입니다."
+                   ttsSpeak("잘못된 범위입니다.")
            }
 
            Preference.score = score         //우선 만족도 프리퍼런스오브젝트에 저장
 
            while (score <6) {
-                "설문을 종료하시려면 종료, 계속하시려면 "계속"이라고 말해주세요"
+               ttsSpeak("설문을 종료하시려면 종료, 계속하시려면 계속 이라고 말해주세요")
+               var ans = "사용자입력한음성"
                 if(ans == "종료")
-                    preferenceQuestion()함수를 종료하는 코드
+                   // preferenceQuestion()함수를 종료하는 코드
                 else if (ans =="계속")
-                    while블록에서 나와서 함수를 계속하는 코드 (break)
+                    break
                 else
-                    "잘못된 음성입니다."
+                    ttsSpeak("잘못된 음성입니다.")
            }
 
- */
 
  /*
             1-2. 6점 미만인 경우 ->설문시작
@@ -350,54 +350,11 @@ class MainActivity : Activity() {
             :turntype가중치 조절
 */
 
-/*
-        “향후 경로안내를 위한 선호도 가중치 조절을 시작합니다. 현재 상태 유지를 원하시면 유지 라고 말하세요”
+
+        ttsSpeak("향후 경로안내를 위한 선호도 가중치 조절을 시작합니다. 현재 상태 유지를 원하시면 유지 라고 말하세요")
         preferenceQuestion_tableWeight()
+        preferenceQuestion_turnPoint()
 
-        fun preferenceQuestion_tableWeight(){
-            while(true){
-                 "경로 안내에 있어 전반적인 도로상태와 시설물개수 중 더 중요한 것은 무엇입니까? 도로, 시설물, 유지 중 하나를 말씀하세요"
-                ans = "사용자가 말한거"
-                if (ans == "유지")
-                    Log.d("Main-preferenceQuestion_tableWeight()","유지")
-                    break
-                else if (ans == "도로")
-                    setPreference(tableWeight, -1)
-                    break
-                else if (ans == "시설물 개수")
-                    setPreference(tableWeight, +1)
-                    break
-                else
-                    "잘못된 음성입니다."
-            }
-         } //end of preferenceQuestion_tableWeight()
-
-
-
-         preferenceQuestion_turnPoint()
-
-         fun preferenceQuestion_turnPoint(){
-             while(true){
-                "직진우선길과 최단거리우선중 어떤 경로를 선호하십니까? 직진우선, 최단거리, 유지 중 하나를 말씀하세요"
-
-                if (ans == "유지")
-                    Log.d("Main-preferenceQuestion_turnPoint()","유지")
-                    break
-                else if (ans == "직진우선")
-                    //분기점 가중치를 높힌다  ->음수값이 클수록
-                    setPreference(turnPoint, -5)
-                    break
-                else if (ans == "최단거리 ")
-                    //분기점 가중치를 낮춘다
-                    setPreference(turnPoint, +5)
-                    break
-                else
-                   "잘못된 음성입니다."
-            }
-         }//End of preferenceQuestion_turnPoint()
-
-
-*/
 
 /*
             if) 시설물이 있는 경우
@@ -405,11 +362,65 @@ class MainActivity : Activity() {
                 →횡단보도/ 위험시설A(엘베,육교,지하보도,계단) / 위험시설B(교량,터널,고가도로,대형시설물이동통로)
             : 이용하신 경로에는 (시설물) 이 있었습니다. 향후 (시설물)이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요
 
-            :해당 시설물 가중치 조절*/
+            :해당 시설물 가중치 조절*
+
+            --> 이부분짜야함
+            /
+ */
 
 
 
     }//End of preferenceQuestion
+
+
+    fun preferenceQuestion_tableWeight(){
+        while(true){
+            ttsSpeak("경로 안내에 있어 전반적인 도로상태와 시설물개수 중 더 중요한 것은 무엇입니까? 도로, 시설물, 유지 중 하나를 말씀하세요")
+            var ans = "사용자가 말한거"
+
+            if (ans == "유지"){
+                Log.d("Main-preferenceQuestion_tableWeight()","유지")
+                break
+            }
+            else if (ans == "도로") {
+                setPreference("tableWeight", -1)
+                break
+            }
+            else if (ans == "시설물 개수") {
+                setPreference("tableWeight", +1)
+                break
+            }
+            else
+                ttsSpeak("잘못된 음성입니다.")
+        }
+    } //end of preferenceQuestion_tableWeight()
+
+    fun preferenceQuestion_turnPoint(){
+        while(true) {       //잘못된 음성인경우 계속 반복
+            ttsSpeak("직진우선길과 최단거리우선중 어떤 경로를 선호하십니까? 직진우선, 최단거리, 유지 중 하나를 말씀하세요")
+            var ans = "사용자가 말한 단어"
+
+            if (ans == "유지") {
+                Log.d("Main-preferenceQuestion_turnPoint()", "유지")
+                break
+            }
+            else if (ans == "직진우선") {
+                //분기점 가중치를 높힌다  ->음수값이 클수록 가중치가 높은거임
+                setPreference("turnPoint", -5)
+                break
+            }
+            else if (ans == "최단거리 ") {
+                //분기점 가중치를 낮춘다{
+                setPreference("turnPoint", +5)
+                break
+            }
+            else {
+                ttsSpeak("잘못된 음성입니다.")
+            }
+        }
+    }//End of preferenceQuestion_turnPoint()
+
+
 
     fun setPreference(category :String, value:Int){
 
