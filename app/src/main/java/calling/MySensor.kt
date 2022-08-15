@@ -1,4 +1,4 @@
-package com.example.watchout
+package calling
 
 import android.content.Context
 import android.hardware.Sensor

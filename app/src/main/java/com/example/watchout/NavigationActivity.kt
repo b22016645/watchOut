@@ -16,6 +16,8 @@ import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
+import calling.MyMqtt
+import calling.MySensor
 import com.google.android.gms.location.*
 import model.DirectionItem
 import model.History
