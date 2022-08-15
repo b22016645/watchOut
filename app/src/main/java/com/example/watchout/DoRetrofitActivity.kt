@@ -262,7 +262,6 @@ class DoRetrofitActivity : Activity(){
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 4가지 모두 추가되면 한 번
 
                                 var max = routeList[0]?.routeScore!!
-                                
 
                                 var ind = 0
                                 for (i in 1..3) {
@@ -351,12 +350,10 @@ class DoRetrofitActivity : Activity(){
         //api를 통해 얻은 JSON을 파싱해서 가져온 분기점 배열 좌표
         var turnTypeList = arrayListOf<Int>()
 
-        //도로타입 배열
-        var roadTypeList = arrayListOf<Int>()
+        //facility리스트
+        var facilityTypeList = arrayListOf<Int>()
 
         var turnPoint = arrayListOf<List<Double>>()
-
-        var addNum = 0
 
         // 길찾기 호출
         instance.searchRoute(
@@ -389,24 +386,18 @@ class DoRetrofitActivity : Activity(){
                                     rawRouteRes.removeAt(rawRouteRes.size-1)
                                 }
                                 var turnType = jsonarrNext.turnType
-                                var roadType = jsonarrNext.roadType
-                                if(turnType!=null && roadType==null){
+                                if(turnType!=null){
                                     turnTypeList.add(turnType)
-                                    roadTypeList.add(0)
-                                    addNum++
-                                }
-                                else if(roadType!=null && turnType==null){
-                                    //var i = addNum
-                                    for(x in addNum .. rawRouteRes.size-1) {
-                                        turnTypeList.add(0)
-                                        roadTypeList.add(roadType)
-                                        addNum++
-                                    }
                                 }
                                 else{
-                                    Log.d(LOG,"여긴 들어오면 안돼")
+                                    for(x in turnTypeList.size .. rawRouteRes.size-1) {
+                                        turnTypeList.add(0)
+                                    }
                                 }
-                                Log.d(LOG,"addNum:"+"${addNum}"+"! turn:"+"${turnTypeList.size}"+"! road:"+"${roadTypeList.size}")
+                                var facilityType = jsonarrNext.facilityType
+                                if(facilityType!=null){
+                                    facilityTypeList.add(facilityType)
+                                }
                             }
                         }
 
@@ -418,7 +409,6 @@ class DoRetrofitActivity : Activity(){
                                 turnPoint.add(listOf(rawRouteRes[i][1],rawRouteRes[i][0]))
                             }
                         }
-
 
                         //routeRes 보냄
 
@@ -502,7 +492,7 @@ class DoRetrofitActivity : Activity(){
 //                        Log.d(LOG,"midpoint : "+"${midpointString}")
 
 
-                        val naviData = NaviData(midpointList, turnTypeList, roadTypeList, destination, turnPoint)
+                        val naviData = NaviData(midpointList, turnTypeList, facilityTypeList, destination, turnPoint)
                         //받아서 retrunMain호출함수호출
                         returnMain(naviData)
 

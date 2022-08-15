@@ -5,5 +5,5 @@ import java.io.Serializable
 
 data class Route(val coordinates : JsonElement,
                  val turnType : Int?,
-                 val roadType : Int?):Serializable
+                 val facilityType : Int?):Serializable
 { }
