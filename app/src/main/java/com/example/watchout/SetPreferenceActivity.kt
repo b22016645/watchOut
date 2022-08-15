@@ -67,6 +67,7 @@ class SetPreferenceActivity : Activity() {
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
+        Log.d("ddddddd","일단 액티비티 넘어옴")
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_speech_to_text)
@@ -78,12 +79,12 @@ class SetPreferenceActivity : Activity() {
 
         image = findViewById(R.id.imageView)
 
-        Log.d(Constant.API.LOG,"SpeechToTextActivity 호출됨")
+        Log.d(Constant.API.LOG,"SET PREFERENCE 호출됨")
 
         createAudioRecord()
         createRetrofitService()
 
-        startSettingPreference()
+        preferenceQuestion()
     }
 
 
@@ -110,6 +111,7 @@ class SetPreferenceActivity : Activity() {
 
 
     private fun createRetrofitService() { //retroservice객체 생성
+        Log.d(Constant.API.LOG,"createRetrofitService() 호출됨")
         val gson = GsonBuilder()
             .setLenient()
             .create()
@@ -204,6 +206,7 @@ class SetPreferenceActivity : Activity() {
     }
 
     private fun createAudioRecord(){
+        Log.d(Constant.API.LOG,"createAudioRecord() 호출됨")
         if (ActivityCompat.checkSelfPermission(
                 this,
                 Manifest.permission.RECORD_AUDIO
@@ -228,7 +231,9 @@ class SetPreferenceActivity : Activity() {
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
 
         if(keyCode== KeyEvent.KEYCODE_BACK){
+            Log.d(Constant.API.LOG,"누름")
             if(recordingState==0){
+                Log.d(Constant.API.LOG,"레코드스테이트0")
                 isActive = true
                 image.setImageResource(R.drawable.des)
                 Log.d(Constant.API.LOG, "Active")
@@ -244,6 +249,7 @@ class SetPreferenceActivity : Activity() {
                 recordingState = 1
             }
             else if (recordingState == 1){
+                Log.d(Constant.API.LOG,"레코드스테이트1")
                 isActive = false
                 image.setImageResource(R.drawable.search)       //이거바꿔야함
 
@@ -258,12 +264,7 @@ class SetPreferenceActivity : Activity() {
 
 
 
-    private fun startSettingPreference() {
-        TODO("Not yet implemented")
 
-        preferenceQuestion()
-
-    }
 
 
 
@@ -281,15 +282,19 @@ class SetPreferenceActivity : Activity() {
                     * 예 -> 종료
                     *아니오 -> 설문시작
 */
+        Log.d(Constant.API.LOG,"preferenceQuestion() 호출됨")
         sttReturnData = null
         var score = -1
-        ttsSpeak("경로만족도를 0~10사이 숫자로 말씀해주세요")
+        recordingState==0
+        ttsSpeak("경로만족도를 0부터 10사이 숫자로 말씀해주세요")
+        Log.d(Constant.API.LOG,"경로만족도를 0부터 10사이 숫자로 말씀해주세요")
 
         while(recordingState==0||recordingState==1||recordingState==3){
             //대기
 
             if (recordingState == 2)      {
                  var score = sttReturnData?.toInt()?:-1
+                Log.d("SCORE",score.toString())
                 if(score > 10 || score <0) {
                     ttsSpeak("잘못된 범위입니다.")
                     sttReturnData = null
@@ -368,6 +373,12 @@ class SetPreferenceActivity : Activity() {
 
             :해당 시설물 가중치 조절*
  */
+        //TEST
+        History.hasDanger = true
+        History.hasDangerA = 1234
+        History.hasDangerB = 5678
+
+
         if(History.hasDanger){
             //시설물이 있는 경우에만 시설물 설문 진행
             if (History.hasDangerA != null){
@@ -600,13 +611,13 @@ class SetPreferenceActivity : Activity() {
                     //largeFacilitypassage = 0
                     recordingState = 4
                 } else {
-                    ttsSpeak("잘못된 음성입니다.  대형 시설물 이동통로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                    ttsSpeak("잘못된 음성입니다. 대형 시설물 이동통로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
                     recordingState = 3
                 }
             }
 
         }
-
+        Log.d("howmuch",howMuch.toString())
 
         setPreference("facilityCar", howMuch)
     }//End of preferenceQuestion_DangerB()
@@ -615,48 +626,72 @@ class SetPreferenceActivity : Activity() {
 
 
     fun preferenceQuestion_tableWeight(){
-        while(true){
-            ttsSpeak("경로 안내에 있어 전반적인 도로상태와 시설물개수 중 더 중요한 것은 무엇입니까? 도로, 시설물, 유지 중 하나를 말씀하세요")
-            var ans = "사용자가 말한거"
 
-            if (ans == "유지"){
-                Log.d("Main-preferenceQuestion_tableWeight()","유지")
-                break
+        recordingState==0
+        sttReturnData = null
+
+
+        while(recordingState == 0 || recordingState == 1 || recordingState ==3){
+
+            ttsSpeak("경로 안내에 있어 전반적인 도로상태와 시설물개수 중 더 중요한 것은 무엇입니까? 도로, 시설물, 유지 중 하나를 말씀하세요")
+
+            recordingState==0
+            if (recordingState == 2){
+                var ans = sttReturnData
+
+                if (ans == "유지"){
+                    Log.d("Main-preferenceQuestion_tableWeight()","유지")
+                    recordingState = 4
+                }
+                else if (ans == "도로") {
+                    setPreference("tableWeight", -1)
+                    recordingState = 4
+                }
+                else if (ans == "시설물 개수") {
+                    setPreference("tableWeight", +1)
+                    recordingState = 4
+                }
+                else {
+                    ttsSpeak("잘못된 음성입니다.")
+                    recordingState = 3
+                    sttReturnData = null
+                }
             }
-            else if (ans == "도로") {
-                setPreference("tableWeight", -1)
-                break
-            }
-            else if (ans == "시설물 개수") {
-                setPreference("tableWeight", +1)
-                break
-            }
-            else
-                ttsSpeak("잘못된 음성입니다.")
+
+
+
         }
-    } //end of preferenceQuestion_tableWeight()
+    }
+    //end of preferenceQuestion_tableWeight()
 
     fun preferenceQuestion_turnPoint(){
-        while(true) {       //잘못된 음성인경우 계속 반복
-            ttsSpeak("직진우선길과 최단거리우선중 어떤 경로를 선호하십니까? 직진우선, 최단거리, 유지 중 하나를 말씀하세요")
-            var ans = "사용자가 말한 단어"
 
-            if (ans == "유지") {
-                Log.d("Main-preferenceQuestion_turnPoint()", "유지")
-                break
-            }
-            else if (ans == "직진우선") {
-                //분기점 가중치를 높힌다  ->음수값이 클수록 가중치가 높은거임
-                setPreference("turnPoint", -5)
-                break
-            }
-            else if (ans == "최단거리 ") {
-                //분기점 가중치를 낮춘다{
-                setPreference("turnPoint", +5)
-                break
-            }
-            else {
-                ttsSpeak("잘못된 음성입니다.")
+        recordingState==0
+        sttReturnData = null
+
+
+        while(recordingState == 0 || recordingState == 1 || recordingState ==3) {
+            recordingState = 0
+            ttsSpeak("직진우선길과 최단거리우선중 어떤 경로를 선호하십니까? 직진우선, 최단거리, 유지 중 하나를 말씀하세요")
+
+            if (recordingState == 2) {
+                var ans = sttReturnData
+
+                if (ans == "유지") {
+                    Log.d("Main-preferenceQuestion_turnPoint()", "유지")
+                    recordingState = 4
+                } else if (ans == "직진우선") {
+                    //분기점 가중치를 높힌다  ->음수값이 클수록 가중치가 높은거임
+                    setPreference("turnPoint", -5)
+                    recordingState = 4
+                } else if (ans == "최단거리 ") {
+                    //분기점 가중치를 낮춘다{
+                    setPreference("turnPoint", +5)
+                    recordingState = 4
+                } else {
+                    ttsSpeak("잘못된 음성입니다.")
+                    recordingState = 3
+                }
             }
         }
     }//End of preferenceQuestion_turnPoint()

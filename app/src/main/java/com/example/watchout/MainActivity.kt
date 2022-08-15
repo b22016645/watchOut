@@ -122,6 +122,10 @@ class MainActivity : Activity() {
 
         startLocationUpdates()
 
+
+        val intent = Intent(this, SetPreferenceActivity::class.java)
+        startActivityForResult(intent, 1000000)
+
     }
 
     private fun startLocationUpdates() {

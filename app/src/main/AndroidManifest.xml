@@ -51,6 +51,7 @@
         <activity android:name="com.example.watchout.SpeechToTextActivity"/>
         <activity android:name="com.example.watchout.DoRetrofitActivity"/>
         <activity android:name="com.example.watchout.DirectionActivity"/>
+        <activity android:name="com.example.watchout.SetPreferenceActivity"/>
 
 
         <service android:name="org.eclipse.paho.android.service.MqttService" />
