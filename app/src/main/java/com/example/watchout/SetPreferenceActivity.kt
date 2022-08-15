@@ -510,59 +510,103 @@ class SetPreferenceActivity : Activity() {
 
 
         var howMuch : Int = 0
-        while(bridge != 0) {
+
+
+        if(bridge != 0) {
+            recordingState = 0
+
             ttsSpeak(" 이용하신 경로에는 교량이 ${bridge}개 포함되었습니다. 향후 교량이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-            var ans = "받아온 사용자 대답"
-            if (ans == "유지") {
-                bridge = 0
-            } else if (ans == "최소화") {
-                //가중치를 높인다 : 음수값을 키운다
-                howMuch-=5
-                bridge = 0
+            sttReturnData = null
+
+            while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
+                var ans = sttReturnData
+                if (ans == "유지") {
+                    //bridge = 0
+                    recordingState = 4
+                } else if (ans == "최소화") {
+                    howMuch -= 5
+                    //bridge = 0
+                    recordingState = 4
+                } else {
+                    ttsSpeak("잘못된 음성입니다. 교량이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                    recordingState = 3
+                }
             }
-            else{
-                ttsSpeak("잘못된 음성입니다.")
-            }
+
         }
-        while(turnnels != 0) {
+
+        if(turnnels != 0) {
+            recordingState = 0
+
             ttsSpeak(" 이용하신 경로에는 터널이 ${turnnels}개 포함되었습니다. 향후 터널이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-            var ans = "받아온 사용자 대답"
-            if (ans == "유지") {
-                turnnels = 0
-            } else if (ans == "최소화") {
-                howMuch-=5
-                turnnels = 0
+            sttReturnData = null
+
+            while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
+                var ans = sttReturnData
+                if (ans == "유지") {
+                    //turnnels = 0
+                    recordingState = 4
+                } else if (ans == "최소화") {
+                    howMuch -= 5
+                    //turnnels = 0
+                    recordingState = 4
+                } else {
+                    ttsSpeak("잘못된 음성입니다. 터널이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                    recordingState = 3
+                }
             }
-            else{
-                ttsSpeak("잘못된 음성입니다.")
-            }
+
         }
-        while(highroad != 0) {
+
+
+
+        if(highroad != 0) {
+            recordingState = 0
+
             ttsSpeak(" 이용하신 경로에는 고가도로가 ${highroad}개 포함되었습니다. 향후 고가도로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-            var ans = "받아온 사용자 대답"
-            if (ans == "유지") {
-                highroad = 0
-            } else if (ans == "최소화") {
-                howMuch-=5
-                highroad = 0
+            sttReturnData = null
+
+            while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
+                var ans = sttReturnData
+                if (ans == "유지") {
+                    //highroad = 0
+                    recordingState = 4
+                } else if (ans == "최소화") {
+                    howMuch -= 5
+                    //highroad = 0
+                    recordingState = 4
+                } else {
+                    ttsSpeak("잘못된 음성입니다. 고가도로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                    recordingState = 3
+                }
             }
-            else{
-                ttsSpeak("잘못된 음성입니다.")
-            }
+
         }
-        while(largeFacilitypassage != 0) {
-            ttsSpeak(" 이용하신 경로에는 대형 시설물 이동통로가 ${largeFacilitypassage}개 포함되었습니다. 향후 대형 시설물 이동 통로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-            var ans = "받아온 사용자 대답"
-            if (ans == "유지") {
-                largeFacilitypassage = 0
-            } else if (ans == "최소화") {
-                howMuch-=5
-                largeFacilitypassage = 0
+
+
+        if(largeFacilitypassage != 0) {
+            recordingState = 0
+
+            ttsSpeak(" 이용하신 경로에는  대형 시설물 이동통로가 ${largeFacilitypassage}개 포함되었습니다. 향후  대형 시설물 이동통로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+            sttReturnData = null
+
+            while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
+                var ans = sttReturnData
+                if (ans == "유지") {
+                    //largeFacilitypassage = 0
+                    recordingState = 4
+                } else if (ans == "최소화") {
+                    howMuch -= 5
+                    //largeFacilitypassage = 0
+                    recordingState = 4
+                } else {
+                    ttsSpeak("잘못된 음성입니다.  대형 시설물 이동통로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                    recordingState = 3
+                }
             }
-            else{
-                ttsSpeak("잘못된 음성입니다.")
-            }
+
         }
+
 
         setPreference("facilityCar", howMuch)
     }//End of preferenceQuestion_DangerB()
