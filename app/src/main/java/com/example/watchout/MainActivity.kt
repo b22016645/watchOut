@@ -233,6 +233,7 @@ class MainActivity : Activity() {
         if (requestCode == 0 || requestCode == 10) {
             if (resultCode == RESULT_OK) {
                 var sttResultMsg = data?.getStringExtra("sttResultMsg")
+                Log.i("Stt", "SpeechToTextActivity: " +sttResultMsg)
                 publish("des",sttResultMsg!!)
 
                 if(requestCode == 10) { //즐겨찾기 등록시

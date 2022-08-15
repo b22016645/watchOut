@@ -149,7 +149,7 @@ class DoRetrofitActivity : Activity(){
 
     private fun startScore(des1 : Double , des2 : Double, sName: String, eName : String) {
         var timercount = 0
-        timer(period = 500,initialDelay = 500){
+        timer(period = 1000,initialDelay = 500){
             if(timercount!=4){
                 getScore(lon,lat,des1,des2,sName,eName,searchOptionList[timercount],timercount)
 
