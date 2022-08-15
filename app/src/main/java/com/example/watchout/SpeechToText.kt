@@ -1,24 +1,13 @@
 package com.example.watchout
 
 import android.Manifest
-import android.app.Activity
 import android.content.Context
-import android.content.Intent
 import android.content.pm.PackageManager
-import android.hardware.Sensor
-import android.hardware.SensorEvent
-import android.hardware.SensorEventListener
-import android.hardware.SensorManager
 import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
-import android.view.KeyEvent
-import android.widget.ImageView
-import android.widget.TextView
-import android.widget.Toast
 import androidx.core.app.ActivityCompat
-import androidx.core.content.ContextCompat.getSystemService
 import com.google.gson.GsonBuilder
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -34,15 +23,12 @@ import retrofit2.converter.gson.GsonConverterFactory
 import utils.Constant
 import java.io.IOException
 
-class MySTT(val context: Context)  {
+class SpeechToText(val context: Context)  {
     private var audioRecord: AudioRecord? = null
     private var byteAudioData: ByteArray? = null
 
     // private var instance = RetrofitManager()
     private var retrofitService: IRetrofit? = null
-
-    //물리버튼을 눌렀을 때마다 true/false가 바뀌는 변수
-    private var activeBool = true
 
     /* AudioRecord 변수 */
     private val audioSource = MediaRecorder.AudioSource.MIC
@@ -50,10 +36,12 @@ class MySTT(val context: Context)  {
     private val channelCount = AudioFormat.CHANNEL_IN_MONO
     private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
     private val bufferSize = sampleRate * 5
-
     private var isActive = false
 
-    private var resultText :String = "text"
+     var resultText :String = "text"
+
+    //선호도 액티비티도 추가
+    private val destinationActivity = DestinationActivity.getInstance()
 
     fun startAudioRecord(){
         createAudioRecord()
@@ -67,12 +55,12 @@ class MySTT(val context: Context)  {
         }.start()
     }
 
-    fun finishAudioRecordAndGetText(): String? {
+    fun finishAudioRecordAndGetText(activityName:String){
         isActive = false
         createRetrofitService()
-        val res = requestStt()
-        return res
+        requestStt(activityName)
     }
+
 
     private fun createRetrofitService() { //retroservice객체 생성
         val gson = GsonBuilder()
@@ -127,8 +115,7 @@ class MySTT(val context: Context)  {
         Log.d(Constant.API.LOG, " Thread돌아가는중")
     }
 
-    private fun requestStt(): String? { //요청 보냄
-        var str : String? = null
+    private fun requestStt(name:String){ //요청 보냄
         try {
             Log.i(Constant.API.LOG,"rest api에 요청 보냄")
             val meida = "video/*".toMediaTypeOrNull()
@@ -162,11 +149,13 @@ class MySTT(val context: Context)  {
                                 val json = JSONObject(result_json_string)
                                 val sttResultMsg = json.getString("value")
                                 Log.i("Stt", sttResultMsg) //STT결과값입니다요!!!!!!!!!!!!!!
-                               str = sttResultMsg
-                                //val returnIntent = Intent()
-                                //    .putExtra("sttResultMsg", sttResultMsg)
-                                //setResult(Activity.RESULT_OK, returnIntent)
-                                //finish()
+                                if(name == "des"){//SpeechToTextActivity
+                                    destinationActivity?.returnToSpeechToTextActivity(sttResultMsg)
+                                }
+//                               else if(name =="선호도액티비티"){
+//                                   선호도액티비티?.returnTo선호도액티비티(sttResultMsg)
+//                               }
+
                             } catch (e: JSONException) {
                                 e.printStackTrace()
                             }
@@ -178,6 +167,7 @@ class MySTT(val context: Context)  {
                     }
                 }
 
+
                 override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
                     Log.i(Constant.API.LOG, "Fail msg = " + t.message)
                 }
@@ -185,7 +175,6 @@ class MySTT(val context: Context)  {
         } catch (e: Exception) {
             Log.i(Constant.API.LOG, "requestStt fail...")
         }
-        return str
     }
 }
 

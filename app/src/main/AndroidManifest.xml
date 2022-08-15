@@ -48,7 +48,7 @@
             </intent-filter>
         </activity>
         <activity android:name="com.example.watchout.NavigationActivity"/>
-        <activity android:name="com.example.watchout.SpeechToTextActivity"/>
+        <activity android:name="com.example.watchout.DestinationActivity"/>
         <activity android:name="com.example.watchout.DoRetrofitActivity"/>
         <activity android:name="com.example.watchout.DirectionActivity"/>
 

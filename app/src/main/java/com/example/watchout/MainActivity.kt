@@ -213,14 +213,14 @@ class MainActivity : Activity() {
             } else {
                 ttsSpeak("버튼을 눌러 목적지를 말하세요.")
                 publish("topic", "목적지 입력을 시작했습니다")
-                val intent = Intent(this, SpeechToTextActivity::class.java)
+                val intent = Intent(this, DestinationActivity::class.java)
                 startActivityForResult(intent, 0)
             }
         }
         else{ //즐겨찾기등록시
             ttsSpeak("즐겨찾기에 등록할 별명을 말해주세요")
             Log.d(LOG,"즐겨찾기 등록 시작")
-            val intent = Intent(this, SpeechToTextActivity::class.java)
+            val intent = Intent(this, DestinationActivity::class.java)
             startActivityForResult(intent, 10)
         }
     }
@@ -233,7 +233,7 @@ class MainActivity : Activity() {
         if (requestCode == 0 || requestCode == 10) {
             if (resultCode == RESULT_OK) {
                 var sttResultMsg = data?.getStringExtra("sttResultMsg")
-                Log.i("Stt", "SpeechToTextActivity: " +sttResultMsg)
+                Log.i("Stt", "MainActivity: " +sttResultMsg)
                 publish("des",sttResultMsg!!)
 
                 if(requestCode == 10) { //즐겨찾기 등록시
