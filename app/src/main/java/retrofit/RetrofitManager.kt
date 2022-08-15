@@ -148,8 +148,15 @@ class RetrofitManager {
                                 var turnType : Int? = properties.get("turnType")?.asInt
                                 var roadType : Int? = properties.get("roadType")?.asInt
                                 var distance : Int? = properties.get("distance")?.asInt
-                                var facilityType : Int? = properties.get("facility")?.asInt
+                                var facilityType : String? = properties.get("facilityType")?.asString
+                                var facil : Int?
 
+                                if (facilityType == ""){
+                                    facil = 0
+                                }
+                                else {
+                                    facil = facilityType!!.toInt()
+                                }
 
                                 if (totalDistance==0){
                                     totalDistance = properties.get("totalDistance")?.asInt      //경로 총 길이: 단위(m)
@@ -164,13 +171,13 @@ class RetrofitManager {
                                 SafeRoute.calcPartialScore(facilityType,distance,roadType,turnType, saftyScore)
                                 //Log.d(Constant.API.SCORE_SAFEROUTE, "FFFFFFFFFFFFFFF" + "${saftyScore}")
 */
-                                SafeRoute.gatherRouteInfor(facilityType,distance,roadType,turnType,routeInfor)
+                                SafeRoute.gatherRouteInfor(facil,distance,roadType,turnType,routeInfor)
                                 // 파싱된 데이터 하나 올 때마다 경로 정보 저장하는 함수.
 
                                 var RouteItem = Route(
                                     coordinates = coordinates,
                                     turnType = turnType,
-                                    facilityType = facilityType
+                                    facilityType = facil
                                 )
                                 parseRouteDataArray.add(RouteItem)
                             }

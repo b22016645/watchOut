@@ -386,17 +386,16 @@ class DoRetrofitActivity : Activity(){
                                     rawRouteRes.removeAt(rawRouteRes.size-1)
                                 }
                                 var turnType = jsonarrNext.turnType
+                                var facilityType = jsonarrNext.facilityType
                                 if(turnType!=null){
                                     turnTypeList.add(turnType)
+                                    facilityTypeList.add(facilityType!!)
                                 }
                                 else{
                                     for(x in turnTypeList.size .. rawRouteRes.size-1) {
                                         turnTypeList.add(0)
+                                        facilityTypeList.add(facilityType!!)
                                     }
-                                }
-                                var facilityType = jsonarrNext.facilityType
-                                if(facilityType!=null){
-                                    facilityTypeList.add(facilityType)
                                 }
                             }
                         }

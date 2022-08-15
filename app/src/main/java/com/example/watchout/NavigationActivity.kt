@@ -120,8 +120,6 @@ class NavigationActivity : Activity(), LocationListener {
         turnPoint = naviData.turnPoint
         mContext = this
 
-        Log.d(LOG,"NavigationActivity - turnTypeList : " +"${turnTypeList}")
-
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
 
         //통합 위치 정보 제공자 클라이언트의 인스턴스
@@ -187,6 +185,8 @@ class NavigationActivity : Activity(), LocationListener {
 
                         var turnNum = turnTypeList[midPointNum]
                         var facilNum = facilityTypeList[midPointNum]
+
+                        Log.d(LOG,"num = "+"${turnNum}"+" + "+"${facilNum}")
 
                         //안내시작 일단 0->1을 안내
                         //나침반불러와서
