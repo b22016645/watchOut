@@ -123,8 +123,11 @@ class MainActivity : Activity() {
         startLocationUpdates()
 
 
+/*
+        PreferenceActicity 테스트용
         val intent = Intent(this, SetPreferenceActivity::class.java)
         startActivityForResult(intent, 1000000)
+*/
 
     }
 
