@@ -318,24 +318,20 @@ class DoRetrofitActivity : Activity(){
 
         //Safey data 4개 pub
         var scoreBuilder = StringBuilder()
-        var ectBuilder = StringBuilder()
         for(i in 0..3) {
             scoreBuilder.append(routeList[i]?.routeInforStringData)
-            ectBuilder.append(routeList[i]?.ectInforStringData)
+            scoreBuilder.append(",");
+            scoreBuilder.append(routeList[i]?.ectInforStringData)
             //여기서 routeInfor에 만들어놓은 퍼블리쉬할 스트링 모두 이어붙이기
             if (i < 3) {
                 scoreBuilder.append("!")
-                ectBuilder.append("!")
             }
         }
         var routeData = scoreBuilder.toString()
-        var ectData = ectBuilder.toString()
         // Log.d(LOG,"SaftyScore : "+scoreStr)
         Log.d("DoRetrofit-getRoute() : 퍼블리쉬할 스트링데이터 (전체루트정보)",routeData)
-        Log.d("DoRetrofit-getRoute() : 퍼블리쉬할 스트링데이터 (기타루트정보)",ectData)
         //웹 내 표에 띄울 데이타들 퍼블리쉬
         publish("saftyScore",routeData)
-        publish("ectData",ectData)
 
         routeList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
 
