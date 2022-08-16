@@ -59,6 +59,9 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
                 expNoCar = 0
                 expWithCar = 0
                 expTotal = 0
+                hasDanger = false
+                hasDangerA = null
+                hasDangerB = null
                 midPointSize = null
         }
 
