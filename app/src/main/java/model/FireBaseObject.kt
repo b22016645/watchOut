@@ -25,6 +25,7 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
 
 
         //RouteInfor 루트 정보 (exp = existPoint: 경로 이탈 부분)
+        var midPointSize : Int? = null          //DoRetrofit = midPointSize
         var routNum: Int? = null         //이용했던 경로 번호용. DoRetrofit에서 인덱스 결정 후 받음
         var expTurnPoint: Int = 0      //분기점에서 이탈한 횟수  Navigation - locationCallBack
         var expCrossWalk: Int = 0       //횡단보도에서 이탈한 횟수
@@ -58,6 +59,10 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
                 expNoCar = 0
                 expWithCar = 0
                 expTotal = 0
+                hasDanger = false
+                hasDangerA = null
+                hasDangerB = null
+                midPointSize = null
         }
 
 }
