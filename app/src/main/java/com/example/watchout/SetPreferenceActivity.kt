@@ -84,9 +84,9 @@ class SetPreferenceActivity : Activity() {
         createAudioRecord()
         createRetrofitService()
 
+        updatePreferenceByExpLog()
         preferenceQuestion()
     }
-
 
 
     fun setTTS(){
@@ -274,6 +274,58 @@ class SetPreferenceActivity : Activity() {
     ////////////////////////////////////////// /////////////////////////////////////////
     //                              경로 안내 종료 후 선호도 조사 함수 모음                    //
     ///////////////////////////////////////// //////////////////////////////////////////
+
+    private fun updatePreferenceByExpLog() {
+        //히스토리 내 이탈 로그에 기반하여 자동으로 가중치 조절
+
+        var stnd = History.midPointSize!! //조정기준
+        var num = 12121     //인덱스넘버
+
+        Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","총크기 :${num}/ 총이탈 :,${History.expTotal}(${History.expTotal/num}) / 직선이탈 :,${History.expStraightRoad}(${History.expStraightRoad/History.expTotal}%)/ 횡단보도이탈 :,${History.expCrossWalk}(${History.expCrossWalk/History.expTotal}%)/ ftCar이탈 :${History.expWithCar}(${History.expWithCar/History.expTotal}%)/ftNoCar이탈  :,${History.expNoCar}(${History.expNoCar/History.expTotal}%)")
+
+        if (History.expTotal / num > 0.2){
+            //총 이탈 비율이 20%가 넘는 경우에만 가중치를 조절한다. (이하인 경우 사용자가 올바르게 길을 갔다고 판단)
+
+            // 1. 직선길 이탈 --> DangerScore 테이블웨이트 조정
+            if (History.expStraightRoad / History.expTotal > stnd){
+                //직진길 이탈률이 40% 넘는 경우 테이블전체가중치를 낮춤 (도로상태가 더 중요하다고 판단)
+                Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","직선길 가중치 조절->tableWieght 낮춤")
+                setPreference("tableWeight",-1)
+            }
+            else if ((History.expTotal - History.expStraightRoad) /History.expTotal > 0.8){
+                //직진길 이탈률이 20% 이하인 경우 테이즐 전체 가중치를 높임 (DangerScore가 더 중요하다고 판단)
+                Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","직선길 가중치 조절->tableWieght 높임")
+                setPreference("tableWeight",+1)
+            }
+
+            //2.분기점
+            if (History.expTurnPoint / History.expTotal > stnd){
+                Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","분기점 가중치 조절")
+                setPreference("turnPoint", 10)
+            }
+
+            //3.횡단보도
+            if (History.expCrossWalk / History.expTotal > stnd){
+                Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","횡단보도 가중치 조절")
+                setPreference("crossWalk", 10)
+            }
+
+            //4.CAR
+            if (History.expWithCar / History.expTotal > stnd){
+                Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","facilityCar 가중치 조절")
+                setPreference("facilityCar", 10)
+            }
+
+            //5.NoCar
+            if (History.expNoCar / History.expTotal > stnd){
+                Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","failityNoCar 가중치 조절")
+                setPreference("failityNoCar", 10)
+            }
+
+
+        }
+    }
+
 
     private fun preferenceQuestion() {      //경로 끝나고 선호도 조사하는 함수
 /*        1. 경로 만족도를 1~10사이 숫자로 말씀해주세요

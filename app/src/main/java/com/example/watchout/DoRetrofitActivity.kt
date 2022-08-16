@@ -343,6 +343,7 @@ class DoRetrofitActivity : Activity(){
 
         //세분화된 좌표를 저장할 배열
         var midpointList = arrayListOf<List<Double>>() //[0]=>lat, [1]=>lon
+        History.midPointSize = midpointList.size
 
         //api를 통해 얻은 JSON을 파싱해서 가져온 이중배열 좌표
         var rawRouteRes = arrayListOf<List<Double>>() //[0]=>lon, [1]=>lat
