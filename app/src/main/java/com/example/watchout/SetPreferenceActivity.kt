@@ -2,6 +2,7 @@ package com.example.watchout
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.media.AudioFormat
 import android.media.AudioRecord
@@ -30,39 +31,25 @@ import retrofit2.converter.gson.GsonConverterFactory
 import utils.Constant
 import java.io.IOException
 import android.speech.tts.TextToSpeech
+import calling.SpeechToText
 import java.util.*
 
 class SetPreferenceActivity : Activity() {
-
-    private var audioRecord: AudioRecord? = null
-    private var byteAudioData: ByteArray? = null
-
-    // private var instance = RetrofitManager()
-    private var retrofitService: IRetrofit? = null
-
-    //물리버튼을 눌렀을 때마다 true/false가 바뀌는 변수
-    private var activeBool = true
     private var recordingState : Int = 0
+
+
     //0 -> 녹음하지 않고 대기중, stringData == null
     //1 -> 녹음중. 버튼 한번 눌렀을때 0->1로 바뀜, byteData쌓는중
     //2 -> 스트링데이타로 변환중, 버튼 한번 더 눌렀을때 1->2로 바뀜 (녹음이 끝났다는 말). stringData만드는중
     //3 -> stringData가 다 만들어진 상태, 쓸 준비 완료. 쓰고 나면 상태변수를 0으로 바꿈
 
-    /* AudioRecord 변수 */
-    private val audioSource = MediaRecorder.AudioSource.MIC
-    private val sampleRate = 16000
-    private val channelCount = AudioFormat.CHANNEL_IN_MONO
-    private val audioFormat = AudioFormat.ENCODING_PCM_16BIT
-    private val bufferSize = sampleRate * 5
-
-    lateinit var image : ImageView
-
-    private var isActive = false
     private lateinit var binding: ActivityMainBinding
 
 
     //음성출력관련
     private lateinit var tts: TextToSpeech
+    private lateinit var callback : sttAdapter //stt결과가 오면 실행할 콜백함수
+    private lateinit var mySTT: SpeechToText
     var sttReturnData  : String? = null
 
 
@@ -70,162 +57,29 @@ class SetPreferenceActivity : Activity() {
         Log.d("ddddddd","일단 액티비티 넘어옴")
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
-        setContentView(R.layout.activity_speech_to_text)
+        setContentView(R.layout.activity_setreference)
 
         setTTS()        //TTS세팅 및 초기화
 
         //화면이 꺼지지 않게
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
-        image = findViewById(R.id.imageView)
-
         Log.d(Constant.API.LOG,"SET PREFERENCE 호출됨")
 
-        createAudioRecord()
-        createRetrofitService()
+        mySTT = SpeechToText(this)
+        callback = object:sttAdapter{//STT결과가 오면 실행되는 콜백 함수여기다 정의
+
+            override fun sttOnResponseCallback(text: String) { //text:STT결과
+                Log.d("SetPreferenceActivity STT실행결과: ",text)
+                //여기서 다 실행하거나
+            }
+
+            //여기서 함수 더 만들거나
+        }
 
         updatePreferenceByExpLog()
         preferenceQuestion()
-    }
 
-
-    fun setTTS(){
-        // TTS를 생성하고 OnInitListener로 초기화 한다.
-        tts= TextToSpeech(this){
-            if(it==TextToSpeech.SUCCESS){
-                val result = tts?.setLanguage(Locale.KOREAN)
-                if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
-                    Log.d("로그","지원하지 않은 언어")
-                    return@TextToSpeech
-                }
-                Log.d("로그","TTS 세팅 성공")
-            }else{
-                Log.d("로그","TTS 세팅 실패")
-            }
-        }
-    }
-
-    private fun ttsSpeak(strTTS:String){
-        tts.speak(strTTS, TextToSpeech.QUEUE_ADD,null,null)
-    }
-
-
-    private fun createRetrofitService() { //retroservice객체 생성
-        Log.d(Constant.API.LOG,"createRetrofitService() 호출됨")
-        val gson = GsonBuilder()
-            .setLenient()
-            .create()
-        val retrofit = Retrofit.Builder()
-            .baseUrl(Constant.API.BASE_URL_KAKAO_API)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-        retrofitService = retrofit.create(IRetrofit::class.java)
-        Log.i("Stt", "retrofitService create")
-    }
-
-    private fun requestStt() :String?{ //요청 보냄
-
-        try {
-            Log.i(Constant.API.LOG,"rest api에 요청 보냄")
-            val meida = "video/*".toMediaTypeOrNull()
-            val requestBody = byteAudioData!!.toRequestBody(meida)
-            val getCall = retrofitService!!.get_post_pcm(
-                Constant.API.transferEncoding,
-                Constant.API.contentType,
-                Constant.API.authorization,
-                requestBody
-            )
-            getCall.enqueue(object : Callback<ResponseBody?> {
-                override fun onResponse(
-                    call: Call<ResponseBody?>,
-                    response: Response<ResponseBody?>
-                ) {
-                    if (response.isSuccessful) {
-                        val body = response.body()
-                        var result: String? = null
-                        try {
-                            result = body!!.string()
-                            Log.i("Stt", result)
-                        } catch (e: IOException) {
-                            e.printStackTrace()
-                        }
-                        val startIndex = result!!.indexOf("{\"type\":\"finalResult\"")
-                        val endIndex = result.lastIndexOf('}')
-                        Log.i("Stt", "startIndex = $startIndex, endIndex = $endIndex")
-                        if (startIndex > 0 && endIndex > 0) {
-                            try {
-                                val result_json_string = result.substring(startIndex, endIndex + 1)
-                                val json = JSONObject(result_json_string)
-                                val sttResultMsg = json.getString("value")
-                                Log.i("Stt", sttResultMsg) //STT결과값입니다요!!!!!!!!!!!!!!
-                             /*   val returnIntent = Intent()
-                                    .putExtra("sttResultMsg", sttResultMsg)
-                                setResult(Activity.RESULT_OK, returnIntent)*/
-                                sttReturnData = sttResultMsg
-
-                            //    finish()
-                            } catch (e: JSONException) {
-                                e.printStackTrace()
-                            }
-                        } else { // errorCalled
-                            Log.i(Constant.API.LOG, "errorCalled")
-                        }
-                    } else {
-                        Log.i(Constant.API.LOG, "Status Code = " + response.code())
-                    }
-                }
-
-                override fun onFailure(call: Call<ResponseBody?>, t: Throwable) {
-                    Log.i(Constant.API.LOG, "Fail msg = " + t.message)
-                }
-            })
-        } catch (e: Exception) {
-            Log.i(Constant.API.LOG, "requestStt fail...")
-        }
-        return sttReturnData
-    }
-
-
-    private fun threadLoop() {
-        byteAudioData = ByteArray(bufferSize*5)
-        Log.d(Constant.API.LOG, "byteAudio 생성")
-        audioRecord?.startRecording()
-        Log.d(Constant.API.LOG, "audioRecord객체 생성 + 녹음 준비 완료")
-        while (isActive) {
-            val ret = audioRecord?.read(byteAudioData!!, 0, byteAudioData!!.size)
-            Log.d(Constant.API.LOG, "read중 크기: $ret")
-            if (!isActive) {
-                audioRecord!!.stop()
-                Log.d(Constant.API.LOG, "audioRecord.stop()")
-                audioRecord!!.release()
-                audioRecord = null
-                Log.d(Constant.API.LOG, " audioRecord = null")
-            }
-        }
-        Log.d(Constant.API.LOG, " Thread돌아가는중")
-    }
-
-    private fun createAudioRecord(){
-        Log.d(Constant.API.LOG,"createAudioRecord() 호출됨")
-        if (ActivityCompat.checkSelfPermission(
-                this,
-                Manifest.permission.RECORD_AUDIO
-            ) != PackageManager.PERMISSION_GRANTED
-        ) {
-            Log.d(Constant.API.LOG, "권한없음")
-            return
-        }
-        audioRecord = AudioRecord.Builder()
-            .setAudioSource(audioSource)
-            .setAudioFormat(
-                AudioFormat.Builder()
-                    .setEncoding(audioFormat)
-                    .setSampleRate(sampleRate)
-                    .setChannelMask(channelCount)
-                    .build()
-            )
-            .setBufferSizeInBytes(bufferSize)
-            .build()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -234,27 +88,14 @@ class SetPreferenceActivity : Activity() {
             Log.d(Constant.API.LOG,"누름")
             if(recordingState==0){
                 Log.d(Constant.API.LOG,"레코드스테이트0")
-                isActive = true
-                image.setImageResource(R.drawable.des)
+                mySTT.startAudioRecord()
                 Log.d(Constant.API.LOG, "Active")
 
-                //짧게 라도 진동을 줘야하나??
-                if (audioRecord == null) {
-                    createAudioRecord()
-                    audioRecord?.startRecording()
-                }
-                Thread  {
-                    threadLoop()
-                }.start()
                 recordingState = 1
             }
             else if (recordingState == 1){
                 Log.d(Constant.API.LOG,"레코드스테이트1")
-                isActive = false
-                image.setImageResource(R.drawable.search)       //이거바꿔야함
-
-                sttReturnData = requestStt()        //녹음데이타 -> 스트링 데이타
-
+                mySTT.finishAudioRecordAndGetText(callback) //음성종료 => text로 변환 => 변환된 text 콜백함수로 건내줌
                 recordingState = 2
             }
             return true
@@ -795,6 +636,26 @@ class SetPreferenceActivity : Activity() {
     /////////////////////////////////////////////////////////////////////////////
 
 
+
+    fun setTTS(){
+        // TTS를 생성하고 OnInitListener로 초기화 한다.
+        tts= TextToSpeech(this){
+            if(it==TextToSpeech.SUCCESS){
+                val result = tts?.setLanguage(Locale.KOREAN)
+                if(result == TextToSpeech.LANG_MISSING_DATA || result == TextToSpeech.LANG_NOT_SUPPORTED){
+                    Log.d("로그","지원하지 않은 언어")
+                    return@TextToSpeech
+                }
+                Log.d("로그","TTS 세팅 성공")
+            }else{
+                Log.d("로그","TTS 세팅 실패")
+            }
+        }
+    }
+
+    private fun ttsSpeak(strTTS:String){
+        tts.speak(strTTS, TextToSpeech.QUEUE_ADD,null,null)
+    }
 
 
 
