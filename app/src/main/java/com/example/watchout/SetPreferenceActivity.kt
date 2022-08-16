@@ -31,13 +31,13 @@ import retrofit2.converter.gson.GsonConverterFactory
 import utils.Constant
 import java.io.IOException
 import android.speech.tts.TextToSpeech
+import android.widget.Button
 import calling.SpeechToText
 import java.util.*
 
 class SetPreferenceActivity : Activity() {
+    private lateinit var btn:Button
     private var recordingState : Int = 0
-
-
     //0 -> 녹음하지 않고 대기중, stringData == null
     //1 -> 녹음중. 버튼 한번 눌렀을때 0->1로 바뀜, byteData쌓는중
     //2 -> 스트링데이타로 변환중, 버튼 한번 더 눌렀을때 1->2로 바뀜 (녹음이 끝났다는 말). stringData만드는중
@@ -58,7 +58,7 @@ class SetPreferenceActivity : Activity() {
         super.onCreate(savedInstanceState)
         binding = ActivityMainBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_setreference)
-
+        btn = findViewById<Button>(R.id.button)
         setTTS()        //TTS세팅 및 초기화
 
         //화면이 꺼지지 않게
@@ -67,19 +67,16 @@ class SetPreferenceActivity : Activity() {
         Log.d(Constant.API.LOG,"SET PREFERENCE 호출됨")
 
         mySTT = SpeechToText(this)
-        callback = object:sttAdapter{//STT결과가 오면 실행되는 콜백 함수여기다 정의
+        setSTTCallbacks()
 
-            override fun sttOnResponseCallback(text: String) { //text:STT결과
-                Log.d("SetPreferenceActivity STT실행결과: ",text)
-                //여기서 다 실행하거나
-            }
+        //updatePreferenceByExpLog()
+        //preferenceQuestion()
 
-            //여기서 함수 더 만들거나
+        btn.setOnClickListener {
+            val returnintent = Intent()
+            setResult(RESULT_OK,returnintent)
+            finish()
         }
-
-        updatePreferenceByExpLog()
-        preferenceQuestion()
-
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -105,7 +102,17 @@ class SetPreferenceActivity : Activity() {
 
 
 
+    private fun setSTTCallbacks(){
+        callback = object:sttAdapter{//STT결과가 오면 실행되는 콜백 함수여기다 정의
 
+            override fun sttOnResponseCallback(text: String) { //text:STT결과
+                Log.d("SetPreferenceActivity STT실행결과: ",text)
+                //여기서 다 실행하거나
+            }
+
+            //여기서 함수 더 만들거나
+        }
+    }
 
 
 

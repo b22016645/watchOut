@@ -10,6 +10,7 @@ import android.speech.tts.TextToSpeech
 import android.util.Log
 import android.view.KeyEvent
 import android.view.WindowManager
+import android.widget.Button
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
@@ -34,6 +35,7 @@ class MainActivity : Activity() {
     private lateinit var binding: ActivityMainBinding
     lateinit var x: TextView
     lateinit var y: TextView
+    lateinit var btn : Button
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest:LocationRequest
@@ -103,6 +105,7 @@ class MainActivity : Activity() {
         //레이아웃 세팅
         x = findViewById<TextView>(R.id.x)
         y = findViewById<TextView>(R.id.y)
+        btn = findViewById<Button>(R.id.btn)
         x.setText(lon.toString())
         y.setText(lat.toString())
 
@@ -130,6 +133,10 @@ class MainActivity : Activity() {
         startActivityForResult(intent, 1000000)
 */
 
+        btn.setOnClickListener {
+            val intent = Intent(this, SetPreferenceActivity::class.java)
+            startActivityForResult(intent, 1000000)
+        }
     }
 
     private fun startLocationUpdates() {
@@ -316,6 +323,7 @@ class MainActivity : Activity() {
                 startActivityForResult(intent, 100)
             }
         }
+
     }
 
 

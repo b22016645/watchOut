@@ -7,25 +7,27 @@
     tools:context=".MainActivity"
     tools:deviceIds="wear">
 
-<!--        <ImageView-->
-<!--            android:id="@+id/imageView"-->
-<!--            android:layout_width="wrap_content"-->
-<!--            android:layout_height="wrap_content"-->
-<!--            android:scaleType="fitXY"-->
-<!--            android:src="@drawable/main"-->
-<!--            />-->
-        <TextView
-            android:id="@+id/x"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="lat"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="70dp"/>
-        <TextView
-            android:id="@+id/y"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="lon"
-            android:layout_marginLeft="40dp"
-            android:layout_marginTop="100dp"/>
+        <LinearLayout
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
+
+                <Button
+                    android:id="@+id/btn"
+                    android:layout_width="match_parent"
+                    android:layout_height="76dp"
+                    android:text="선호도액티비티로" />
+
+                <TextView
+                    android:id="@+id/x"
+                    android:layout_width="match_parent"
+                    android:layout_height="42dp"
+                    android:text="&quot;lat:" />
+
+                <TextView
+                    android:id="@+id/y"
+                    android:layout_width="match_parent"
+                    android:layout_height="46dp"
+                    android:text="&quot;lon&quot;" />
+        </LinearLayout>
 </androidx.wear.widget.BoxInsetLayout>
