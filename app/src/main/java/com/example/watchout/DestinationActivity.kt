@@ -17,6 +17,7 @@ class DestinationActivity : Activity() {
     private lateinit var binding: ActivityMainBinding
     private var activeBool = true
     private lateinit var mystt: SpeechToText
+    private lateinit var callback : sttAdapter
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -28,30 +29,40 @@ class DestinationActivity : Activity() {
 
         image = findViewById(R.id.imageView)
 
+        callback = object:sttAdapter{
+            override fun sttOnResponseCallback(text: String) {
+                        val returnIntent = Intent()
+            .putExtra("sttResultMsg", text)
+            Log.i("Stt", "SpeechToTextActivity: " +text)
+            setResult(Activity.RESULT_OK, returnIntent)
+            finish()
+            }
+
+        }
         Log.d(LOG,"DestinationActivity 호출됨")
         mystt = SpeechToText(this)
 
     }
 
 
-    //MySTT에서 돌아올 때를 위한 instace와 함수
-    init{
-        instance = this
-    }
-    companion object{
-        private var instance:DestinationActivity? = null
-        fun getInstance(): DestinationActivity? {
-            return instance
-        }
-    }
-
-    fun returnToSpeechToTextActivity(resStr : String){
-        val returnIntent = Intent()
-            .putExtra("sttResultMsg", resStr)
-        Log.i("Stt", "SpeechToTextActivity: " +resStr)
-        setResult(Activity.RESULT_OK, returnIntent)
-        finish()
-    }
+//    //MySTT에서 돌아올 때를 위한 instace와 함수
+//    init{
+//        instance = this
+//    }
+//    companion object{
+//        private var instance:DestinationActivity? = null
+//        fun getInstance(): DestinationActivity? {
+//            return instance
+//        }
+//    }
+//
+//    fun returnToSpeechToTextActivity(resStr : String){
+//        val returnIntent = Intent()
+//            .putExtra("sttResultMsg", resStr)
+//        Log.i("Stt", "SpeechToTextActivity: " +resStr)
+//        setResult(Activity.RESULT_OK, returnIntent)
+//        finish()
+//    }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
         if(keyCode== KeyEvent.KEYCODE_BACK){
@@ -62,7 +73,7 @@ class DestinationActivity : Activity() {
             }
             else{
                 image.setImageResource(R.drawable.search)
-                mystt.finishAudioRecordAndGetText("des")
+                mystt.finishAudioRecordAndGetText(callback)
             }
             return true
         }

@@ -8,7 +8,7 @@ import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.util.Log
 import androidx.core.app.ActivityCompat
-import com.example.watchout.DestinationActivity
+import com.example.watchout.sttAdapter
 import com.google.gson.GsonBuilder
 import okhttp3.MediaType.Companion.toMediaTypeOrNull
 import okhttp3.RequestBody.Companion.toRequestBody
@@ -39,10 +39,7 @@ class SpeechToText(val context: Context)  {
     private val bufferSize = sampleRate * 5
     private var isActive = false
 
-     var resultText :String = "text"
-
     //선호도 액티비티도 추가
-    private val destinationActivity = DestinationActivity.getInstance()
 
     fun startAudioRecord(){
         createAudioRecord()
@@ -56,10 +53,10 @@ class SpeechToText(val context: Context)  {
         }.start()
     }
 
-    fun finishAudioRecordAndGetText(activityName:String){
+    fun finishAudioRecordAndGetText(callback:sttAdapter){
         isActive = false
         createRetrofitService()
-        requestStt(activityName)
+        requestStt(callback)
     }
 
 
@@ -116,7 +113,7 @@ class SpeechToText(val context: Context)  {
         Log.d(Constant.API.LOG, " Thread돌아가는중")
     }
 
-    private fun requestStt(name:String){ //요청 보냄
+    private fun requestStt(callback:sttAdapter){ //요청 보냄
         try {
             Log.i(Constant.API.LOG,"rest api에 요청 보냄")
             val meida = "video/*".toMediaTypeOrNull()
@@ -150,12 +147,7 @@ class SpeechToText(val context: Context)  {
                                 val json = JSONObject(result_json_string)
                                 val sttResultMsg = json.getString("value")
                                 Log.i("Stt", sttResultMsg) //STT결과값입니다요!!!!!!!!!!!!!!
-                                if(name == "des"){//SpeechToTextActivity
-                                    destinationActivity?.returnToSpeechToTextActivity(sttResultMsg)
-                                }
-//                               else if(name =="선호도액티비티"){
-//                                   선호도액티비티?.returnTo선호도액티비티(sttResultMsg)
-//                               }
+                                callback.sttOnResponseCallback(sttResultMsg)
 
                             } catch (e: JSONException) {
                                 e.printStackTrace()
