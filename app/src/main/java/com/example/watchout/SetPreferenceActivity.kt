@@ -8,6 +8,8 @@ import android.media.AudioFormat
 import android.media.AudioRecord
 import android.media.MediaRecorder
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
 import android.util.Log
 import android.view.KeyEvent
 import android.view.WindowManager
@@ -34,6 +36,7 @@ import android.speech.tts.TextToSpeech
 import android.widget.Button
 import calling.SpeechToText
 import com.example.watchout.databinding.ActivitySetreferenceBinding
+import utils.Constant.API.LOG
 import java.util.*
 
 class SetPreferenceActivity : Activity() {
@@ -71,13 +74,21 @@ class SetPreferenceActivity : Activity() {
         mySTT = SpeechToText(this)
         setSTTCallbacks()
 
-        updatePreferenceByExpLog()
-        preferenceQuestion()
 
-/*        btn.setOnClickListener {
+
+
+        btn.setOnClickListener {
             val returnintent = Intent()
             setResult(RESULT_OK,returnintent)
-        }*/
+            finish()
+            //이거안됌~~~~~~~~~~~~~~~메인으로 안돌아감~~~~~~~~~~
+
+        }
+    }
+
+    fun main(){
+        updatePreferenceByExpLog()
+        //preferenceQuestion()
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
@@ -95,6 +106,7 @@ class SetPreferenceActivity : Activity() {
                 Log.d(Constant.API.LOG,"레코드스테이트1")
                 mySTT.finishAudioRecordAndGetText(callback) //음성종료 => text로 변환 => 변환된 text 콜백함수로 건내줌
                 recordingState = 2
+                Log.d(Constant.API.LOG,recordingState.toString())
             }
             return true
         }
@@ -108,6 +120,11 @@ class SetPreferenceActivity : Activity() {
 
             override fun sttOnResponseCallback(text: String) { //text:STT결과
                 Log.d("SetPreferenceActivity STT실행결과: ",text)
+                sttReturnData = text
+                Log.d("SetPreferenceActivity-sttOnResponseCallback",sttReturnData?:"null")
+                recordingState = 2
+                Log.d("SetPreferenceActivity-sttOnResponseCallback : recordingState",recordingState.toString())
+
                 //여기서 다 실행하거나
             }
 
@@ -192,30 +209,41 @@ class SetPreferenceActivity : Activity() {
                     * 예 -> 종료
                     *아니오 -> 설문시작
 */
+
+
+
         Log.d(Constant.API.LOG,"preferenceQuestion() 호출됨")
         sttReturnData = null
         var score = -1
-        recordingState==0
+        //recordingState=0
         ttsSpeak("경로만족도를 0부터 10사이 숫자로 말씀해주세요")
         Log.d(Constant.API.LOG,"경로만족도를 0부터 10사이 숫자로 말씀해주세요")
+        Log.d("recordingState : ",recordingState.toString())
 
         while(recordingState==0||recordingState==1||recordingState==3){
             //대기
+            Log.d("while)recordingState : ",recordingState.toString())
 
-            if (recordingState == 2)      {
-                 var score = sttReturnData?.toInt()?:-1
-                Log.d("SCORE",score.toString())
-                if(score > 10 || score <0) {
-                    ttsSpeak("잘못된 범위입니다.")
-                    sttReturnData = null
-                    recordingState  = 3
-                }else{
-                    //정상 범위안의 값인 경우
-                    Preference.score = score         //우선 만족도 프리퍼런스오브젝트에 저장
-                    recordingState  = 4
-                    break
+
+                if (recordingState == 2)      {
+                    Log.d("recordingState-2 : ",recordingState.toString())
+                    var score = sttReturnData?.toInt()?:-1
+                    Log.d("SCORE",score.toString())
+                    if(score > 10 || score <0) {
+                        ttsSpeak("잘못된 범위입니다.")
+                        sttReturnData = null
+                        recordingState  = 3
+                    }else{
+                        //정상 범위안의 값인 경우
+                        Preference.score = score         //우선 만족도 프리퍼런스오브젝트에 저장
+                        recordingState  = 4
+
+                    }
                 }
-            }
+
+
+
+
         }
 
  /*           while (sttReturnData != null||score >10 || score <0){
