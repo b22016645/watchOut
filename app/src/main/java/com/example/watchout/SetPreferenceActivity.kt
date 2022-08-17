@@ -33,6 +33,7 @@ import java.io.IOException
 import android.speech.tts.TextToSpeech
 import android.widget.Button
 import calling.SpeechToText
+import com.example.watchout.databinding.ActivitySetreferenceBinding
 import java.util.*
 
 class SetPreferenceActivity : Activity() {
@@ -43,7 +44,7 @@ class SetPreferenceActivity : Activity() {
     //2 -> 스트링데이타로 변환중, 버튼 한번 더 눌렀을때 1->2로 바뀜 (녹음이 끝났다는 말). stringData만드는중
     //3 -> stringData가 다 만들어진 상태, 쓸 준비 완료. 쓰고 나면 상태변수를 0으로 바꿈
 
-    private lateinit var binding: ActivityMainBinding
+    private lateinit var binding: ActivitySetreferenceBinding
 
 
     //음성출력관련
@@ -56,9 +57,10 @@ class SetPreferenceActivity : Activity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         Log.d("ddddddd","일단 액티비티 넘어옴")
         super.onCreate(savedInstanceState)
-        binding = ActivityMainBinding.inflate(layoutInflater)
+        binding = ActivitySetreferenceBinding.inflate(layoutInflater)
         setContentView(R.layout.activity_setreference)
-        btn = findViewById<Button>(R.id.button)
+       // btn = findViewById<Button>(R.id.button)
+        btn = binding.button
         setTTS()        //TTS세팅 및 초기화
 
         //화면이 꺼지지 않게
@@ -69,18 +71,17 @@ class SetPreferenceActivity : Activity() {
         mySTT = SpeechToText(this)
         setSTTCallbacks()
 
-        //updatePreferenceByExpLog()
-        //preferenceQuestion()
+        updatePreferenceByExpLog()
+        preferenceQuestion()
 
-        btn.setOnClickListener {
+/*        btn.setOnClickListener {
             val returnintent = Intent()
             setResult(RESULT_OK,returnintent)
-            finish()
-        }
+        }*/
     }
 
     override fun onKeyDown(keyCode: Int, event: KeyEvent?): Boolean {
-
+        Log.d("SetPreferenceActivity-onKeyDown","온키다운 호출")
         if(keyCode== KeyEvent.KEYCODE_BACK){
             Log.d(Constant.API.LOG,"누름")
             if(recordingState==0){
@@ -126,46 +127,55 @@ class SetPreferenceActivity : Activity() {
     private fun updatePreferenceByExpLog() {
         //히스토리 내 이탈 로그에 기반하여 자동으로 가중치 조절
 
-        var stnd = History.midPointSize!! //조정기준
-        var num = 12121     //인덱스넘버
+        //테스트를 위해 고정으로
+        History.midPointSize = 100
+        History.expTotal = 50
+        History.expStraightRoad = 7
+        History.expTurnPoint = 40
+        History.expCrossWalk = 1
+        History.expNoCar = 1
+        History.expWithCar = 1
 
-        Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","총크기 :${num}/ 총이탈 :,${History.expTotal}(${History.expTotal/num}) / 직선이탈 :,${History.expStraightRoad}(${History.expStraightRoad/History.expTotal}%)/ 횡단보도이탈 :,${History.expCrossWalk}(${History.expCrossWalk/History.expTotal}%)/ ftCar이탈 :${History.expWithCar}(${History.expWithCar/History.expTotal}%)/ftNoCar이탈  :,${History.expNoCar}(${History.expNoCar/History.expTotal}%)")
+        var stnd = 0.4 //조정기준
+        var num = History.midPointSize!!      //인덱스넘버
 
-        if (History.expTotal / num > 0.2){
+        Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","총크기 :${num} / 총이탈 :${History.expTotal}(${History.expTotal.toDouble()/num}) / 직선이탈 :${History.expStraightRoad}(${History.expStraightRoad.toDouble()/History.expTotal}%) / 횡단보도이탈 :${History.expCrossWalk}(${History.expCrossWalk.toDouble()/History.expTotal}%) / ftCar이탈:${History.expWithCar}(${History.expWithCar.toDouble()/History.expTotal}%) / ftNoCar이탈:${History.expNoCar}(${History.expNoCar.toDouble()/History.expTotal}%)")
+
+        if (History.expTotal.toDouble() / num > 0.2){
             //총 이탈 비율이 20%가 넘는 경우에만 가중치를 조절한다. (이하인 경우 사용자가 올바르게 길을 갔다고 판단)
 
             // 1. 직선길 이탈 --> DangerScore 테이블웨이트 조정
-            if (History.expStraightRoad / History.expTotal > stnd){
+            if (History.expStraightRoad.toDouble() / History.expTotal > stnd){
                 //직진길 이탈률이 40% 넘는 경우 테이블전체가중치를 낮춤 (도로상태가 더 중요하다고 판단)
-                Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","직선길 가중치 조절->tableWieght 낮춤")
+                Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","RoadType 가중치 조절->tableWieght 낮춤")
                 setPreference("tableWeight",-1)
             }
-            else if ((History.expTotal - History.expStraightRoad) /History.expTotal > 0.8){
+            else if ((History.expTotal - History.expStraightRoad).toDouble() /History.expTotal > 0.8){
                 //직진길 이탈률이 20% 이하인 경우 테이즐 전체 가중치를 높임 (DangerScore가 더 중요하다고 판단)
-                Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","직선길 가중치 조절->tableWieght 높임")
+                Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","DangerScore 가중치 조절->tableWieght 높임")
                 setPreference("tableWeight",+1)
             }
 
             //2.분기점
-            if (History.expTurnPoint / History.expTotal > stnd){
+            if (History.expTurnPoint.toDouble() / History.expTotal > stnd){
                 Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","분기점 가중치 조절")
                 setPreference("turnPoint", 10)
             }
 
             //3.횡단보도
-            if (History.expCrossWalk / History.expTotal > stnd){
+            if (History.expCrossWalk.toDouble() / History.expTotal > stnd){
                 Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","횡단보도 가중치 조절")
                 setPreference("crossWalk", 10)
             }
 
             //4.CAR
-            if (History.expWithCar / History.expTotal > stnd){
+            if (History.expWithCar.toDouble() / History.expTotal > stnd){
                 Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","facilityCar 가중치 조절")
                 setPreference("facilityCar", 10)
             }
 
             //5.NoCar
-            if (History.expNoCar / History.expTotal > stnd){
+            if (History.expNoCar.toDouble() / History.expTotal > stnd){
                 Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","failityNoCar 가중치 조절")
                 setPreference("failityNoCar", 10)
             }
