@@ -224,11 +224,12 @@ class SetPreferenceActivity : Activity() {
         Log.d(Constant.API.LOG,"경로만족도를 0부터 10사이 숫자로 말씀해주세요")
         Log.d("recordingState : ",recordingState.toString())
 
-   var thread = Thread{
-
+   var thread = thread() {
+        Log.d("tmfpemwjqthr","스레드안")
        sleep(2000)
-       return@Thread
-            while(recordingState==0||recordingState==1||recordingState==3){
+       Log.d("잠듬:","깸")
+       //recordingState==0||recordingState==1||recordingState==3
+            while(false){
 
                 //대기
                 Log.d("경로만족도)recordingState : ",recordingState.toString())
@@ -252,9 +253,10 @@ class SetPreferenceActivity : Activity() {
                         }
                     }
              }
-    } .join()
+    }
 
 
+thread.join()
         Log.d("스레드종료","ㄹㄴㄹㅇ")
 
 
