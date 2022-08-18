@@ -265,7 +265,9 @@ object SafeRoute {//End of object SafeRoute
                 if (noEct){
                     ectBuilder.append("특이사항 없음")
                 }
-                ectBuilder.append("포함된 경로입니다.")
+                else {
+                    ectBuilder.append("포함된 경로입니다.")
+                }
                 it.ectInforStringData = ectBuilder.toString()
                 Log.d("SafeRoute-makeEctInfor_forPublish() : ","${it.ectInforStringData}")
             }
