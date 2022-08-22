@@ -236,6 +236,8 @@ class SetPreferenceActivity : Activity() {
     private fun preferenceQuestion() {      //경로 끝나고 선호도 조사하는 함수
         Log.d(Constant.API.LOG,"preferenceQuestion() 호출됨")
 
+/*
+
         //점수 받기 (0~10)
         var thread = thread() {
             getScore()
@@ -245,56 +247,60 @@ class SetPreferenceActivity : Activity() {
 
 
         //점수 7점 이상일 경우 설문 진행여부 조사
-         thread = thread() {
+         var thread2 = thread() {
              continueQuestioin(Preference.score!!)
          }
-        thread.join()
+        thread2.join()
         Log.d("2번 스레드 설문 계속? 종료","스레드밖")
 
 
+
         //테이블 웨이트 조정 설문 (필수)
-        thread = thread() {
-        ttsSpeak("향후 경로안내를 위한지 선호도 가중치 조절을 시작합니다. 현재 상태 유지를 원하시면 유지 라고 말하세요")
+        var thread3 = thread() {
+        ttsSpeak("향후 경로안내를 위한 선호도 조사를 시작합니다.")
         Log.d("LOG:-"," 선호도 가중치 조절을 시작합니다. 현재 상태 유지를 원하시면 유지 말하삼")
             preferenceQuestion_tableWeight()
         }
-        thread.join()
+        thread3.join()
+*/
 
 
         //분기점 가중치 조절 설문(필수)
-        thread = thread() {
+        var thread4 = thread() {
             preferenceQuestion_turnPoint()
         }
-        thread.join()
+        thread4.join()
 
 
+        History.hasCrossWalk = 6
         //횡단보도 가중치 조절 설문
         if(History.hasCrossWalk > 0) {
-            thread = thread(){
+            var thread5 = thread(){
               preferenceQuestion_crossWalk()
             }
+            thread5.join()
         }
-        thread.join()
+
 
 
         //TEST
         History.hasDanger = true
-        History.hasDangerA = 1234
+        History.hasDangerA = 2434
         History.hasDangerB = 5678
 
         //시설물 설문 진행
         if(History.hasDanger){
             if (History.hasDangerA != null){
-                thread = thread() {
+                var thread6 = thread() {
                     preferenceQuestion_DangerA()
                 }
-                thread.join()
+                thread6.join()
             }
             if (History.hasDangerB != null){
-                thread = thread() {
+                var thread7 = thread() {
                     preferenceQuestion_DangerB()
                 }
-                thread.join()
+                thread7.join()
             }
         }
         ttsSpeak("선호도 가중치 조절이 완료되었습니다. 향후 경로 안내시 조정된 값으로 경로를 안내합니다.")
@@ -312,7 +318,7 @@ class SetPreferenceActivity : Activity() {
         Log.d("recordingState : ", recordingState.toString())
 
         while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
-            Log.d("경로만족도)recordingState : ", recordingState.toString())
+            //Log.d("경로만족도)recordingState : ", recordingState.toString())
             if (recordingState == 2) {
                 Log.d("recordingState-2 : ", recordingState.toString())
                 var score = sttReturnData?.toInt() ?: -1
@@ -328,6 +334,7 @@ class SetPreferenceActivity : Activity() {
                     recordingState = 0
                     Log.d("경로 만족도 : ", score.toString())
                     ttsSpeak("경로만족도 입력이 완료되었습니다.")
+                    sttReturnData = null
                     break
                 }
             }
@@ -341,43 +348,59 @@ class SetPreferenceActivity : Activity() {
             Log.d("LOG", "설문을 종료하시려면 종료, 계속하시려면 계속 이라고 말해주세요")
             recordingState = 0
             sttReturnData = null
-            while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
+            var ii = 0
+            while (true) {
                 //대기
+                ii = -1
                 if (recordingState == 2) {
                     if (sttReturnData == "종료") {
                         Log.d("LOG", "종료")
                         //안텐트객체추가
+                        ii=1
                         finish()
+                       // finish()
                     } else if (sttReturnData == "계속") {
                         Log.d("LOG", "계속")
-                        recordingState = 4
+                        sttReturnData = null
+                        recordingState = 0
+                        ii=2
                         break
                     } else {
                         ttsSpeak("종료 또는 계속중 하나만 말씀해주세요.")
                         Log.d("LOG", "종료 또는 계속중 하나만 말씀해주세요.")
-                        recordingState = 3
+                        sttReturnData = null
+                        recordingState = 0
+                        ii=3
                     }
                 }
-            }
+            }//end of WhileLoop
+            Log.d("설문계속?","와일루프빠져나옴, $ii")
         }
     }
 
     private fun preferenceQuestion_crossWalk() {
-        ttsSpeak(" 이용하신 경로에는 횡단보도가 ${History.hasCrossWalk}개 포함되었습니다. 향후 횡단보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+        ttsSpeak(" 이용하신 경로에는 횡단보도가 ${History.hasCrossWalk}개 포함되었습니다. ")
+       // ttsSpeak("횡단보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
         Log.d("LOG:-","이용하신 경로에는 횡단보도가 ${History.hasCrossWalk}개 포함되었습니다. 향후 횡단보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
         sttReturnData = null
+        recordingState = 0
 
-        while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
+        while (true) {
             if (recordingState == 2) {
                 var ans = sttReturnData
                 if (ans == "유지") {
-                    recordingState = 4
+                    sttReturnData = null
+                    recordingState = 0
+                    break
                 } else if (ans == "최소화") {
                     setPreference("crossWalk", -10)
-                    recordingState = 4
+                    sttReturnData = null
+                    recordingState = 0
+                    break
                 } else {
-                    ttsSpeak("잘못된 음성입니다. 향후 횡단보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-                    recordingState = 3
+                    ttsSpeak("잘못된 음성입니다. ")
+                    ttsSpeak("향후 횡단보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                    recordingState = 0
                 }
             }
         }
@@ -399,100 +422,160 @@ class SetPreferenceActivity : Activity() {
 
         var howMuch : Int = 0
 
-        if(elevator != 0) {
-            var thread = thread() {
+        if (elevator > 0)
+            ttsSpeak("엘리베이터 $elevator 개,")
+        if (overPasses > 0)
+            ttsSpeak("육교 $overPasses 개,")
+        if (underPasses >0)
+            ttsSpeak( "지하보도 $underPasses 개,")
+        if (stairs >0)
+            ttsSpeak( "계단 $stairs 개")
+
+        ttsSpeak("가 포함된 경로를 이용하셨습니다.")
+        ttsSpeak("해당 시설물이 최소화된 경로를 이용하시려면 '최소화' ")
+        ttsSpeak("현재 상태 유지를 원하시면 ,유지, 를 말씀하세요")
+
+        var threadNoCar = thread(){
+            recordingState = 0
+            sttReturnData = null
+            while (true) {
+                if (recordingState == 2) {
+                    var ans = sttReturnData
+                    if (ans == "유지") {
+                        // elevator = 0
+                        sttReturnData = null
+                        recordingState = 0
+                        break
+                    } else if (ans == "최소화") {
+                        setPreference("facilityNoCar",-5)
+                        // elevator = 0
+                        sttReturnData = null
+                        recordingState = 0
+                        break
+                    } else {
+                        ttsSpeak("잘못된 음성입니다. 최소화 또는 유지 를 말씀하세요")
+                        recordingState = 3
+                    }
+                }
+            }
+        }
+        threadNoCar.join()
+
+        /*if(elevator != 0) {
+            var thread88 = thread() {
                 recordingState=0
-                ttsSpeak(" 이용하신 경로에는 엘리베이터가 ${elevator}개 포함되었습니다. 향후 엘리베이터가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                ttsSpeak(" 이용하신 경로에는 엘리베이터가 ${elevator}개 포함되었습니다.")
+                //ttsSpeak("향후 엘리베이터가 최소화된 길을 안내받으시려면 ,최소화, 현재 상태 유지를 원하시면 ,유지, 를 말씀하세요")
                 sttReturnData = null
-                while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
+                recordingState = 0
+                while (true) {
                     if (recordingState == 2) {
                         var ans = sttReturnData
                         if (ans == "유지") {
                             // elevator = 0
-                            recordingState = 4
+                            sttReturnData = null
+                            recordingState = 0
+                            break
                         } else if (ans == "최소화") {
                             howMuch -= 5
                             // elevator = 0
-                            recordingState = 4
+                            sttReturnData = null
+                            recordingState = 0
+                            break
                         } else {
-                            ttsSpeak("잘못된 음성입니다. 향후 엘리베이터가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                            ttsSpeak("잘못된 음성입니다. 최소화 또는 유지 를 말씀하세요")
                             recordingState = 3
                         }
                     }
                 }
             }
-            thread.join()
+            thread88.join()
         }
 
 
         if(overPasses != 0) {
-            var thread = thread () {
+            var thread87 = thread () {
                 recordingState = 0
-                ttsSpeak(" 이용하신 경로에는 육교가 ${overPasses}개 포함되었습니다. 향후 육교가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                ttsSpeak(" 이용하신 경로에는 육교가 ${overPasses}개 포함되었습니다.")
+                //ttsSpeak(" 육교가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
                 sttReturnData = null
-                while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
-                    var ans = sttReturnData
-                    if (ans == "유지") {
-                        //overPasses = 0
-                        recordingState = 4
-                    } else if (ans == "최소화") {
-                        howMuch -= 5
-                        //overPasses = 0
-                        recordingState = 4
-                    } else {
-                        ttsSpeak("잘못된 음성입니다. 육교가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-                        recordingState = 3
+                while (true) {
+                    if (recordingState == 2) {
+                        var ans = sttReturnData
+                        if (ans == "유지") {
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else if (ans == "최소화") {
+                            howMuch -= 5
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else {
+                            ttsSpeak("잘못된 음성입니다. “최소화” 또는 “유지”를 말씀하세요")
+                            recordingState = 0
+                        }
                     }
                 }
             }
-            thread.join()
+            thread87.join()
         }
 
         if(underPasses != 0) {
-            var thread = thread(){
+            var thread86 = thread(){
                 recordingState = 0
-                ttsSpeak(" 이용하신 경로에는 지하보도가 ${overPasses}개 포함되었습니다. 향후 지하보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                ttsSpeak(" 이용하신 경로에는 지하보도가 ${overPasses}개 포함되었습니다.")
+                //ttsSpeak("향후 지하보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
                 sttReturnData = null
-                while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
-                    var ans = sttReturnData
-                    if (ans == "유지") {
-                        //underPasses = 0
-                        recordingState = 4
-                    } else if (ans == "최소화") {
-                        howMuch -= 5
-                        //underPasses = 0
-                        recordingState = 4
-                    } else {
-                        ttsSpeak("잘못된 음성입니다. 지하보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-                        recordingState = 3
+                while (true) {
+                    if (recordingState == 2) {
+                        var ans = sttReturnData
+                        if (ans == "유지") {
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else if (ans == "최소화") {
+                            howMuch -= 5
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else {
+                            ttsSpeak("잘못된 음성입니다. 지하보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                            recordingState = 0
+                        }
                     }
                 }
             }
-            thread.join()
+            thread86.join()
         }
 
         if(stairs != 0) {
-            var thread = thread(){
+            var thread85 = thread(){
                 recordingState = 0
-                ttsSpeak(" 이용하신 경로에는 계단이 ${stairs}개 포함되었습니다. 향후 계단이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                ttsSpeak(" 이용하신 경로에는 계단이 ${stairs}개 포함되었습니다.")
+                //ttsSpeak("향후 계단이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
                 sttReturnData = null
-                while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
-                    var ans = sttReturnData
-                    if (ans == "유지") {
-                        //stairs = 0
-                        recordingState = 4
-                    } else if (ans == "최소화") {
-                        howMuch -= 5
-                        //stairs = 0
-                        recordingState = 4
-                    } else {
-                        ttsSpeak("잘못된 음성입니다. 계단이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-                        recordingState = 3
+                while (true) {
+                    if (recordingState == 2) {
+                        var ans = sttReturnData
+                        if (ans == "유지") {
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else if (ans == "최소화") {
+                            howMuch -= 5
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else {
+                            ttsSpeak("잘못된 음성입니다. 계단이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                            recordingState = 0
+                        }
                     }
                 }
                 }
-            thread.join()
-        }
+            thread85.join()
+        }*/
     } //End of preferenceQuestion_DangerA()
 
 
@@ -513,22 +596,28 @@ class SetPreferenceActivity : Activity() {
         var howMuch : Int = 0
 
         if(bridge != 0) {
+            recordingState = 0
             var thread = thread () {
-                recordingState = 0
+
                 ttsSpeak(" 이용하신 경로에는 교량이 ${bridge}개 포함되었습니다. 향후 교량이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
                 sttReturnData = null
-                while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
-                    var ans = sttReturnData
-                    if (ans == "유지") {
-                        //bridge = 0
-                        recordingState = 4
-                    } else if (ans == "최소화") {
-                        howMuch -= 5
-                        //bridge = 0
-                        recordingState = 4
-                    } else {
-                        ttsSpeak("잘못된 음성입니다. 교량이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-                        recordingState = 3
+                while (true) {
+
+                    if (recordingState ==2) {
+                        var ans = sttReturnData.toString()
+                        if (ans == "유지") {
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else if (ans == "최소화") {
+                            howMuch -= 5
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else {
+                            ttsSpeak("잘못된 음성입니다. 교량이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                            recordingState = 0
+                        }
                     }
                 }
             }
@@ -537,21 +626,25 @@ class SetPreferenceActivity : Activity() {
 
         if(turnnels != 0) {
             var thread = thread () {
-            recordingState = 0
+                recordingState = 0
                 ttsSpeak(" 이용하신 경로에는 터널이 ${turnnels}개 포함되었습니다. 향후 터널이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
                 sttReturnData = null
-                while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
-                    var ans = sttReturnData
-                    if (ans == "유지") {
-                        //turnnels = 0
-                        recordingState = 4
-                    } else if (ans == "최소화") {
-                        howMuch -= 5
-                        //turnnels = 0
-                        recordingState = 4
-                    } else {
-                        ttsSpeak("잘못된 음성입니다. 터널이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-                        recordingState = 3
+                while (true) {
+                    if (recordingState == 2) {
+                        var ans = sttReturnData.toString()
+                        if (ans == "유지") {
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else if (ans == "최소화") {
+                            howMuch -= 5
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else {
+                            ttsSpeak("잘못된 음성입니다. 터널이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                            recordingState = 3
+                        }
                     }
                 }
             }
@@ -565,18 +658,22 @@ class SetPreferenceActivity : Activity() {
                 recordingState = 0
                 ttsSpeak(" 이용하신 경로에는 고가도로가 ${highroad}개 포함되었습니다. 향후 고가도로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
                 sttReturnData = null
-                while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
-                    var ans = sttReturnData
-                    if (ans == "유지") {
-                        //highroad = 0
-                        recordingState = 4
-                    } else if (ans == "최소화") {
-                        howMuch -= 5
-                        //highroad = 0
-                        recordingState = 4
-                    } else {
-                        ttsSpeak("잘못된 음성입니다. 고가도로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-                        recordingState = 3
+                while (true) {
+                    if (recordingState ==2) {
+                        var ans = sttReturnData.toString()
+                        if (ans == "유지") {
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else if (ans == "최소화") {
+                            howMuch -= 5
+                            sttReturnData = null
+                            recordingState = 0
+                            break
+                        } else {
+                            ttsSpeak("잘못된 음성입니다. 고가도로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+                            recordingState = 0
+                        }
                     }
                 }
             }
@@ -589,20 +686,23 @@ class SetPreferenceActivity : Activity() {
                 recordingState = 0
                 ttsSpeak(" 이용하신 경로에는  대형 시설물 이동통로가 ${largeFacilitypassage}개 포함되었습니다. 향후  대형 시설물 이동통로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
                 sttReturnData = null
-                while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
-                    var ans = sttReturnData
+                while (true) {
+                    if (recordingState ==2) {
+                    var ans = sttReturnData.toString()
                     if (ans == "유지") {
-                        //largeFacilitypassage = 0
-                        recordingState = 4
+                        sttReturnData = null
+                        recordingState = 0
+                        break
                     } else if (ans == "최소화") {
                         howMuch -= 5
-                        //largeFacilitypassage = 0
-                        recordingState = 4
+                        sttReturnData = null
+                        recordingState = 0
+                        break
                     } else {
                         ttsSpeak("잘못된 음성입니다. 대형 시설물 이동통로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-                        recordingState = 3
+                        recordingState = 0
                     }
-                }
+                }}
             }
             thread.join()
 
@@ -615,67 +715,89 @@ class SetPreferenceActivity : Activity() {
 
 
     private fun preferenceQuestion_tableWeight(){
-        recordingState==0
-        sttReturnData = null
-        ttsSpeak("경로 안내에 있어 전반적인 도로상태와 시설물개수 중 더 중요한 것은 무엇입니까? 도로, 시설물, 유지 중 하나를 말씀하세요")
-        while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
+        //var thread99 = thread() {
+            recordingState = 0
+            sttReturnData = null
+            ttsSpeak("경로에서 전반적인 도로상태와 시설물개수 중 더 중요한 것은 무엇입니까?")
+            ttsSpeak("도로, 시설물, 유지 중 하나를 말씀하세요")
+            //tts가 너무 길면 자꾸 에러뜸
 
-            recordingState == 0
-            if (recordingState == 2) {
-                var ans = sttReturnData
+             Log.d ("","도로,시설물,유지")
+            while (true) {
+                //recordingState = 0
+                if (recordingState == 2) {
+                    var ans = sttReturnData.toString()
 
-                if (ans == "유지") {
-                    Log.d("Main-preferenceQuestion_tableWeight()", "유지")
-                    recordingState = 4
-                } else if (ans == "도로") {
-                    setPreference("tableWeight", -1)
-                    recordingState = 4
-                } else if (ans == "시설물 개수") {
-                    setPreference("tableWeight", +1)
-                    recordingState = 4
-                } else {
-                    ttsSpeak("잘못된 음성입니다.도로, 시설물, 유지 중 하나를 말씀하세요")
-                    recordingState = 3
-                    sttReturnData = null
+                    if (ans == "유지") {
+                        Log.d("Main-preferenceQuestion_tableWeight()", "유지")
+                        recordingState = 0
+                        sttReturnData = null
+                        break
+                    } else if (ans == "도로") {
+                        setPreference("tableWeight", -1)
+                        recordingState = 0
+                        sttReturnData = null
+                        break
+                    } else if (ans == "시설물") {
+                        setPreference("tableWeight", +1)
+                        recordingState = 0
+                        sttReturnData = null
+                        break
+                    } else {
+                        ttsSpeak("잘못된 음성입니다. ")
+                        ttsSpeak("도로, 시설물, 유지 중 하나를 말씀하세요")
+                        recordingState = 0
+                        sttReturnData = null
+                    }
                 }
             }
-            }
+        /*}
+        thread99.join()*/
     }
     //end of preferenceQuestion_tableWeight()
 
     private fun preferenceQuestion_turnPoint(){
         Log.d("LOG","분기점 질문 함수 진입")
-        recordingState==0
+        recordingState=0
         sttReturnData = null
-        ttsSpeak("직진우선길과 최단거리우선중 어떤 경로를 선호하십니까? 직진우선, 최단거리, 유지 중 하나를 말씀하세요")
+        ttsSpeak("직진우선길과 최단거리우선중 어떤 경로를 선호하십니까? ")
+        ttsSpeak("직진우선, 최단거리, 유지 중 하나를 말씀하세요")
         Log.d("LOG","직진우선길과 최단거리우선중 어떤 경로를 선호하십니까? 직진우선, 최단거리, 유지 중 하나를 말씀하세요")
-        Thread {
-            while (recordingState == 0 || recordingState == 1 || recordingState == 3) {
-                recordingState = 0
+
+            while (true) {
                 if (recordingState == 2) {
-                    var ans = sttReturnData
+                    var ans = sttReturnData.toString()
 
                     if (ans == "유지") {
                         Log.d("Main-preferenceQuestion_turnPoint()", "유지")
-                        recordingState = 4
-                    } else if (ans == "직진우선") {
+                        recordingState = 0
+                        sttReturnData = null
+                        break
+
+                    } else if (ans == "직진우선"|| ans == "직진 우선") {
                         //분기점 가중치를 높힌다  ->음수값이 클수록 가중치가 높은거임
                         Log.d("Main-preferenceQuestion_turnPoint()", "직진우선")
                         setPreference("turnPoint", -5)
-                        recordingState = 4
-                    } else if (ans == "최단거리") {
+                        recordingState = 0
+                        sttReturnData = null
+                        break
+                    } else if (ans == "최단거리" || ans == "최단 거리") {
                         //분기점 가중치를 낮춘다
                         Log.d("Main-preferenceQuestion_turnPoint()", "최단거리")
                         setPreference("turnPoint", +5)
-                        recordingState = 4
+                        recordingState = 0
+                        sttReturnData = null
+                        break
                     } else {
                         Log.d("Main-preferenceQuestion_turnPoint()", "잘못된 음성입니다. 직진우선, 최단거리, 유지 중 하나를 말씀하세요")
-                        ttsSpeak("잘못된 음성입니다. 직진우선, 최단거리, 유지 중 하나를 말씀하세요")
-                        recordingState = 3
+                        ttsSpeak("잘못된 음성입니다.")
+                        ttsSpeak("직진우선, 최단거리, 유지 중 하나를 말씀하세요")
+                        recordingState = 0
+                        sttReturnData = null
                     }
                 }
             }
-        }.join()
+
     }//End of preferenceQuestion_turnPoint()
 
 
