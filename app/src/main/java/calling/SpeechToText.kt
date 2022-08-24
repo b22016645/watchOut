@@ -150,7 +150,7 @@ class SpeechToText(val context: Context)  {
                                 val result_json_string = result.substring(startIndex, endIndex + 1)
                                 val json = JSONObject(result_json_string)
                                 val sttResultMsg = json.getString("value")
-                                Log.i("Stt", sttResultMsg) //STT결과값입니다요!!!!!!!!!!!!!!
+                                //Log.i("Stt", sttResultMsg) //STT결과값입니다요!!!!!!!!!!!!!!
                                 callback.sttOnResponseCallback(sttResultMsg)
 
                             } catch (e: JSONException) {
