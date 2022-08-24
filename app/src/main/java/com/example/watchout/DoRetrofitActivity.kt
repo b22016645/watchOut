@@ -275,7 +275,7 @@ class DoRetrofitActivity : Activity(){
                                 History.hasDanger = routeList[ind]!!.hasDanger
                                 History.hasDangerA = routeList[ind]!!.hasDangerA
                                 History.hasDangerB = routeList[ind]!!.hasDangerB
-
+                                History.hasCrossWalk=routeList[ind]!!.hasCrossWalk
                                 var timercount = 0
                                 timer(period = 500, initialDelay = 500) {
                                     if (timercount == 0) {

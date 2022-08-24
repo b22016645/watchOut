@@ -23,6 +23,7 @@ import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 import utils.Constant
 import java.io.IOException
+import kotlin.concurrent.thread
 
 class SpeechToText(val context: Context)  {
     private var audioRecord: AudioRecord? = null
@@ -48,9 +49,9 @@ class SpeechToText(val context: Context)  {
             audioRecord?.startRecording()
         }
         isActive = true
-        Thread  {
+        var th = thread()  {
             threadLoop()
-        }.start()
+        }
     }
 
     fun finishAudioRecordAndGetText(callback:sttAdapter){

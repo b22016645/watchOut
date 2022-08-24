@@ -8,6 +8,7 @@ import java.io.Serializable
 data class RouteInfor (var searchOption : Int )
     : Serializable{
 
+
     var totalDistance :Int = 0
 
     // WEB Publish를 위한 stringData
@@ -18,6 +19,7 @@ data class RouteInfor (var searchOption : Int )
     var hasDanger : Boolean = false                 //DangerA,B중 하나라도 있으면 true, 기본값은 False
     var hasDangerA: Int? = null                 //DangerA중 하나라도 있으면 notNull, 순서는 엘리베이터-육교-지하보도-계단으로 각 자리수가 시설물의 개수를 나타냄
     var hasDangerB: Int? = null                 //DangerB중 하나라도 있으면 notNull, 순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
+    var hasCrossWalk: Int = 0
 
     /////////////////////////////////////SCORE /////////////////////////////////////
     var routeScore : Int = 0        //경로별 최종 점수

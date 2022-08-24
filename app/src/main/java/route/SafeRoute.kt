@@ -87,7 +87,7 @@ object SafeRoute {//End of object SafeRoute
                 15 ->{ routeInfor.crossWalk = routeInfor.crossWalk?.plus(1)
                     routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_crossWalk!!).toInt()
                     routeInfor.hasDanger = true
-                    routeInfor.hasDangerA?:0+1}     //횡단보도
+                    routeInfor.hasCrossWalk.plus(1)}     //횡단보도
             }
         }
 
