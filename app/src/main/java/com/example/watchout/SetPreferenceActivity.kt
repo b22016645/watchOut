@@ -106,6 +106,7 @@ class SetPreferenceActivity : Activity() {
             }
             else if (recordingState == 1){
                 Log.d(Constant.API.LOG,"레코드스테이트1")
+                Log.d("Stt","onKeyDown,레코드스테이트1")
                 mySTT.finishAudioRecordAndGetText(callback) //음성종료 => text로 변환 => 변환된 text 콜백함수로 건내줌
                 //recordingState = 2
                 Log.d(Constant.API.LOG,recordingState.toString())
@@ -236,7 +237,7 @@ class SetPreferenceActivity : Activity() {
     private fun preferenceQuestion() {      //경로 끝나고 선호도 조사하는 함수
         Log.d(Constant.API.LOG,"preferenceQuestion() 호출됨")
 
-/*
+
 
         //점수 받기 (0~10)
         var thread = thread() {
@@ -262,7 +263,7 @@ class SetPreferenceActivity : Activity() {
             preferenceQuestion_tableWeight()
         }
         thread3.join()
-*/
+
 
 
         //분기점 가중치 조절 설문(필수)
@@ -380,7 +381,7 @@ class SetPreferenceActivity : Activity() {
 
     private fun preferenceQuestion_crossWalk() {
         ttsSpeak(" 이용하신 경로에는 횡단보도가 ${History.hasCrossWalk}개 포함되었습니다. ")
-       // ttsSpeak("횡단보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
+        ttsSpeak("횡단보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
         Log.d("LOG:-","이용하신 경로에는 횡단보도가 ${History.hasCrossWalk}개 포함되었습니다. 향후 횡단보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
         sttReturnData = null
         recordingState = 0

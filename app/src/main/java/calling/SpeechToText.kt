@@ -40,6 +40,7 @@ class SpeechToText(val context: Context)  {
     private val bufferSize = sampleRate * 5
     private var isActive = false
 
+    private lateinit var scallback : sttAdapter
     //선호도 액티비티도 추가
 
     fun startAudioRecord(){
@@ -49,13 +50,17 @@ class SpeechToText(val context: Context)  {
             audioRecord?.startRecording()
         }
         isActive = true
-        var th = thread()  {
+        Log.d(Constant.API.LOG, "startAudio;isActive : " + isActive)
+        var th1 = thread()  {
+            Log.d("Stt", "스레드 실행 !!")
             threadLoop()
         }
     }
 
     fun finishAudioRecordAndGetText(callback:sttAdapter){
+        //scallback = callback
         isActive = false
+        Log.d(Constant.API.LOG, "finishAudio;isActive : " + isActive)
         createRetrofitService()
         requestStt(callback)
     }
@@ -96,22 +101,25 @@ class SpeechToText(val context: Context)  {
     }
 
     private fun threadLoop() {
+        Log.d("Stt", "threadLoop들어옴")
         byteAudioData = ByteArray(bufferSize*5)
         Log.d(Constant.API.LOG, "byteAudio 생성")
         audioRecord?.startRecording()
         Log.d(Constant.API.LOG, "audioRecord객체 생성 + 녹음 준비 완료")
         while (isActive) {
-            val ret = audioRecord?.read(byteAudioData!!, 0, byteAudioData!!.size)
-            Log.d(Constant.API.LOG, "read중 크기: $ret")
             if (!isActive) {
+                Log.d("Stt", "thread;isActive: " + isActive)
                 audioRecord!!.stop()
                 Log.d(Constant.API.LOG, "audioRecord.stop()")
                 audioRecord!!.release()
                 audioRecord = null
                 Log.d(Constant.API.LOG, " audioRecord = null")
+                break
             }
+            val ret = audioRecord?.read(byteAudioData!!, 0, byteAudioData!!.size)
+            Log.d(Constant.API.LOG, "read중 크기: $ret")
         }
-        Log.d(Constant.API.LOG, " Thread돌아가는중")
+        Log.d("Stt", " threadLoop나간다")
     }
 
     private fun requestStt(callback:sttAdapter){ //요청 보냄
