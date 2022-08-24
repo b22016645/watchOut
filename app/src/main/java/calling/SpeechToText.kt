@@ -40,9 +40,6 @@ class SpeechToText(val context: Context)  {
     private val bufferSize = sampleRate * 5
     private var isActive = false
 
-    private lateinit var scallback : sttAdapter
-    //선호도 액티비티도 추가
-
     fun startAudioRecord(){
         createAudioRecord()
         if (audioRecord == null) {
@@ -50,7 +47,6 @@ class SpeechToText(val context: Context)  {
             audioRecord?.startRecording()
         }
         isActive = true
-        Log.d(Constant.API.LOG, "startAudio;isActive : " + isActive)
         var th1 = thread()  {
             Log.d("Stt", "스레드 실행 !!")
             threadLoop()
@@ -60,7 +56,6 @@ class SpeechToText(val context: Context)  {
     fun finishAudioRecordAndGetText(callback:sttAdapter){
         //scallback = callback
         isActive = false
-        Log.d(Constant.API.LOG, "finishAudio;isActive : " + isActive)
         createRetrofitService()
         requestStt(callback)
     }
