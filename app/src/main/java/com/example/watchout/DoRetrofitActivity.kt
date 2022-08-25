@@ -74,9 +74,13 @@ class DoRetrofitActivity : Activity(){
         destination = doRrtrofitData.destination!!
         lat = doRrtrofitData.lat
         lon = doRrtrofitData.lon
+        //여기는 현재로 가야함
 
         if (num == 1){ //즐겨찾기에 있었다면
-            startScore(lon,lat,"",destination)
+            var dpLat = intent.getDoubleExtra("dpLat",.0)
+            var dpLon = intent.getDoubleExtra("dpLon",.0)
+            startScore(dpLat,dpLon,"",destination)
+            //여기는 디피로 가야함
         }
         else { //없었다면
             getPOI(destination, lat, lon)

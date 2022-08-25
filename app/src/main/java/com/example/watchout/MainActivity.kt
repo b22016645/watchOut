@@ -112,7 +112,7 @@ class MainActivity : Activity() {
 
         //mqtt관련
         myMqtt = MyMqtt(this)
-//        myMqtt.connect(arrayOf<String>(sub_topic))
+        myMqtt.connect(arrayOf<String>(sub_topic))
 
         //진동관련
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
@@ -298,7 +298,7 @@ class MainActivity : Activity() {
 
                 addHistory()
                 Log.d("파이어베이스 히스토리 데이터 저장","${History}")
-                preferenceQuestion()  //선호도 조사
+                //선호도 조사 액티비티 넘어가는 코드 추가
                 updatePreferenceToDB()  //선호도 조사 결과 DB에 업데이트
 
                 ttsSpeak("목적지에 도착했습니다. 목적지를 즐겨찾기에 등록하려면 아래버튼을 두번 이상 눌러주세요.")
@@ -327,322 +327,8 @@ class MainActivity : Activity() {
     }
 
 
-    ////////////////////////////////////////// /////////////////////////////////////////
-    //                              경로 안내 종료 후 선호도 조사 함수 모음                    //
-    ///////////////////////////////////////// //////////////////////////////////////////
-
-    private fun preferenceQuestion() {      //경로 끝나고 선호도 조사하는 함수
-/*        1. 경로 만족도를 1~10사이 숫자로 말씀해주세요
-            1-1. 6점 이상인 경우
-                - 설문을 종료하시겠습니까?
-                    * 예 -> 종료
-                    *아니오 -> 설문시작
-*/
-           var score = -1
-           while (score >10 || score <0){
-               ttsSpeak("경로만족도를 0~10사이 숫자로 말씀해주세요")
-                var score = "사용자가 말한 숫자".toInt()
-               if(score > 10 || score <0)
-                   ttsSpeak("잘못된 범위입니다.")
-           }
-
-           Preference.score = score         //우선 만족도 프리퍼런스오브젝트에 저장
-
-           while (score <6) {
-               ttsSpeak("설문을 종료하시려면 종료, 계속하시려면 계속 이라고 말해주세요")
-               var ans = "사용자입력한음성"
-                if(ans == "종료")
-                   // preferenceQuestion()함수를 종료하는 코드
-                else if (ans =="계속")
-                    break
-                else
-                    ttsSpeak("잘못된 음성입니다.")
-           }
 
 
- /*
-            1-2. 6점 미만인 경우 ->설문시작
-            “향후 경로안내를 위한 선호도 조사 질문입니다. 현재 상태 유지를 원하시면 유지 라고 말하세요”
-
-            A. 도로타입 배점질문
-            : 경로 안내에 있어 전반적인 도로상태와 시설물개수 중 더 중요한 것은 무엇입니까? 도로, 시설물, 유지 중 하나를 말씀하세요
-            :테이블 웨이트 조정
-
-            B. 분기점질문
-            :직진우선길과 최단거리우선중 어떤 경로를 선호하십니까? 직진우선, 최단거리, 유지 중 하나를 말씀하세요
-            :turntype가중치 조절
-*/
-
-
-        ttsSpeak("향후 경로안내를 위한 선호도 가중치 조절을 시작합니다. 현재 상태 유지를 원하시면 유지 라고 말하세요")
-        preferenceQuestion_tableWeight()
-        preferenceQuestion_turnPoint()
-
-
-/*
-            if) 시설물이 있는 경우
-                시설물질문 : 시설물 있는 경우에만
-                →횡단보도/ 위험시설A(엘베,육교,지하보도,계단) / 위험시설B(교량,터널,고가도로,대형시설물이동통로)
-            : 이용하신 경로에는 (시설물) 이 있었습니다. 향후 (시설물)이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요
-
-            :해당 시설물 가중치 조절*
- */
-        if(History.hasDanger){
-            //시설물이 있는 경우에만 시설물 설문 진행
-            if (History.hasDangerA != null){
-                preferenceQuestion_DangerA()
-            }
-            if (History.hasDangerB != null){
-                preferenceQuestion_DangerB()
-            }
-        }
-
-        ttsSpeak("선호도 가중치 조절이 완료되었습니다. 향후 경로 안내시 조정된 값으로 경로를 안내합니다.")
-
-    }//End of preferenceQuestion
-
-
-
-
-    fun preferenceQuestion_DangerA(){
-        //순서는 엘리베이터-육교-지하보도-계단으로 각 자리수가 시설물의 개수를 나타냄
-        var DangerA = History.hasDangerA!!
-        var elevator = DangerA .div(1000)
-        DangerA %= 1000
-        var overPasses =DangerA.div(100)
-        DangerA %= 100
-        var underPasses = DangerA.div(10)
-        DangerA %= 10
-        var stairs = DangerA
-
-
-        var howMuch : Int = 0
-        while(elevator != 0) {
-                ttsSpeak(" 이용하신 경로에는 엘리베이터가 ${elevator}개 포함되었습니다. 향후 엘리베이터가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-                var ans = "받아온 사용자 대답"
-                if (ans == "유지") {
-                    elevator = 0
-                } else if (ans == "최소화") {
-                    howMuch-=5
-                    elevator = 0
-                }
-                else{
-                    ttsSpeak("잘못된 음성입니다.")
-                }
-        }
-        while(overPasses != 0) {
-            ttsSpeak(" 이용하신 경로에는 육교가 ${overPasses}개 포함되었습니다. 향후 육교가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-            var ans = "받아온 사용자 대답"
-            if (ans == "유지") {
-                overPasses = 0
-            } else if (ans == "최소화") {
-                howMuch-=5
-                overPasses = 0
-            }
-            else{
-                ttsSpeak("잘못된 음성입니다.")
-            }
-        }
-        while(underPasses != 0) {
-            ttsSpeak(" 이용하신 경로에는 지하보도가 ${underPasses}개 포함되었습니다. 향후 지하보도가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-            var ans = "받아온 사용자 대답"
-            if (ans == "유지") {
-                underPasses = 0
-            } else if (ans == "최소화") {
-                howMuch-=5
-                underPasses = 0
-            }
-            else{
-                ttsSpeak("잘못된 음성입니다.")
-            }
-        }
-        while(stairs != 0) {
-            ttsSpeak(" 이용하신 경로에는 계단이 ${stairs}개 포함되었습니다. 향후 계단이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-            var ans = "받아온 사용자 대답"
-            if (ans == "유지") {
-                stairs = 0
-            } else if (ans == "최소화") {
-                howMuch-=5
-                stairs = 0
-            }
-            else{
-                ttsSpeak("잘못된 음성입니다.")
-            }
-        }
-
-        setPreference("facilityNoCar", howMuch)
-
-    } //End of preferenceQuestion_DangerA()
-
-
-
-
-    fun preferenceQuestion_DangerB(){
-        //순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
-
-        var DangerB = History.hasDangerB!!
-        var bridge = DangerB .div(1000)
-        DangerB %= 1000
-        var turnnels =DangerB.div(100)
-        DangerB %= 100
-        var highroad = DangerB.div(10)
-        DangerB %= 10
-        var largeFacilitypassage = DangerB
-
-
-        var howMuch : Int = 0
-        while(bridge != 0) {
-            ttsSpeak(" 이용하신 경로에는 교량이 ${bridge}개 포함되었습니다. 향후 교량이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-            var ans = "받아온 사용자 대답"
-            if (ans == "유지") {
-                bridge = 0
-            } else if (ans == "최소화") {
-                //가중치를 높인다 : 음수값을 키운다
-                howMuch-=5
-                bridge = 0
-            }
-            else{
-                ttsSpeak("잘못된 음성입니다.")
-            }
-        }
-        while(turnnels != 0) {
-            ttsSpeak(" 이용하신 경로에는 터널이 ${turnnels}개 포함되었습니다. 향후 터널이 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-            var ans = "받아온 사용자 대답"
-            if (ans == "유지") {
-                turnnels = 0
-            } else if (ans == "최소화") {
-                howMuch-=5
-                turnnels = 0
-            }
-            else{
-                ttsSpeak("잘못된 음성입니다.")
-            }
-        }
-        while(highroad != 0) {
-            ttsSpeak(" 이용하신 경로에는 고가도로가 ${highroad}개 포함되었습니다. 향후 고가도로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-            var ans = "받아온 사용자 대답"
-            if (ans == "유지") {
-                highroad = 0
-            } else if (ans == "최소화") {
-                howMuch-=5
-                highroad = 0
-            }
-            else{
-                ttsSpeak("잘못된 음성입니다.")
-            }
-        }
-        while(largeFacilitypassage != 0) {
-            ttsSpeak(" 이용하신 경로에는 대형 시설물 이동통로가 ${largeFacilitypassage}개 포함되었습니다. 향후 대형 시설물 이동 통로가 최소화된 길을 안내받으시려면 “최소화”, 현재 상태 유지를 원하시면 “유지”를 말씀하세요")
-            var ans = "받아온 사용자 대답"
-            if (ans == "유지") {
-                largeFacilitypassage = 0
-            } else if (ans == "최소화") {
-                howMuch-=5
-                largeFacilitypassage = 0
-            }
-            else{
-                ttsSpeak("잘못된 음성입니다.")
-            }
-        }
-
-        setPreference("facilityCar", howMuch)
-    }//End of preferenceQuestion_DangerB()
-
-
-
-
-    fun preferenceQuestion_tableWeight(){
-        while(true){
-            ttsSpeak("경로 안내에 있어 전반적인 도로상태와 시설물개수 중 더 중요한 것은 무엇입니까? 도로, 시설물, 유지 중 하나를 말씀하세요")
-            var ans = "사용자가 말한거"
-
-            if (ans == "유지"){
-                Log.d("Main-preferenceQuestion_tableWeight()","유지")
-                break
-            }
-            else if (ans == "도로") {
-                setPreference("tableWeight", -1)
-                break
-            }
-            else if (ans == "시설물 개수") {
-                setPreference("tableWeight", +1)
-                break
-            }
-            else
-                ttsSpeak("잘못된 음성입니다.")
-        }
-    } //end of preferenceQuestion_tableWeight()
-
-    fun preferenceQuestion_turnPoint(){
-        while(true) {       //잘못된 음성인경우 계속 반복
-            ttsSpeak("직진우선길과 최단거리우선중 어떤 경로를 선호하십니까? 직진우선, 최단거리, 유지 중 하나를 말씀하세요")
-            var ans = "사용자가 말한 단어"
-
-            if (ans == "유지") {
-                Log.d("Main-preferenceQuestion_turnPoint()", "유지")
-                break
-            }
-            else if (ans == "직진우선") {
-                //분기점 가중치를 높힌다  ->음수값이 클수록 가중치가 높은거임
-                setPreference("turnPoint", -5)
-                break
-            }
-            else if (ans == "최단거리 ") {
-                //분기점 가중치를 낮춘다{
-                setPreference("turnPoint", +5)
-                break
-            }
-            else {
-                ttsSpeak("잘못된 음성입니다.")
-            }
-        }
-    }//End of preferenceQuestion_turnPoint()
-
-
-
-    fun setPreference(category :String, value:Int){
-
-        //tableWeight가중치 조절. 클수록 Danger 중요, 작을수록 Road 중요
-        //       tableWeight:     -> 기본값 = 0.5 | min = 0.1 | max = 1)
-        //      roadscore의 범위는 고정 :  50 ~ 100 | 50 ~ 100 | 50 ~ 100
-        //  해당 tw일때 DangerScore 범위 :  0 ~ -25 |  0 ~ -5  | 0 ~ -50
-        //  해당 tw일때 routeScore 범위 :  25 ~ 100 | 45 ~ 100 | 0 ~ 100
-        if (category =="tableWeight"){
-            if (value > 0){
-                if (Preference.tableWeight >=1)
-                    Log.d("Main-setPreference()","tableWeight가 이미 최대치(1)임")
-                else
-                    Preference.tableWeight += 0.1
-                    Log.d("Main-setPreference()","증가된 tableWeight : ${Preference.tableWeight}")
-            }
-            else if (value < 0){
-                if (Preference.tableWeight <=0.1)
-                    Log.d("Main-setPrefernece()","tableWeigt가 이미 최소치(0.1)임")
-                else
-                    Preference.tableWeight -= 0.1
-                Log.d("Main-setPreference()","감소된 tableWeight : ${Preference.tableWeight}")
-            }
-        }
-
-        //분기점 가중치 조정
-        else if (category =="turnPoint")
-            Preference.algorithmWeight_turnPoint?.plus(value)
-
-        else if (category == " crossWalk")
-            Preference.algorithmWeight_crossWalk?.plus(value)
-
-        else if (category =="facilityCar")
-            Preference.algorithmWeight_facilityCar?.plus(value)
-
-        else if (category =="facilityNoCar")
-            Preference.algorithmWeight_facilityNoCar?.plus(value)
-
-    }//End of setPreference()
-
-
-    /////////////////////////////////////////////////////////////////////////////
-    //                            선호도 관련 함수 모음 끝                           //
-    /////////////////////////////////////////////////////////////////////////////
 
 
 
@@ -712,10 +398,14 @@ class MainActivity : Activity() {
                     Log.d("즐찾","${dpLat}")
                     Log.d("즐찾","${dpLon}")
 
-                    var doRrtrofitData = DoRetrofitData(destinationName,dpLat,dpLon)
+                    var doRrtrofitData = DoRetrofitData(destinationName,lat,lon)
+
 
                     val intent = Intent(this, DoRetrofitActivity::class.java)
                     intent.putExtra("doRrtrofitData",doRrtrofitData).putExtra("num",1)
+                    intent.putExtra("dpLat",dpLat)
+                    intent.putExtra("dpLon",dpLon)
+
 
                     //DoRetrofit 실행
                     startActivityForResult(intent, 100)
