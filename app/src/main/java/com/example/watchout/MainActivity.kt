@@ -180,10 +180,6 @@ class MainActivity : Activity() {
                     }
 
                     Log.d(LOG,"MainActivity - 현재위치 : ["+"${lat}"+", "+"${lon}"+"]")
-                    History.arrivedLat = lat     //DB 저장용
-                    History.arrivedLon = lon     // DB저장용
-
-
                 }
             }
         }
@@ -226,6 +222,8 @@ class MainActivity : Activity() {
             if (modified < 3) {
                 ttsSpeak("위치 조정 중")
             } else {
+                History.dpLat = lat     //DB 저장용
+                History.dpLon = lon     // DB저장용
                 ttsSpeak("버튼을 눌러 목적지를 말하세요.")
                 publish("topic", "목적지 입력을 시작했습니다")
                 val intent = Intent(this, DestinationActivity::class.java)

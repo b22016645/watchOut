@@ -75,6 +75,7 @@ class DoRetrofitActivity : Activity(){
         destination = doRrtrofitData.destination!!
         lat = doRrtrofitData.lat
         lon = doRrtrofitData.lon
+
         //여기는 현재로 가야함
         Log.d("온크리에이트","num $num")
 
@@ -137,9 +138,9 @@ class DoRetrofitActivity : Activity(){
 
                         Log.d(LOG,"목적지 좌표 : "+"${destinationPoint[0]}"+", "+"${destinationPoint[1]}")
 
-                        History.dpLat = destinationPoint[0]         //DB저장용
-                        History.dpLon = destinationPoint[1]         //DB저장용
-                        History.dpName = poiArray.address           //DB저장용 (목적지주소)
+                        History.arrivedLat= destinationPoint[0]         //DB저장용 목적지
+                        History.arrivedLon = destinationPoint[1]         //DB저장용
+                        History.arrivedName = poiArray.address           //DB저장용 (목적지주소)
                         Favorites.dat.replace("lat",destinationPoint[0])  //즐겨찾기 저장용
                         Favorites.dat.replace("lon",destinationPoint[0])  //즐겨찾기 저장용
 
