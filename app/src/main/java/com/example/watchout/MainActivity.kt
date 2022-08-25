@@ -402,7 +402,8 @@ class MainActivity : Activity() {
 
 
                     val intent = Intent(this, DoRetrofitActivity::class.java)
-                    intent.putExtra("doRrtrofitData",doRrtrofitData).putExtra("num",1)
+                    intent.putExtra("doRrtrofitData",doRrtrofitData)
+                    intent.putExtra("num",1)
                     intent.putExtra("dpLat",dpLat)
                     intent.putExtra("dpLon",dpLon)
 

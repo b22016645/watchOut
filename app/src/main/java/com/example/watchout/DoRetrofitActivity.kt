@@ -65,7 +65,8 @@ class DoRetrofitActivity : Activity(){
         myMqtt.connect(arrayOf<String>(sub_topic))
 
         val doRrtrofitData = intent.getSerializableExtra("doRrtrofitData") as model.DoRetrofitData
-        val num = intent.getIntExtra("name",0)
+        val num = intent.getIntExtra("num",7)
+
 
         Log.d(LOG,"DoRetrofit - doRrtrofitData : "+"${doRrtrofitData}")
 
@@ -75,11 +76,15 @@ class DoRetrofitActivity : Activity(){
         lat = doRrtrofitData.lat
         lon = doRrtrofitData.lon
         //여기는 현재로 가야함
+        Log.d("온크리에이트","num $num")
 
-        if (num == 1){ //즐겨찾기에 있었다면
+        if (num == 1){ //즐겨찾기에 있었다면'
+            Log.d("dddd","즐겨찾기넘어와서")
             var dpLat = intent.getDoubleExtra("dpLat",.0)
             var dpLon = intent.getDoubleExtra("dpLon",.0)
-            startScore(dpLat,dpLon,"",destination)
+            startScore(dpLat,dpLon,"%EC%B6%9C%EB%B0%9C",destination)
+
+
             //여기는 디피로 가야함
         }
         else { //없었다면
