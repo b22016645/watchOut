@@ -60,19 +60,6 @@ class SpeechToText(val context: Context)  {
         requestStt(callback)
     }
 
-
-    private fun createRetrofitService() { //retroservice객체 생성
-        val gson = GsonBuilder()
-            .setLenient()
-            .create()
-        val retrofit = Retrofit.Builder()
-            .baseUrl(Constant.API.BASE_URL_KAKAO_API)
-            .addConverterFactory(GsonConverterFactory.create(gson))
-            .build()
-        retrofitService = retrofit.create(IRetrofit::class.java)
-        Log.i("Stt", "retrofitService create")
-    }
-
     private fun createAudioRecord(){
         if (ActivityCompat.checkSelfPermission(
                 context,
@@ -115,6 +102,18 @@ class SpeechToText(val context: Context)  {
             Log.d(Constant.API.LOG, "read중 크기: $ret")
         }
         Log.d("Stt", " threadLoop나간다")
+    }
+
+    private fun createRetrofitService() { //retroservice객체 생성
+        val gson = GsonBuilder()
+            .setLenient()
+            .create()
+        val retrofit = Retrofit.Builder()
+            .baseUrl(Constant.API.BASE_URL_KAKAO_API)
+            .addConverterFactory(GsonConverterFactory.create(gson))
+            .build()
+        retrofitService = retrofit.create(IRetrofit::class.java)
+        Log.i("Stt", "retrofitService create")
     }
 
     private fun requestStt(callback:sttAdapter){ //요청 보냄
