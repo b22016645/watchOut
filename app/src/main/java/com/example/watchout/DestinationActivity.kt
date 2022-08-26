@@ -48,11 +48,11 @@ class DestinationActivity : Activity() {
         if(keyCode== KeyEvent.KEYCODE_BACK){
             if(activeBool==true){
                 mystt.startAudioRecord()
-                image.setImageResource(R.drawable.des)
+                image.setImageResource(R.drawable.speakdestination)
                 activeBool = false
             }
             else{
-                image.setImageResource(R.drawable.search)
+                image.setImageResource(R.drawable.searchingdestination)
                 mystt.finishAudioRecordAndGetText(callback)
             }
             return true

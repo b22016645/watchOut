@@ -360,7 +360,7 @@ class MainActivity : Activity() {
                     Preference.algorithmWeight_facilityNoCar = "${snapshotData.get("algorithmWeight_facilityNoCar")}".toDouble()
                     Preference.tableWeight = "${snapshotData.get("tableWeight")}".toDouble()
                     Preference.algorithmWeight_turnPoint = "${snapshotData.get("algorithmWeight_turnPoint")}".toDouble()
-                    Preference.score = "${snapshotData.get("score")}".toInt()
+                   // Preference.score = "${snapshotData.get("score")}".toInt()
 
                 } else {
                     Log.d("에러 : 알고리즘 가중치값 DB에서 불러오기", "No such document")
