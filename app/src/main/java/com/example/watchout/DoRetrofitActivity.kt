@@ -83,7 +83,7 @@ class DoRetrofitActivity : Activity(){
             Log.d("dddd","즐겨찾기넘어와서")
             var dpLat = intent.getDoubleExtra("dpLat",.0)
             var dpLon = intent.getDoubleExtra("dpLon",.0)
-            startScore(dpLat,dpLon,"%EC%B6%9C%EB%B0%9C",destination)
+            startScore(dpLon,dpLat,"%EC%B6%9C%EB%B0%9C",destination)
 
 
             //여기는 디피로 가야함
@@ -473,30 +473,33 @@ class DoRetrofitActivity : Activity(){
                         }
 
 //                        //midpointList 보냄
-//
-//                        var midpointBuilder = StringBuilder()
-//
-//                        // x좌표 다 넣기
-//                        for (i in midpointList.indices) {
-//                            midpointBuilder.append(midpointList[i][0].toString())
-//                            if (i < midpointList.size-1){
-//                                midpointBuilder.append(",")
-//                            }
-//                        }
-//
-//                        //y좌표 다 스트링으로 만듬
-//                        midpointBuilder.append("/")
-//                        for (i in midpointList.indices) {
-//                            midpointBuilder.append(midpointList[i][1].toString())
-//                            if (i < midpointList.size-1){
-//                                midpointBuilder.append(",")
-//                            }
-//                        }
-//
-//                        var midpointString = midpointBuilder.toString()
-//
+
+                        var midpointBuilder = StringBuilder()
+                        var midBuilder = StringBuilder()
+
+                        // x좌표 다 넣기
+                        for (i in midpointList.indices) {
+                            midpointBuilder.append(midpointList[i][0].toString())
+                            if (i < midpointList.size-1){
+                                midpointBuilder.append(",")
+                            }
+                        }
+
+                        //y좌표 다 스트링으로 만듬
+                        midpointBuilder.append("/")
+                        for (i in midpointList.indices) {
+                            midBuilder.append(midpointList[i][1].toString())
+                            if (i < midpointList.size-1){
+                                midBuilder.append(",")
+                            }
+                        }
+
+                        var midpointString = midpointBuilder.toString()
+                        var midString = midBuilder.toString()
+
 //                        publish("midpoint",midpointString)
-//                        Log.d(LOG,"midpoint : "+"${midpointString}")
+                        Log.d(LOG,"midpoint : "+"${midpointString}")
+                        Log.d(LOG,"mid : "+"${midString}")
 
 
                         val naviData = NaviData(midpointList, turnTypeList, facilityTypeList, destination, turnPoint)
