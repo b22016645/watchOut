@@ -18,6 +18,7 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import calling.Mqtt
 import calling.MySensor
+import com.example.vibrateexam.VibratorPattern
 import com.google.android.gms.location.*
 import model.DirectionItem
 import model.History
@@ -67,7 +68,7 @@ class NavigationActivity : Activity(), LocationListener {
     private var turnPointCount = 0
 
     //진동관련
-    lateinit var vibrator: Vibrator
+    private lateinit var viberatorPattern: VibratorPattern
 
     //현재위치
 //    private var lat: Double = 37.58217852030164
@@ -112,6 +113,9 @@ class NavigationActivity : Activity(), LocationListener {
         mySensor = MySensor(this)
         mySensor.startSensor()
 
+        //진동
+        viberatorPattern = VibratorPattern(this)
+
         //Intent값 받기
         val naviData = intent.getSerializableExtra("naviData") as model.NaviData
 
@@ -121,8 +125,6 @@ class NavigationActivity : Activity(), LocationListener {
         destination = naviData.destination
         turnPoint = naviData.turnPoint
         mContext = this
-
-        vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
 
         //통합 위치 정보 제공자 클라이언트의 인스턴스
         locationRequest = LocationRequest.create()
@@ -193,7 +195,7 @@ class NavigationActivity : Activity(), LocationListener {
                         //안내시작 일단 0->1을 안내
                         //나침반불러와서
                         if (midPointNum == 0 && sppoint == 0 ) {
-                            vibe(1000,100)
+                            viberatorPattern.simplePattern()
                             sppoint ++
                             Log.d(LOG, "NavigationActivity 첫 방향 조정")
                             doSensor(lat,lon)
@@ -205,7 +207,6 @@ class NavigationActivity : Activity(), LocationListener {
                         else {
                             //분기점일때
                             if ((turnNum in 12..19) && sppoint == 0) {
-                                turnRoad()
                                 sppoint ++
                                 turnPointCount++
                                 publish("topic", "분기점을 마주했습니다")
@@ -218,7 +219,7 @@ class NavigationActivity : Activity(), LocationListener {
 
                             //위험요소 (횡단보도, 육교 등)
                             else if ((turnNum in 125..129 || turnNum in 211..217) && sppoint == 0) {
-                                watchOut()
+                                viberatorPattern.pattern()
                                 publish("topic", "위험요소 앞입니다")
                                 sppoint ++
 
@@ -271,7 +272,7 @@ class NavigationActivity : Activity(), LocationListener {
                                             12,14,17 -> History.expNoCar.plus(1) //위험시설A 경로이탈 +1
                                             else -> return
                                         }
-                                        youOut()
+                                        viberatorPattern.outPattern()
                                         outNum = 0
                                         Log.d(LOG, "NavigationActivity 경로이탈일 때")
                                         clear()
@@ -290,6 +291,7 @@ class NavigationActivity : Activity(), LocationListener {
                                     //다음 좌표가 분기점일때
                                     if (turnTypeList[midPointNum+1] in 12..19) {
                                         Log.d(LOG, "다음좌표 분기점입니다")
+                                        viberatorPattern.simplePattern()
                                         when (turnTypeList[midPointNum+1]) {
                                             12, 16, 17 -> ttsSpeak("${distance}"+"m 뒤에 좌회전입니다")
                                             13, 18, 19 -> ttsSpeak("${distance}"+"m 뒤에 우회전입니다")
@@ -313,7 +315,7 @@ class NavigationActivity : Activity(), LocationListener {
     }
 
     private fun endOfRoute() {
-        vibe(1500, 100)
+        viberatorPattern.startAndFinishPattern()
         publish("topic", "목적지에 도착하였습니다")
         Log.d(LOG, "안내완료")
 
@@ -339,9 +341,6 @@ class NavigationActivity : Activity(), LocationListener {
      firestore?.collection("Preference")?.document("AlgorithmWeight")?.set(preference)
      Log.d("파이어베이스 데이터 저장","${preference}")
 */
-
-
-
 
         clear()
         mySensor.stopSensor()
@@ -408,29 +407,6 @@ class NavigationActivity : Activity(), LocationListener {
                 },1000)
             }
         }
-    }
-
-    //위험요소앞일때
-    fun watchOut() {
-        vibe(2000, 100)
-    }
-
-    //경로이탈시
-    fun youOut() {
-        val timing = longArrayOf(0, 500, 0, 500, 0, 500, 0, 500)
-        val amplitudes = intArrayOf(0, 100, 0, 100, 0, 100, 0, 100)
-        val effect = VibrationEffect.createWaveform(timing,amplitudes,-1)
-        vibrator.vibrate(effect)
-    }
-
-    //분기점시
-    fun turnRoad() {
-        vibe(2000,100)
-    }
-
-    fun vibe( ms : Long , at : Int ){
-        val effect = VibrationEffect.createOneShot(ms, at)
-        vibrator.vibrate(effect)
     }
 
     //clear함수
