@@ -497,7 +497,7 @@ class DoRetrofitActivity : Activity(){
                         var midpointString = midpointBuilder.toString()
                         var midString = midBuilder.toString()
 
-//                        publish("midpoint",midpointString)
+                        publish("mid",midpointString)
                         Log.d(LOG,"midpoint : "+"${midpointString}")
                         Log.d(LOG,"mid : "+"${midString}")
 
