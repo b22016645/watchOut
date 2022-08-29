@@ -14,7 +14,7 @@ import android.widget.Button
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
-import calling.MyMqtt
+import calling.Mqtt
 import com.example.watchout.databinding.ActivityMainBinding
 import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
@@ -50,7 +50,7 @@ class MainActivity : Activity() {
     private var uid : String? = null
 
     //mqtt관련
-    private lateinit var myMqtt: MyMqtt
+    private lateinit var myMqtt: Mqtt
     val sub_topic = "android"
 
     //음성출력관련
@@ -111,7 +111,7 @@ class MainActivity : Activity() {
 
 
         //mqtt관련
-        myMqtt = MyMqtt(this)
+        myMqtt = Mqtt(this)
         myMqtt.connect(arrayOf<String>(sub_topic))
 
         //진동관련

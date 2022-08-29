@@ -12,6 +12,7 @@ import android.os.Vibrator
 import android.util.Log
 import android.view.KeyEvent
 import android.view.WindowManager
+import com.example.vibrateexam.VibratorPattern
 import utils.Constant
 import utils.Constant.API.LOG
 import java.lang.Math.abs
@@ -49,14 +50,13 @@ class DirectionActivity : Activity(), SensorEventListener {
     private var y = 0f
     private var z = 0f
 
-    //진동관련
-    lateinit var vibrator: Vibrator
-
     //현재위치
     private var lat: Double = 0.0
     private var lon: Double = 0.0
 
     private var startDirection = 0f
+
+    private lateinit var viberatorPattern: VibratorPattern
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -67,7 +67,7 @@ class DirectionActivity : Activity(), SensorEventListener {
         setContentView(R.layout.activity_sensor)
         Log.d(LOG,"Sensor호출됨")
 
-        vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+        viberatorPattern = VibratorPattern(this)
 
         //Intent값 받기
         val directionItem = intent.getSerializableExtra("sensorItem") as model.DirectionItem
@@ -178,8 +178,7 @@ class DirectionActivity : Activity(), SensorEventListener {
                     if (sensorCount % 100 == 0) {  //이러면 대략 1초에 한 번씩 판단함.
                         ccccount++
                         Log.d(LOG, "ccccount=" + "${ccccount}" + ", azimuthin=" + "${azimuthinDegress}")
-                        val effect = VibrationEffect.createOneShot(500,100)
-                        vibrator.vibrate(effect)
+                       viberatorPattern.simplePattern()
                         if (ccccount == 5) {
                             startDirection = azimuthinDegress
                             offSensor()
