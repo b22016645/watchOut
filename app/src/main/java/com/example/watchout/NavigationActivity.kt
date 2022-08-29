@@ -194,9 +194,9 @@ class NavigationActivity : Activity(), LocationListener {
 
                         //안내시작 일단 0->1을 안내
                         //나침반불러와서
-                        viberatorPattern.startAndFinishPattern()
+
                         if (midPointNum == 0 && sppoint == 0 ) {
-                            viberatorPattern.simplePattern()
+                            viberatorPattern.startAndFinishPattern()
                             sppoint ++
                             Log.d(LOG, "NavigationActivity 출발 방향 조정")
                             doSensor(lat,lon)

@@ -175,7 +175,7 @@ class MainActivity : Activity() {
                     if(modified==3){
                         //현재위치가 조정 완료되었다는 tts
                         ttsSpeak("현재위치 조정이 완료되었습니다.")
-                        val effect = VibrationEffect.createOneShot(1500, 150)
+                        val effect = VibrationEffect.createOneShot(500, 100)
                         vibrator.vibrate(effect)
                     }
 

@@ -420,23 +420,31 @@ class DoRetrofitActivity : Activity(){
                         //routeRes 보냄
 
                         var routeResBuilder = StringBuilder()
+                        var oneBuilder = StringBuilder()
+                        var twoBuilder = StringBuilder()
 
                         // x좌표 다 넣기
                         for (i in rawRouteRes.indices) {
+                            oneBuilder.append(rawRouteRes[i][1].toString())
                             routeResBuilder.append(rawRouteRes[i][1].toString())
                             if (i < rawRouteRes.size-1){
+                                oneBuilder.append(",")
                                 routeResBuilder.append(",")
                             }
                         }
+                        Log.d(LOG,oneBuilder.toString())
 
                         //y좌표 다 스트링으로 만듬
                         routeResBuilder.append("/")
                         for (i in rawRouteRes.indices) {
+                            twoBuilder.append(rawRouteRes[i][0].toString())
                             routeResBuilder.append(rawRouteRes[i][0].toString())
                             if (i < rawRouteRes.size-1){
+                                twoBuilder.append(",")
                                 routeResBuilder.append(",")
                             }
                         }
+                        Log.d(LOG,twoBuilder.toString())
 
                         var routeResString = routeResBuilder.toString()
 
