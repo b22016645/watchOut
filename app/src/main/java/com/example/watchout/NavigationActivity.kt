@@ -16,7 +16,7 @@ import android.view.KeyEvent
 import android.view.WindowManager
 import android.widget.TextView
 import androidx.core.app.ActivityCompat
-import calling.MyMqtt
+import calling.Mqtt
 import calling.MySensor
 import com.google.android.gms.location.*
 import model.DirectionItem
@@ -36,7 +36,7 @@ class NavigationActivity : Activity(), LocationListener {
     private val REQUEST_PERMISSION_LOCATION = 10
 
     //mqtt관련
-    private lateinit var myMqtt: MyMqtt
+    private lateinit var myMqtt: Mqtt
     val sub_topic = "android"
 
     //stepCounter
@@ -105,7 +105,7 @@ class NavigationActivity : Activity(), LocationListener {
         text = findViewById<TextView>(R.id.text)
 
         //mqtt관련
-        myMqtt = MyMqtt(this)
+        myMqtt = Mqtt(this)
         myMqtt.connect(arrayOf<String>(sub_topic))
 
         //stepcounter 시작

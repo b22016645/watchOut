@@ -8,7 +8,7 @@ import org.eclipse.paho.client.mqttv3.MqttClient.generateClientId
 
 
 //client의 첫번째 인자 context룰 위해 매개변수로 전달 받음
-class MyMqtt(val context: Context, val uri:String = "tcp://15.165.174.55:1883") {
+class Mqtt(val context: Context, val uri:String = "tcp://15.165.174.55:1883") {
     //"tcp://172.20.10.6:1883"
     //"tcp://15.165.174.55:1883"
 

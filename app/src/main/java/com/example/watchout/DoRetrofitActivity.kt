@@ -5,7 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.util.Log
 import android.view.WindowManager
-import calling.MyMqtt
+import calling.Mqtt
 import com.example.watchout.databinding.ActivityMainBinding
 import com.google.gson.Gson
 import model.*
@@ -20,7 +20,7 @@ import kotlin.concurrent.timer
 class DoRetrofitActivity : Activity(){
 
     //mqtt관련
-    private lateinit var myMqtt: MyMqtt
+    private lateinit var myMqtt: Mqtt
     val sub_topic = "android"
 
     //mqtt보낼 route4개저장
@@ -61,7 +61,7 @@ class DoRetrofitActivity : Activity(){
         Log.d(LOG,"DoRetrofit호출됨")
 
         //mqtt관련
-        myMqtt = MyMqtt(this)
+        myMqtt = Mqtt(this)
         myMqtt.connect(arrayOf<String>(sub_topic))
 
         val doRrtrofitData = intent.getSerializableExtra("doRrtrofitData") as model.DoRetrofitData
