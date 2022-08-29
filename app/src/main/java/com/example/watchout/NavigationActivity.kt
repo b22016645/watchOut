@@ -194,10 +194,11 @@ class NavigationActivity : Activity(), LocationListener {
 
                         //안내시작 일단 0->1을 안내
                         //나침반불러와서
+                        viberatorPattern.startAndFinishPattern()
                         if (midPointNum == 0 && sppoint == 0 ) {
                             viberatorPattern.simplePattern()
                             sppoint ++
-                            Log.d(LOG, "NavigationActivity 첫 방향 조정")
+                            Log.d(LOG, "NavigationActivity 출발 방향 조정")
                             doSensor(lat,lon)
                         }
                         //도착
@@ -300,6 +301,7 @@ class NavigationActivity : Activity(), LocationListener {
                                     }
                                     //분기점 다음 좌표에서 직진임을 알려줌
                                     else if (turnTypeList[midPointNum-1] in 12..19) {
+                                        viberatorPattern.stopVibrator()
                                         ttsSpeak("다음 안내까지 "+"${distance}"+"m 직진입니다")
                                     }
                                 }
@@ -363,7 +365,7 @@ class NavigationActivity : Activity(), LocationListener {
 
     private fun doSensor(lat : Double, lon : Double) {
         //SensorActivity 실행
-        publish("vibe","start")
+//        publish("vibe","start")
         var sensorItem = DirectionItem(lat,lon,midpointList,midPointNum)
         val intent = Intent(this, DirectionActivity::class.java)
         intent.putExtra("sensorItem",sensorItem)
@@ -390,13 +392,23 @@ class NavigationActivity : Activity(), LocationListener {
         if (requestCode == 4){
             if (resultCode == RESULT_OK) {
                 var trueName = data.getStringExtra("trueName")
+                var trueNum = data.getIntExtra("trueNum",0)
                 ttsSpeak("${trueName}"+" 입니다.")
-                Log.d(LOG, "${trueName}")
+                Log.d(LOG, "${trueName}"+":"+"${trueNum}")
+                if (trueNum == 1) {
+                    viberatorPattern.leftPattern()
+                }
+                else if (trueNum == 2) {
+                    viberatorPattern.rightPattern()
+                }
+                else {
+                    Log.d(LOG,"직진일세..")
+                }
                 //publish("vibe", "end")
                 publish("topic", "이동중입니다...")
             }
             else if (resultCode == 2){
-                publish("vibe", "stop")
+//                publish("vibe", "stop")
                 publish("topic","목적지를 재 입력합니다")
                 publish("route","restart")
                 clear()

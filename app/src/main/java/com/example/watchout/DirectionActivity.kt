@@ -130,10 +130,15 @@ class DirectionActivity : Activity(), SensorEventListener {
                 in -150f .. -120f -> "8시 방향 좌회전"
                 else -> "유턴"
             }
-
+            var trueNum = when(trueDir){
+                in 30f..150f -> 1
+                in -30f..-150f -> 2
+                else -> 0
+            }
             midpointList.clear()
             val returnIntent = Intent()
             returnIntent.putExtra("trueName",trueName)
+            returnIntent.putExtra("trueNum",trueNum)
             setResult(RESULT_OK,returnIntent)
             finish()
         }
@@ -178,7 +183,7 @@ class DirectionActivity : Activity(), SensorEventListener {
                     if (sensorCount % 100 == 0) {  //이러면 대략 1초에 한 번씩 판단함.
                         ccccount++
                         Log.d(LOG, "ccccount=" + "${ccccount}" + ", azimuthin=" + "${azimuthinDegress}")
-                       viberatorPattern.simplePattern()
+//                       viberatorPattern.simplePattern()
                         if (ccccount == 5) {
                             startDirection = azimuthinDegress
                             offSensor()

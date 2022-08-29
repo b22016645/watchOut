@@ -441,6 +441,7 @@ class DoRetrofitActivity : Activity(){
                         var routeResString = routeResBuilder.toString()
 
                         publish("route_res",routeResString)
+                        publish("mid",routeResString)
                         Log.d(LOG,"routeRes : "+"${routeResString}")
 
                         var size=0
@@ -472,34 +473,30 @@ class DoRetrofitActivity : Activity(){
                             }
                         }
 
-//                        //midpointList 보냄
-
-                        var midpointBuilder = StringBuilder()
-                        var midBuilder = StringBuilder()
-
-                        // x좌표 다 넣기
-                        for (i in midpointList.indices) {
-                            midpointBuilder.append("\"").append(midpointList[i][0].toString()).append("\"")
-                            if (i < midpointList.size-1){
-                                midpointBuilder.append(",")
-                            }
-                        }
-
-                        //y좌표 다 스트링으로 만듬
-                        midpointBuilder.append("/")
-                        for (i in midpointList.indices) {
-                            midpointBuilder.append("\"").append(midpointList[i][1].toString()).append("\"")
-                            if (i < midpointList.size-1){
-                                midpointBuilder.append(",")
-                            }
-                        }
-
-                        var midpointString = midpointBuilder.toString()
-                        var midString = midBuilder.toString()
-
-                        publish("mid",midpointString)
-                        Log.d(LOG,"midpoint : "+"${midpointString}")
-                        Log.d(LOG,"mid : "+"${midString}")
+////                        //midpointList 보냄
+//
+//                        var midpointBuilder = StringBuilder()
+//
+//                        // x좌표 다 넣기
+//                        for (i in midpointList.indices) {
+//                            midpointBuilder.append(midpointList[i][0].toString())
+//                            if (i < midpointList.size-1){
+//                                midpointBuilder.append(",")
+//                            }
+//                        }
+//
+//                        //y좌표 다 스트링으로 만듬
+//                        midpointBuilder.append("/")
+//                        for (i in midpointList.indices) {
+//                            midpointBuilder.append(midpointList[i][1].toString())
+//                            if (i < midpointList.size-1){
+//                                midpointBuilder.append(",")
+//                            }
+//                        }
+//
+//                        var midpointString = midpointBuilder.toString()
+//                        publish("midpoint",midpointString)
+//                        Log.d(LOG,"midpoint : "+"${midpointString}")
 
 
                         val naviData = NaviData(midpointList, turnTypeList, facilityTypeList, destination, turnPoint)
