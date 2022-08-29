@@ -479,7 +479,7 @@ class DoRetrofitActivity : Activity(){
 
                         // x좌표 다 넣기
                         for (i in midpointList.indices) {
-                            midpointBuilder.append(midpointList[i][0].toString())
+                            midpointBuilder.append("\"").append(midpointList[i][0].toString()).append("\"")
                             if (i < midpointList.size-1){
                                 midpointBuilder.append(",")
                             }
@@ -488,9 +488,9 @@ class DoRetrofitActivity : Activity(){
                         //y좌표 다 스트링으로 만듬
                         midpointBuilder.append("/")
                         for (i in midpointList.indices) {
-                            midBuilder.append(midpointList[i][1].toString())
+                            midpointBuilder.append("\"").append(midpointList[i][1].toString()).append("\"")
                             if (i < midpointList.size-1){
-                                midBuilder.append(",")
+                                midpointBuilder.append(",")
                             }
                         }
 
