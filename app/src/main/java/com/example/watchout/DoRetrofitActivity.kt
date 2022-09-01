@@ -480,7 +480,7 @@ class DoRetrofitActivity : Activity(){
                                 twoBuilder.append(",")
                                 routeResBuilder.append(",")
                                 if ( i % 10 == 0) {
-                                    oneBuilder.append("\n")
+                                    twoBuilder.append("\n")
                                 }
                             }
                         }
