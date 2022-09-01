@@ -172,7 +172,7 @@ class MainActivity : Activity() {
                     y.setText(lat.toString())
 
                     modified++
-                    if(modified==3){
+                    if(modified==2){
                         //현재위치가 조정 완료되었다는 tts
                         ttsSpeak("현재위치 조정이 완료되었습니다.")
                         val effect = VibrationEffect.createOneShot(500, 100)
@@ -219,7 +219,7 @@ class MainActivity : Activity() {
     private fun startSTT(intentNum:Int){
         //SpeechToTextActivity 실행
         if (intentNum == 0) { //목적지입력시
-            if (modified < 3) {
+            if (modified < 2) {
                 ttsSpeak("위치 조정 중")
             } else {
                 History.dpLat = lat     //DB 저장용

@@ -464,6 +464,9 @@ class DoRetrofitActivity : Activity(){
                             if (i < rawRouteRes.size-1){
                                 oneBuilder.append(",")
                                 routeResBuilder.append(",")
+                                if ( i % 10 == 0) {
+                                    oneBuilder.append("\n")
+                                }
                             }
                         }
                         Log.d("simul",oneBuilder.toString())
@@ -476,6 +479,9 @@ class DoRetrofitActivity : Activity(){
                             if (i < rawRouteRes.size-1){
                                 twoBuilder.append(",")
                                 routeResBuilder.append(",")
+                                if ( i % 10 == 0) {
+                                    oneBuilder.append("\n")
+                                }
                             }
                         }
                         Log.d("simul",twoBuilder.toString())

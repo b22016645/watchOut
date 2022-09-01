@@ -131,8 +131,8 @@ class DirectionActivity : Activity(), SensorEventListener {
                 else -> "유턴"
             }
             var trueNum = when(trueDir){
-                in 30f..150f -> 1
-                in -30f..-150f -> 2
+                in 30f..150f -> 2
+                in -150f..-30f -> 1
                 else -> 0
             }
             midpointList.clear()
