@@ -417,6 +417,40 @@ class DoRetrofitActivity : Activity(){
                             }
                         }
 
+
+                        /////////////////////////////////////////////////////////////
+                        ///////****************시뮬레이션용********************////////
+                        /////////////////////////////////////////////////////////////
+                        var turnIndex = arrayListOf<Int>()
+                        var cross_hashMap = HashMap<String, Any>()
+                        //분기점 인덱스만
+                        for ( i in turnTypeList.indices){
+                            if(turnTypeList[i] in 12..19) {
+                                turnIndex.add(i)
+                            }
+                            else if (turnTypeList[i] in 125..129 || turnTypeList[i] in 211..217) {
+                                val turnName = when (turnTypeList[i]) {
+                                    125 -> "육교"
+                                    211 -> "직진 횡단보도"
+                                    212 -> "좌측 횡단보도"
+                                    213 -> "우측 횡단보도"
+                                    214 -> "8시 횡단보도"
+                                    215 -> "10시 횡단보도"
+                                    216 -> "2시 횡단보도"
+                                    217 -> "4시 횡단보도"
+                                    else -> ""
+                                }
+                                cross_hashMap.put(turnName,i)
+                            }
+                        }
+                        Log.d("simul","turn: "+"${turnIndex}")
+                        Log.d("simul","cross: "+"${cross_hashMap}")
+
+                        /////////////////////////////////////////////////////////////
+                        /////////////////////////////////////////////////////////////
+
+
+
                         //routeRes 보냄
 
                         var routeResBuilder = StringBuilder()
@@ -432,7 +466,7 @@ class DoRetrofitActivity : Activity(){
                                 routeResBuilder.append(",")
                             }
                         }
-                        Log.d(LOG,oneBuilder.toString())
+                        Log.d("simul",oneBuilder.toString())
 
                         //y좌표 다 스트링으로 만듬
                         routeResBuilder.append("/")
@@ -444,7 +478,7 @@ class DoRetrofitActivity : Activity(){
                                 routeResBuilder.append(",")
                             }
                         }
-                        Log.d(LOG,twoBuilder.toString())
+                        Log.d("simul",twoBuilder.toString())
 
                         var routeResString = routeResBuilder.toString()
 

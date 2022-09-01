@@ -300,7 +300,7 @@ class NavigationActivity : Activity(), LocationListener {
                                         }
                                     }
                                     //분기점 다음 좌표에서 직진임을 알려줌
-                                    else if (turnTypeList[midPointNum-1] in 12..19) {
+                                    else if (turnTypeList[midPointNum-1] in 12..19 || midPointNum == 1) {
                                         viberatorPattern.stopVibrator()
                                         ttsSpeak("다음 안내까지 "+"${distance}"+"m 직진입니다")
                                     }
@@ -423,6 +423,7 @@ class NavigationActivity : Activity(), LocationListener {
 
     //clear함수
     fun clear(){
+        viberatorPattern.stopVibrator()
         midpointList.clear()
         turnPoint.clear()
         turnTypeList.clear()
