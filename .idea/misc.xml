@@ -3,16 +3,12 @@
   <component name="DesignSurface">
     <option name="filePathToZoomLevelMap">
       <map>
-        <entry key="..\:/Users/Seul/Documents/GitHub/watchOut/app/src/main/res/layout/activity_main.xml" value="0.40481171548117156" />
-        <entry key="..\:/Users/Seul/Documents/GitHub/watchOut/app/src/main/res/layout/activity_navigation.xml" value="0.40481171548117156" />
-        <entry key="..\:/Users/Seul/Documents/GitHub/watchOut/app/src/main/res/layout/activity_sensor.xml" value="0.40481171548117156" />
-        <entry key="..\:/Users/Seul/Documents/GitHub/watchOut/app/src/main/res/layout/activity_setreference.xml" value="0.40481171548117156" />
-        <entry key="..\:/Users/hansung/Documents/GitHub/watchOut/app/src/main/res/layout/activity_doretrofit.xml" value="0.209375" />
-        <entry key="..\:/Users/hansung/Documents/GitHub/watchOut/app/src/main/res/layout/activity_main.xml" value="0.209375" />
-        <entry key="..\:/Users/hansung/Documents/GitHub/watchOut/app/src/main/res/layout/activity_navigation.xml" value="0.209375" />
-        <entry key="..\:/Users/hansung/Documents/GitHub/watchOut/app/src/main/res/layout/activity_sensor.xml" value="0.209375" />
+        <entry key="..\:/Users/hansung/Documents/GitHub/watchOut/app/src/main/res/layout/activity_doretrofit.xml" value="0.1" />
+        <entry key="..\:/Users/hansung/Documents/GitHub/watchOut/app/src/main/res/layout/activity_main.xml" value="1.0" />
+        <entry key="..\:/Users/hansung/Documents/GitHub/watchOut/app/src/main/res/layout/activity_navigation.xml" value="0.1" />
+        <entry key="..\:/Users/hansung/Documents/GitHub/watchOut/app/src/main/res/layout/activity_sensor.xml" value="0.1" />
         <entry key="..\:/Users/hansung/Documents/GitHub/watchOut/app/src/main/res/layout/activity_setreference.xml" value="0.1" />
-        <entry key="..\:/Users/hansung/Documents/GitHub/watchOut/app/src/main/res/layout/activity_speech_to_text.xml" value="0.209375" />
+        <entry key="..\:/Users/hansung/Documents/GitHub/watchOut/app/src/main/res/layout/activity_speech_to_text.xml" value="0.1" />
         <entry key="..\:/Users/user/AndroidStudioProjects/watchOut/app/src/main/res/layout/activity_doretrofit.xml" value="0.4457236842105263" />
         <entry key="..\:/Users/user/AndroidStudioProjects/watchOut/app/src/main/res/layout/activity_main.xml" value="0.4457236842105263" />
         <entry key="..\:/Users/user/AndroidStudioProjects/watchOut/app/src/main/res/layout/activity_navigation.xml" value="0.4457236842105263" />

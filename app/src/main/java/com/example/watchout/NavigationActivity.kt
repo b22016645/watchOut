@@ -101,6 +101,7 @@ class NavigationActivity : Activity(), LocationListener {
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
 
         setContentView(R.layout.activity_navigation)
+
         Log.d(LOG,"Navigation호출됨")
 
         text = findViewById<TextView>(R.id.text)
@@ -274,6 +275,7 @@ class NavigationActivity : Activity(), LocationListener {
                                             else -> return
                                         }
                                         viberatorPattern.outPattern()
+
                                         outNum = 0
                                         Log.d(LOG, "NavigationActivity 경로이탈일 때")
                                         clear()

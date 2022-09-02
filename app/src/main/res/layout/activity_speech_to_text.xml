@@ -13,7 +13,7 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:scaleType="fitXY"
-        android:src="@drawable/pressbutton" />
+        android:src="@drawable/diol_button" />
 
 
 </androidx.wear.widget.BoxInsetLayout>
