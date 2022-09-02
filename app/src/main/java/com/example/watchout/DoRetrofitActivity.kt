@@ -75,6 +75,7 @@ class DoRetrofitActivity : Activity(){
         destination = doRrtrofitData.destination!!
         lat = doRrtrofitData.lat
         lon = doRrtrofitData.lon
+        Log.d("simul","start = "+"${lat}"+","+"${lon}")
 
         //여기는 현재로 가야함
         Log.d("온크리에이트","num $num")
@@ -141,6 +142,7 @@ class DoRetrofitActivity : Activity(){
                         History.arrivedLat= destinationPoint[0]         //DB저장용 목적지
                         History.arrivedLon = destinationPoint[1]         //DB저장용
                         History.arrivedName = poiArray.address           //DB저장용 (목적지주소)
+                        Log.d("simul","end = "+"${destinationPoint[0]}"+","+"${destinationPoint[1]}"+"/"+"${poiArray.address}")
                         Favorites.dat.replace("lat",destinationPoint[0])  //즐겨찾기 저장용
                         Favorites.dat.replace("lon",destinationPoint[0])  //즐겨찾기 저장용
 
@@ -427,10 +429,13 @@ class DoRetrofitActivity : Activity(){
                         for ( i in turnTypeList.indices){
                             if(turnTypeList[i] in 12..19) {
                                 turnIndex.add(i)
+                                Log.d("simul","turn: "+"${i}"+"/"+"${rawRouteRes[i][1]}"+","+"${rawRouteRes[i][0]}")
                             }
                             else if (turnTypeList[i] in 125..129 || turnTypeList[i] in 211..217) {
                                 val turnName = when (turnTypeList[i]) {
                                     125 -> "육교"
+                                    126 -> "지하보도"
+                                    127 -> "계단"
                                     211 -> "직진 횡단보도"
                                     212 -> "좌측 횡단보도"
                                     213 -> "우측 횡단보도"
@@ -438,13 +443,16 @@ class DoRetrofitActivity : Activity(){
                                     215 -> "10시 횡단보도"
                                     216 -> "2시 횡단보도"
                                     217 -> "4시 횡단보도"
+                                    218 -> "엘레베이터"
                                     else -> ""
                                 }
                                 cross_hashMap.put(turnName,i)
+                                Log.d("simul","cross: "+"${i}"+"/"+"${turnName}")
                             }
                         }
-                        Log.d("simul","turn: "+"${turnIndex}")
-                        Log.d("simul","cross: "+"${cross_hashMap}")
+
+                        Log.d("simul","Allturn: "+"${turnIndex}")
+                        Log.d("simul","Allcross: "+"${cross_hashMap}")
 
                         /////////////////////////////////////////////////////////////
                         /////////////////////////////////////////////////////////////

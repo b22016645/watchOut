@@ -220,7 +220,7 @@ class NavigationActivity : Activity(), LocationListener {
                             }
 
                             //위험요소 (횡단보도, 육교 등)
-                            else if ((turnNum in 125..129 || turnNum in 211..217) && sppoint == 0) {
+                            else if ((turnNum in 125..127 || turnNum in 211..218) && sppoint == 0) {
                                 viberatorPattern.pattern()
                                 publish("topic", "위험요소 앞입니다")
                                 sppoint ++
@@ -228,6 +228,8 @@ class NavigationActivity : Activity(), LocationListener {
                                 Log.d(LOG, "NavigationActivity 위험요소")
                                 val turnName = when (turnNum) {
                                     125 -> "육교"
+                                    126 -> "지하보도"
+                                    127 -> "계단"
                                     211 -> "직진 횡단보도"
                                     212 -> "좌측 횡단보도"
                                     213 -> "우측 횡단보도"
@@ -235,14 +237,10 @@ class NavigationActivity : Activity(), LocationListener {
                                     215 -> "10시 횡단보도"
                                     216 -> "2시 횡단보도"
                                     217 -> "4시 횡단보도"
+                                    218 -> "엘레베이터"
                                     else -> ""
                                 }
                                 ttsSpeak("${distance}"+"m 뒤에 "+"${turnName}"+"입니다")
-                            }
-
-                            //예외 (엘베, 직진암시)
-                            else if ((turnNum == 218 || turnNum == 233) && sppoint == 0 ){
-                                Log.d(LOG,"NavigationActivity 예외 길")
                             }
 
                             var distanceRange = 8.0      //오차범위
