@@ -110,7 +110,8 @@ class DoRetrofitActivity : Activity(){
     private fun getPOI(location : String, lat : Double, lon : Double){
         Log.d(LOG,"DoRetrofit - getPOI호출")
         Log.d(LOG, "DoRetrofit - 목적지 : "+"${location}")
-
+        
+        History.arrivedName = location          //DB저장용 (목적지주소)
         //publish를 여기ㅅ 꼭 해야하는지??
         //publish("des",location)
 
@@ -141,7 +142,6 @@ class DoRetrofitActivity : Activity(){
 
                         History.arrivedLat= destinationPoint[0]         //DB저장용 목적지
                         History.arrivedLon = destinationPoint[1]         //DB저장용
-                        History.arrivedName = poiArray.address           //DB저장용 (목적지주소)
                         Log.d("simul","end = "+"${destinationPoint[0]}"+","+"${destinationPoint[1]}"+"/"+"${poiArray.address}")
                         Favorites.dat.replace("lat",destinationPoint[0])  //즐겨찾기 저장용
                         Favorites.dat.replace("lon",destinationPoint[0])  //즐겨찾기 저장용
