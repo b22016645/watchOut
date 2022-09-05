@@ -130,7 +130,7 @@ class RetrofitManager {
                             val body = it.asJsonObject
 
                             var score = 0.0
-                            var totalDistance : Int? = 0
+                            var totalDistance : Double? = 0.0
                             val features=body.getAsJsonArray("features")
                        /*     var saftyScore = SaftyScore(.0,0,0,0,0,
                                 0,0,0,0,
@@ -147,7 +147,7 @@ class RetrofitManager {
 
                                 var turnType : Int? = properties.get("turnType")?.asInt
                                 var roadType : Int? = properties.get("roadType")?.asInt
-                                var distance : Int? = properties.get("distance")?.asInt
+                                var distance : Double? = properties.get("distance")?.asDouble
                                 var facilityType : String? = properties.get("facilityType")?.asString
                                 var facil : Int?
 
@@ -158,8 +158,8 @@ class RetrofitManager {
                                     facil = facilityType!!.toInt()
                                 }
 
-                                if (totalDistance==0){
-                                    totalDistance = properties.get("totalDistance")?.asInt      //경로 총 길이: 단위(m)
+                                if (totalDistance==0.0){
+                                    totalDistance = properties.get("totalDistance")?.asDouble      //경로 총 길이: 단위(m)
                                     var totalTime : Int? = properties.get("totalTime")?.asInt //경로 총 시간 : 단위(초)
                                     History.expectedTime = totalTime
                                 }

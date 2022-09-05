@@ -52,6 +52,7 @@ class DoRetrofitActivity : Activity(){
         super.onCreate(savedInstanceState)
 
         binding = ActivityMainBinding.inflate(layoutInflater)
+
         setContentView(R.layout.activity_doretrofit)
 
         //화면이 꺼지지 않게
@@ -268,8 +269,9 @@ class DoRetrofitActivity : Activity(){
 
                                 SafeRoute.nomalizeScore(routeList)  //점수 정규화
                                 SafeRoute.makeFinalScore(routeList)     //최종 점수 합성
-                                SafeRoute.makeRouteInfor_forPublish(routeList)      //pub할 스트링 데이타 만들기
-                                SafeRoute.makeEctInfor_forPublish(routeList)      //pub할 기타내용 스트링 데이타 만들기
+                                SafeRoute.makeStringData_forPublish(routeList)
+                                SafeRoute.makeScoreInfor_forPublish(routeList)
+
 
                                 Log.d("DoRetrofitActivity-getScore() :최종 경로 4가지 모음", ""+"${routeInfor}" )
                                 //경로 배열내 4가지(전부임)경로 모두 프린트(정보), 경로 4가지 모두 추가되면 한 번
@@ -277,17 +279,21 @@ class DoRetrofitActivity : Activity(){
                                 var max = routeList[0]?.routeScore!!
 
                                 var ind = 0
-                                for (i in 1..3) {
+                                for (i in 0..3) {
+                                    History.totalRouteList[i] = routeList[i]
                                     if (routeList[i]?.routeScore!! > max) {
                                         max = routeList[i]?.routeScore!!
                                         ind=i
                                     }
                                 }
                                 History.routNum = ind       //DB저장용
-                                History.hasDanger = routeList[ind]!!.hasDanger
+                                History.totalRouteList[ind].isSelected = true
+
+/*                               History.hasDanger = routeList[ind]!!.hasDanger
                                 History.hasDangerA = routeList[ind]!!.hasDangerA
                                 History.hasDangerB = routeList[ind]!!.hasDangerB
                                 History.hasCrossWalk=routeList[ind]!!.hasCrossWalk
+                                */
                                 var timercount = 0
                                 timer(period = 500, initialDelay = 500) {
                                     if (timercount == 0) {

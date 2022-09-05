@@ -26,9 +26,21 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
         var stepNum: Int? = null           //발걸음 수      Navigation - endOfRoute()
 
 
-        //RouteInfor 루트 정보 (exp = existPoint: 경로 이탈 부분)
+        //RouteInfor 최종 선택된 루트 정보
         var midPointSize : Int? = null          //DoRetrofit = midPointSize
         var routNum: Int? = null         //이용했던 경로 번호용. DoRetrofit에서 인덱스 결정 후 받음
+        var totalDistance : Double =0.0         //경로 길이
+        var routeScore : Double = 0.0           //최종 경로 점수
+        var stringData : String = ""            //엘리베이터(2회),분기점(31회),지하보도(1회)가 포함된 경로입니다.
+
+        //후보경로 정보.
+        var totalRouteList = arrayListOf<otherRouteInfor>()
+
+        lateinit var preference : Preference
+
+
+
+        //경로이탈정보 (exp = existPoint: 경로 이탈 부분)
         var expTurnPoint: Int = 0      //분기점에서 이탈한 횟수  Navigation - locationCallBack
         var expCrossWalk: Int = 0       //횡단보도에서 이탈한 횟수
         var expStraightRoad: Int = 0    //직진길에서 이탈한 횟수
@@ -37,10 +49,13 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
         var expTotal: Int = 0           //총 이탈 횟수
 
         // 선호도 가중치 DB업데이트를 위한 Flag 모음. DoRetrofir 274
-        var hasDanger : Boolean = false                 //DangerA,B중 하나라도 있으면 true, 기본값은 False
-        var hasDangerA: Int? = null                 //DangerA중 하나라도 있으면 notNull, 순서는 엘리베이터-육교-지하보도-계단으로 각 자리수가 시설물의 개수를 나타냄
-        var hasDangerB: Int? = null                 //DangerB중 하나라도 있으면 notNull, 순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
-        var hasCrossWalk: Int = 0
+      //  var hasDanger : Boolean = false                 //DangerA,B중 하나라도 있으면 true, 기본값은 False
+      //  var hasDangerA: Int? = null                 //DangerA중 하나라도 있으면 notNull, 순서는 엘리베이터-육교-지하보도-계단으로 각 자리수가 시설물의 개수를 나타냄
+      //  var hasDangerB: Int? = null                 //DangerB중 하나라도 있으면 notNull, 순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
+      //  var hasCrossWalk: Int = 0
+
+
+
 
         fun init() {
                 arrivedName = null
@@ -62,11 +77,14 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
                 expNoCar = 0
                 expWithCar = 0
                 expTotal = 0
-                hasDanger = false
-                hasDangerA = null
-                hasDangerB = null
+              //  hasDanger = false
+              //  hasDangerA = null
+              //  hasDangerB = null
                 midPointSize = null
-                hasCrossWalk = 0
+              //  hasCrossWalk = 0
+
+                totalRouteList.clear()
+
         }
 
 }

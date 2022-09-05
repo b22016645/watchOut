@@ -9,6 +9,7 @@ import android.preference.PreferenceGroup
 import android.util.Log
 import model.Preference
 import model.RouteInfor
+import model.otherRouteInfor
 
 
 object SafeRoute {//End of object SafeRoute
@@ -24,29 +25,31 @@ object SafeRoute {//End of object SafeRoute
     //1. 배열에다가 모든 루트의 정보를 담기만 하는 함수 ( 점수매기기 X )
     fun gatherRouteInfor(
         facilityType: Int?,
-        distance: Int?=0,
+        distance: Double?,
         roadType: Int?,
         turnType: Int?,
         routeInfor : RouteInfor
     ){
+        //그냥 totaldDistance를 여기서 누적계산할까..
         //도로타입정보(RoadType)
-        if (roadType != null) {
+        if (roadType != null && distance != null) {
             when (roadType) {
                 21 -> {//차도와 인도가 분리, 정해진 횡단구역으로만 횡단 가능 : 배점 ) 90
-                    routeInfor.roadTypeB = routeInfor.roadTypeB?.plus(distance!!)
-                    routeInfor.roadScore_draft = routeInfor.roadScore_draft?.plus(distance!!*90) }
+                    routeInfor.roadTypeB += distance
+                    routeInfor.roadScore_draft += (distance * 90) }
 
-                22 -> {//차도 인도 분리 X || 보행자 횡단에 제약 X 보행자도로 : 배점 ) 70
-                    routeInfor.roadTypeC = routeInfor.roadTypeC?.plus(distance!!)
-                    routeInfor.roadScore_draft = routeInfor.roadScore_draft?.plus(distance!!*50) }
+                22 -> {//차도 인도 분리 X || 보행자 횡단에 제약 X 보행자도로 : 배점 ) 50
+                    routeInfor.roadTypeC += distance
+                    routeInfor.roadScore_draft += (distance * 50)  }
 
                 23 -> {//차량 통행 불가 보행자 도로 : 배점) 100
-                    routeInfor.roadTypeA = routeInfor.roadTypeA.plus(distance!!)
-                    routeInfor.roadScore_draft = routeInfor.roadScore_draft?.plus(distance!!*100) }
+                    routeInfor.roadTypeA += distance
+                    routeInfor.roadScore_draft += (distance * 100)  }
 
                 24 -> {//쾌적 X 도로 :  배점 ) 50
-                    routeInfor.roadTypeD = routeInfor.roadTypeD?.plus(distance!!)
-                    routeInfor.roadScore_draft = routeInfor.roadScore_draft?.plus(distance!!*0) }
+                    routeInfor.roadTypeD += distance
+                    routeInfor.roadScore_draft += (distance * 0)
+                    routeInfor.roadScore_draft += (distance*0) }
 
                 else -> {}
             }
@@ -57,49 +60,65 @@ object SafeRoute {//End of object SafeRoute
             when (facilityType) {
 
                 //Danger C : 보행자도로 / 차도  분리
-                12 ->{ routeInfor.overPasses = routeInfor.overPasses?.plus(1)        //육교. 순서2번
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()
-                    routeInfor.hasDanger = true
-                    routeInfor.hasDangerA?:0+10
+                12 ->{ //routeInfor.overPasses = routeInfor.overPasses?.plus(1)        //육교. 순서2번
+                    //routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()
+                  //  routeInfor.hasDanger = true
+                   // routeInfor.hasDangerA?:0+10
+                    routeInfor.overPasses += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityNoCar!!)
                     routeInfor.DangerCount++}
-                14 ->{ routeInfor.underPasses = routeInfor.underPasses?.plus(1)     //지하보도. 순서3번
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()
-                    routeInfor.hasDanger = true
-                    routeInfor.hasDangerA?:0+100
+                14 ->{ //routeInfor.underPasses = routeInfor.underPasses?.plus(1)     //지하보도. 순서3번
+                  //  routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()
+                  //  routeInfor.hasDanger = true
+                  //  routeInfor.hasDangerA?:0+100
+                    routeInfor.underPasses += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityNoCar!!)
                     routeInfor.DangerCount++}
-                17 ->{ routeInfor.stairs  = routeInfor.stairs?.plus(1)              //계단
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()
-                    routeInfor.hasDanger = true
-                    routeInfor.hasDangerA?:0+1000
+                17 ->{ //routeInfor.stairs  = routeInfor.stairs?.plus(1)              //계단
+                  //  routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()
+                    routeInfor.overPasses += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityNoCar!!)
+                    //     routeInfor.hasDanger = true
+                //    routeInfor.hasDangerA?:0+1000
                     routeInfor.DangerCount++}
 
                 //Danger D : 보행자도로 / 차도  분리 X
-                1 ->{ routeInfor.bridge  = routeInfor.bridge?.plus(1)            //교량. 순서1
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityCar!!).toInt()
-                    routeInfor.hasDanger = true
-                    routeInfor.hasDangerB?:0+1
+                1 ->{ //routeInfor.bridge  = routeInfor.bridge?.plus(1)            //교량. 순서1
+                  //  routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityCar!!).toInt()
+               //     routeInfor.hasDanger = true
+                //    routeInfor.hasDangerB?:0+1
+                    routeInfor.bridge += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityCar!!)
                     routeInfor.DangerCount++}
-                2 ->{ routeInfor.turnnels  = routeInfor.turnnels?.plus(1)       //터널. 순서2
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityCar!!).toInt()
-                    routeInfor.hasDanger = true
-                    routeInfor.hasDangerB?:0+10
+                2 ->{ //routeInfor.turnnels  = routeInfor.turnnels?.plus(1)       //터널. 순서2
+                 //   routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityCar!!).toInt()
+                    //    routeInfor.hasDanger = true
+                 //   routeInfor.hasDangerB?:0+10
+                    routeInfor.turnnels += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityCar!!)
                     routeInfor.DangerCount++}
-                3 ->{ routeInfor.highroad  = routeInfor.highroad?.plus(1)       ///고가도로. 순서3
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityCar!!).toInt()
-                    routeInfor.hasDanger = true
-                    routeInfor.hasDangerB?:0+100
+                3 ->{ //routeInfor.highroad  = routeInfor.highroad?.plus(1)       ///고가도로. 순서3
+                   // routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityCar!!).toInt()
+                //    routeInfor.hasDanger = true
+                //    routeInfor.hasDangerB?:0+100
+                    routeInfor.highroad += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityCar!!)
                     routeInfor.DangerCount++}
-                16 ->{ routeInfor.largeFacilitypassage  = routeInfor.largeFacilitypassage?.plus(1)      //대형 시설물 이동 통로. 순서4
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityCar!!).toInt()
-                    routeInfor.hasDanger = true
-                    routeInfor.hasDangerB?:0+1000
+                16 ->{ //routeInfor.largeFacilitypassage  = routeInfor.largeFacilitypassage?.plus(1)      //대형 시설물 이동 통로. 순서4
+                 //   routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityCar!!).toInt()
+                //    routeInfor.hasDanger = true
+                //    routeInfor.hasDangerB?:0+1000
+                    routeInfor.largeFacilitypassage += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityCar!!)
                     routeInfor.DangerCount++}
 
                 //횡단보도. DangerA -순서1
-                15 ->{ routeInfor.crossWalk = routeInfor.crossWalk?.plus(1)
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_crossWalk!!).toInt()
-                    routeInfor.hasDanger = true
-                    routeInfor.hasCrossWalk.plus(1)
+                15 ->{ //routeInfor.crossWalk = routeInfor.crossWalk?.plus(1)
+                  //  routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_crossWalk!!).toInt()
+                //    routeInfor.hasDanger = true
+                 //   routeInfor.hasCrossWalk.plus(1)
+                    routeInfor.crossWalk += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_crossWalk!!)
                     routeInfor.DangerCount++}     //횡단보도
             }
         }
@@ -115,38 +134,46 @@ object SafeRoute {//End of object SafeRoute
                 //분기점
                 in 12..19 -> {
                     routeInfor.DangerCount++
-                    routeInfor.turnPoint = routeInfor.turnPoint?.plus(1)
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_turnPoint!!).toInt()
+                    routeInfor.turnPoint += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_turnPoint!!)
+                   // routeInfor.turnPoint = routeInfor.turnPoint?.plus(1)
+                  //  routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_turnPoint!!).toInt()
                 }
 
                 //횡단보도
-                in 211..217 ->{
+                in 211..217 -> {
                     routeInfor.DangerCount++
-                    routeInfor.crossWalk = routeInfor.crossWalk?.plus(1)
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_crossWalk!!).toInt()}
-
+                    routeInfor.crossWalk += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_crossWalk!!)
+                    //routeInfor.crossWalk = routeInfor.crossWalk?.plus(1)
+                    // routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_crossWalk!!).toInt()}
+                }
                 //Danger A : 보행자도로 / 차도  분리
                 218 -> {
                     routeInfor.DangerCount++
-                    routeInfor.elevator = routeInfor.elevator?.plus(1)          //엘리베이터
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()}                   //엘리베이터
-                125 ->{
+                    routeInfor.elevator += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityNoCar!!)
+                    //routeInfor.elevator = routeInfor.elevator?.plus(1)          //엘리베이터
+                    //routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()}                   //엘리베이터
+                }
+                125 ->{//육교
                     routeInfor.DangerCount++
-                    routeInfor.overPasses = routeInfor.overPasses?.plus(1)      //육교
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()}                //육교
-                126 ->{
+                    routeInfor.overPasses += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityNoCar!!) }
+
+                126 ->{ //지하보도
                     routeInfor.DangerCount++
-                    routeInfor.underPasses = routeInfor.underPasses?.plus(1)    //지하보도
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()}              //지하보도
-                127 ->{
+                    routeInfor.underPasses += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityNoCar!!)}
+                127 ->{//계단 진입
                     routeInfor.DangerCount++
-                    routeInfor.stairs  = routeInfor.stairs?.plus(1)             //계단
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()}                       //계단 진입
+                    routeInfor.stairs += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityNoCar!!)}
               //128 ->{ //경사로진입}
-                129 ->{
-                    routeInfor.DangerCount++
-                    routeInfor.stairs  = routeInfor.stairs?.plus(1)             //계단+경사로
-                    routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_facilityNoCar!!).toInt()}                       //계단 + 경사로 진입
+                129 ->{//계단+경사로
+                    routeInfor.DangerCount
+                    routeInfor.stairs += 1
+                    routeInfor.DangerScore_draft += (pf.algorithmWeight_facilityNoCar!!)}                       //계단 + 경사로 진입
 
                 else -> {}
             }
@@ -181,8 +208,13 @@ object SafeRoute {//End of object SafeRoute
 
         //DangerScore Nomalize :: 업데이트 버전
         routeList.forEach{
-            it?.DangerScore_final = (it?.DangerScore_draft!! / it?.DangerCount)
-            Log.d("SafeRoute-nomalizeScore() -","${it?.DangerScore_final} = (${it?.DangerScore_draft!!} / ${it?.DangerCount})")
+            if(it!= null) {
+                it.DangerScore_final = (it.DangerScore_draft / it.DangerCount)
+                Log.d("SafeRoute-nomalizeScore() -", "${it.DangerScore_final} = (${it.DangerScore_draft} / ${it.DangerCount})")
+            }
+            else {
+                Log.d("SafeRoute-nomalizeScore()","RouteInfor is null :: ERROR")
+            }
         }
 
 
@@ -232,27 +264,54 @@ object SafeRoute {//End of object SafeRoute
         }
     }//End of makeFinalScore()
 
-    fun makeRouteInfor_forPublish(routeList: ArrayList<RouteInfor?>) {
+    fun makeStringData_forPublish(routeList: ArrayList<RouteInfor?>) {
+        routeList.forEach {
+            if (it!= null){
+                var stringDataBuilder = StringBuilder()
+                if (it.turnPoint > 0)
+                    stringDataBuilder.append("분기점(${it.turnPoint}회)")
+                if (it.crossWalk >0)
+                    stringDataBuilder.append(", 횡단보도(${it.crossWalk}회")
+                if (it.elevator >0)
+                    stringDataBuilder.append(", 엘리베이터(${it.elevator}회")
+                if (it.overPasses >0)
+                    stringDataBuilder.append(", 육교(${it.overPasses}회")
+                if (it.underPasses >0)
+                    stringDataBuilder.append(", 지하도로(${it.underPasses}회")
+                if (it.stairs >0)
+                    stringDataBuilder.append(", 계단(${it.stairs}회")
+                if (it.bridge >0)
+                    stringDataBuilder.append(", 교량(${it.bridge}회")
+                if (it.turnnels >0)
+                    stringDataBuilder.append(", 터널(${it.turnnels}회")
+                if (it.highroad >0)
+                    stringDataBuilder.append(", 고가도로(${it.highroad}회")
+                if (it.largeFacilitypassage >0)
+                    stringDataBuilder.append(", 대형시설물이동통로(${it.largeFacilitypassage}회")
+                stringDataBuilder.append(" 가 포함된 경로입니다.")
+
+                it.stringData = stringDataBuilder.toString()
+                Log.d("SafeRoute-makeStringData() : ","${it.stringData}")
+            }
+        }
+    }//End of makeStringData_forPublish()
+
+    fun makeScoreInfor_forPublish(routeList: ArrayList<RouteInfor?>) {
         routeList.forEach{
             if (it!= null){
                 var inforBuilder = StringBuilder()
-                inforBuilder.append(it.turnPoint)
-                inforBuilder.append(",")
-                inforBuilder.append(it.crossWalk)
-                inforBuilder.append(",")
                 inforBuilder.append(it.roadScore_final)
                 inforBuilder.append(",")
                 inforBuilder.append(it.DangerScore_final)
                 inforBuilder.append(",")
                 inforBuilder.append(it.routeScore)
-                //inforBuilder.append(",")
-                //inforBuilder.append(it.totalDistance)
-                it.routeInforStringData = inforBuilder.toString()
-                Log.d("SafeRoute-makeRouteInfor_forPublish() : ","${it.routeInforStringData}")
+                it.scoreData = inforBuilder.toString()
+                Log.d("SafeRoute-makeScoreInfor_forPublish() : ","${it.scoreData}")
             }
         }
-    }//End of makeRouteInfor_forPublish()
+    }//End of makeScoreInfor_forPublish()
 
+    /*
     fun makeEctInfor_forPublish(routeList: ArrayList<RouteInfor?>){
         routeList.forEach{
             if (it!=null){
@@ -316,7 +375,7 @@ object SafeRoute {//End of object SafeRoute
         }
     }//End of makeEctInfor_forPublish()
 
-
+*/
 
 }
 
