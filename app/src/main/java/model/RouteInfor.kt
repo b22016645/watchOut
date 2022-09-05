@@ -21,8 +21,10 @@ data class RouteInfor (var searchOption : Int )
     var hasDangerB: Int? = null                 //DangerB중 하나라도 있으면 notNull, 순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
     var hasCrossWalk: Int = 0
 
+
+
     /////////////////////////////////////SCORE /////////////////////////////////////
-    var routeScore : Int = 0        //경로별 최종 점수
+    var routeScore : Double = 0.0       //경로별 최종 점수
     //최종 루트 결정시 기준이 되는 값.
     //RouteScore = roadScore + DangerScore(final)
     //min = 0 , max = 100
@@ -44,20 +46,22 @@ data class RouteInfor (var searchOption : Int )
 
     /////////////////////////////////////Danger/////////////////////////////////////
     //Danger
-    var turnPoint : Int = 0
-    var crossWalk : Int = 0
+    var turnPoint : Int = 0             //DangerA
+    var crossWalk : Int = 0             //DangerB
 
-    //Danger A
+    //Danger C
     var elevator : Int = 0              //엘리베이터
     var overPasses : Int= 0             //육교
     var underPasses : Int = 0           //지하보도
     var stairs : Int = 0                //계단
 
-    //Danger B
+    //Danger D
     var bridge : Int = 0                //교량
     var turnnels : Int = 0              //터널
     var highroad  : Int = 0             //고가도로
     var largeFacilitypassage  : Int = 0 //대형시설물이동통로
+
+    var DangerCount : Int = 0           //위험시설 A~D의 총개수, 위험시설 점수 정규화를 위함
 
 
     /////////////////////////////////////ROAD_TYPE/////////////////////////////////////

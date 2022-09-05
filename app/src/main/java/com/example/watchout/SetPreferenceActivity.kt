@@ -31,6 +31,8 @@ class SetPreferenceActivity : Activity() {
     private lateinit var callback : sttAdapter //stt결과가 오면 실행할 콜백함수
     private lateinit var mySTT: SpeechToText
     var sttReturnData  : String? = null
+    var unit : Int = 10     //가중치 조정 단위 (선호도조사)
+    var unit_auto : Int = 10 // 자동 가중치 조정 단위 (길이탈분석)
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -162,6 +164,7 @@ class SetPreferenceActivity : Activity() {
         History.expNoCar = 1
         History.expWithCar = 1
 
+        //var unit : Int = 10
         var stnd = 0.4 //조정기준
         var num = History.midPointSize!!      //인덱스넘버
 
@@ -169,41 +172,42 @@ class SetPreferenceActivity : Activity() {
 
         if (History.expTotal.toDouble() / num > 0.2){
             //총 이탈 비율이 20%가 넘는 경우에만 가중치를 조절한다. (이하인 경우 사용자가 올바르게 길을 갔다고 판단)
+            //도로를 높이려면 양수
 
             // 1. 직선길 이탈 --> DangerScore 테이블웨이트 조정
             if (History.expStraightRoad.toDouble() / History.expTotal > stnd){
-                //직진길 이탈률이 40% 넘는 경우 테이블전체가중치를 낮춤 (도로상태가 더 중요하다고 판단)
+                //직진길 이탈률이 40% 넘는 경우 : 도로상태가 더 중요하다고 판단
                 Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","RoadType 가중치 조절->tableWieght 낮춤")
-                setPreference("tableWeight",-1)
+                setPreference("tableWeight",+1)
             }
             else if ((History.expTotal - History.expStraightRoad).toDouble() /History.expTotal > 0.8){
-                //직진길 이탈률이 20% 이하인 경우 테이즐 전체 가중치를 높임 (DangerScore가 더 중요하다고 판단)
+                //직진길 이탈률이 20% 이하인 경우 : DangerScore가 더 중요하다고 판단
                 Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","DangerScore 가중치 조절->tableWieght 높임")
-                setPreference("tableWeight",+1)
+                setPreference("tableWeight",-1)
             }
 
             //2.분기점
             if (History.expTurnPoint.toDouble() / History.expTotal > stnd){
                 Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","분기점 가중치 조절")
-                setPreference("turnPoint", 10)
+                setPreference("turnPoint", unit_auto)
             }
 
             //3.횡단보도
             if (History.expCrossWalk.toDouble() / History.expTotal > stnd){
                 Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","횡단보도 가중치 조절")
-                setPreference("crossWalk", 10)
+                setPreference("crossWalk", unit_auto)
             }
 
             //4.CAR
             if (History.expWithCar.toDouble() / History.expTotal > stnd){
                 Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","facilityCar 가중치 조절")
-                setPreference("facilityCar", 10)
+                setPreference("facilityCar", unit_auto)
             }
 
             //5.NoCar
             if (History.expNoCar.toDouble() / History.expTotal > stnd){
                 Log.d("SetPreferenceActivity - updatePreferenceByExpLog() ","failityNoCar 가중치 조절")
-                setPreference("failityNoCar", 10)
+                setPreference("failityNoCar", unit_auto)
             }
         }
     }
@@ -369,7 +373,7 @@ class SetPreferenceActivity : Activity() {
                     recordingState = 0
                     break
                 } else if (ans == "최소화") {
-                    setPreference("crossWalk", -10)
+                    setPreference("crossWalk", unit)
                     sttReturnData = null
                     recordingState = 0
                     break
@@ -423,7 +427,7 @@ class SetPreferenceActivity : Activity() {
                         recordingState = 0
                         break
                     } else if (ans == "최소화") {
-                        setPreference("facilityNoCar",-5)
+                        setPreference("facilityNoCar",unit)
                         // elevator = 0
                         sttReturnData = null
                         recordingState = 0
@@ -586,7 +590,7 @@ class SetPreferenceActivity : Activity() {
                             recordingState = 0
                             break
                         } else if (ans == "최소화") {
-                            howMuch -= 5
+                            howMuch += unit
                             sttReturnData = null
                             recordingState = 0
                             break
@@ -613,7 +617,7 @@ class SetPreferenceActivity : Activity() {
                             recordingState = 0
                             break
                         } else if (ans == "최소화") {
-                            howMuch -= 5
+                            howMuch += unit
                             sttReturnData = null
                             recordingState = 0
                             break
@@ -642,7 +646,7 @@ class SetPreferenceActivity : Activity() {
                             recordingState = 0
                             break
                         } else if (ans == "최소화") {
-                            howMuch -= 5
+                            howMuch += unit
                             sttReturnData = null
                             recordingState = 0
                             break
@@ -670,7 +674,7 @@ class SetPreferenceActivity : Activity() {
                         recordingState = 0
                         break
                     } else if (ans == "최소화") {
-                        howMuch -= 5
+                        howMuch += unit
                         sttReturnData = null
                         recordingState = 0
                         break
@@ -704,18 +708,19 @@ class SetPreferenceActivity : Activity() {
                 if (recordingState == 2) {
                     var ans = sttReturnData.toString()
 
+                    //양수면로드증가
                     if (ans == "유지") {
                         Log.d("Main-preferenceQuestion_tableWeight()", "유지")
                         recordingState = 0
                         sttReturnData = null
                         break
                     } else if (ans == "도로") {
-                        setPreference("tableWeight", -1)
+                        setPreference("tableWeight", +1)
                         recordingState = 0
                         sttReturnData = null
                         break
                     } else if (ans == "시설물") {
-                        setPreference("tableWeight", +1)
+                        setPreference("tableWeight", -1)
                         recordingState = 0
                         sttReturnData = null
                         break
@@ -753,14 +758,14 @@ class SetPreferenceActivity : Activity() {
                     } else if (ans == "직진우선"|| ans == "직진 우선") {
                         //분기점 가중치를 높힌다  ->음수값이 클수록 가중치가 높은거임
                         Log.d("Main-preferenceQuestion_turnPoint()", "직진우선")
-                        setPreference("turnPoint", -5)
+                        setPreference("turnPoint", unit)
                         recordingState = 0
                         sttReturnData = null
                         break
                     } else if (ans == "최단거리" || ans == "최단 거리") {
                         //분기점 가중치를 낮춘다
                         Log.d("Main-preferenceQuestion_turnPoint()", "최단거리")
-                        setPreference("turnPoint", +5)
+                        setPreference("turnPoint", -1 * unit)
                         recordingState = 0
                         sttReturnData = null
                         break
@@ -780,40 +785,79 @@ class SetPreferenceActivity : Activity() {
 
     private fun setPreference(category :String, value:Int){
 
-        //tableWeight가중치 조절. 클수록 Danger 중요, 작을수록 Road 중요
-        //       tableWeight:     -> 기본값 = 0.5 | min = 0.1 | max = 1)
-        //      roadscore의 범위는 고정 :  50 ~ 100 | 50 ~ 100 | 50 ~ 100
-        //  해당 tw일때 DangerScore 범위 :  0 ~ -25 |  0 ~ -5  | 0 ~ -50
-        //  해당 tw일때 routeScore 범위 :  25 ~ 100 | 45 ~ 100 | 0 ~ 100
-        if (category =="tableWeight"){
+        //tableWeight가중치 조절.
+        //value가 양수값이면 tableWeigt_road증가, tableWeight_danger감소
+
+        if (category == "tableWeight"){
             if (value > 0){
-                if (Preference.tableWeight >=1)
-                    Log.d("Main-setPreference()","tableWeight가 이미 최대치(1)임")
-                else
-                    Preference.tableWeight += 0.1
-                Log.d("Main-setPreference()","증가된 tableWeight : ${Preference.tableWeight}")
+                if (Preference.tableWeight_road >= 1.5){
+                    Log.d("SetPreferenceActivity-setPreference()","tableWeigh_road가 이미 최대치(1.5)임")
+                }
+                else {
+                    Preference.tableWeight_road += 0.1
+                    Preference.tableWeight_danger -= 0.1
+                }
             }
-            else if (value < 0){
-                if (Preference.tableWeight <=0.1)
-                    Log.d("Main-setPrefernece()","tableWeigt가 이미 최소치(0.1)임")
-                else
-                    Preference.tableWeight -= 0.1
-                Log.d("Main-setPreference()","감소된 tableWeight : ${Preference.tableWeight}")
+            if (value < 0){
+                if (Preference.tableWeight_road <= 0.5){
+                    Log.d("SetPreferenceActivity-setPreference()","tableWeigh_danger가 이미 최대치(1.5)임")
+                }
+                else {
+                    Preference.tableWeight_road -= 0.1
+                    Preference.tableWeight_danger += 0.1
+                }
             }
         }
 
+
         //분기점 가중치 조정
-        else if (category =="turnPoint")
+        else if (category =="turnPoint") {
             Preference.algorithmWeight_turnPoint?.plus(value)
+            if (Preference.algorithmWeight_turnPoint!! >= 100){
+                Preference.algorithmWeight_turnPoint = 100
+                Log.d("SetPreferenceActivity-setPreference()","분기점 가중치가 최댓값 (100)입니다.")
+            }
+            if (Preference.algorithmWeight_turnPoint!! <= 0 ){
+                Preference.algorithmWeight_turnPoint = 0
+                Log.d("SetPreferenceActivity-setPreference()","분기점 가중치가 최솟값(0)입니다.")
+            }
+        }
 
-        else if (category == " crossWalk")
+        else if (category == " crossWalk") {
             Preference.algorithmWeight_crossWalk?.plus(value)
+            if (Preference.algorithmWeight_crossWalk!! >= 100) {
+                Preference.algorithmWeight_crossWalk = 100
+                Log.d("SetPreferenceActivity-setPreference()", "횡단보도 가중치가 최댓값 (100)입니다.")
+            }
+            if (Preference.algorithmWeight_crossWalk!! <= 0) {
+                Preference.algorithmWeight_crossWalk = 0
+                Log.d("SetPreferenceActivity-setPreference()", "횡단보도 가중치가 최솟값(0)입니다.")
+            }
+        }
 
-        else if (category =="facilityCar")
+        else if (category =="facilityCar") {
             Preference.algorithmWeight_facilityCar?.plus(value)
+            if (Preference.algorithmWeight_facilityCar!! >= 100) {
+                Preference.algorithmWeight_facilityCar = 100
+                Log.d("SetPreferenceActivity-setPreference()", "차도비분리시설 가중치가 최댓값 (100)입니다.")
+            }
+            if (Preference.algorithmWeight_facilityCar!! <= 0) {
+                Preference.algorithmWeight_facilityCar = 0
+                Log.d("SetPreferenceActivity-setPreference()", "차도비분리시설 가중치가 최솟값(0)입니다.")
+            }
+        }
 
-        else if (category =="facilityNoCar")
+        else if (category =="facilityNoCar") {
             Preference.algorithmWeight_facilityNoCar?.plus(value)
+            if (Preference.algorithmWeight_facilityNoCar!! >= 100) {
+                Preference.algorithmWeight_facilityNoCar = 100
+                Log.d("SetPreferenceActivity-setPreference()", "차도분리시설 가중치가 최댓값 (100)입니다.")
+            }
+            if (Preference.algorithmWeight_facilityNoCar!! <= 0) {
+                Preference.algorithmWeight_facilityNoCar = 0
+                Log.d("SetPreferenceActivity-setPreference()", "차도분리시설 가중치가 최솟값(0)입니다.")
+            }
+        }
 
     }//End of setPreference()
 

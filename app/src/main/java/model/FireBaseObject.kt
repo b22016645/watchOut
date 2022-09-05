@@ -75,12 +75,14 @@ object Preference {   //도착지 도착 후 선호도 평가 데이터 베이�
         var score: Int? = null  //만족도
 
         //AW : Alogrithm Weight : 안전한길 알고리즘 가중치
-        var algorithmWeight_turnPoint: Double? = null   //분기점 가중치
-        var algorithmWeight_crossWalk: Double? = null      //횡단보도 가중치 (주의 : 미터당 마이너스점수)
-        var algorithmWeight_facilityCar: Double? = null       //FT_Car 가중치 : 교량, 터널, 고가도로
-        var algorithmWeight_facilityNoCar: Double? = null      //FT_noCar 가중치 : 육교, 지하보도, 계단
+        var algorithmWeight_turnPoint: Int? = null   //분기점 가중치
+        var algorithmWeight_crossWalk: Int? = null      //횡단보도 가중치 (주의 : 미터당 마이너스점수)
+        var algorithmWeight_facilityCar: Int? = null       //FT_Car 가중치 : 교량, 터널, 고가도로
+        var algorithmWeight_facilityNoCar: Int? = null      //FT_noCar 가중치 : 육교, 지하보도, 계단
 
-        var tableWeight: Double = 0.5      //알고리즘 마이너스 점수 테이블 전체의 가중치
+        //var tableWeight: Double = 0.5      //알고리즘 마이너스 점수 테이블 전체의 가중치
+        var tableWeight_road : Double  = 1.0
+        var tableWeight_danger : Double  = 1.0
 }
 
 object Favorites  { //즐겨찾기 데이터 클래스 (파이어베이스 저장용)
