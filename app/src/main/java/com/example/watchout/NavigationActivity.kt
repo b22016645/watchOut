@@ -333,6 +333,17 @@ class NavigationActivity : Activity(), LocationListener {
         (History.dpLon)?:midpointList[0][1]
         History.dpName = getAddress(History.dpLat!!, History.dpLon!!)
 
+        //히스토리의 finalRouteInfor_simul에 이탈횟수, 최대심박수, 평균심박수 이어붙이기
+        var sb = StringBuilder()
+        sb.append(History.finalRouteInfor_simul)
+        sb.append("이탈 횟수 : ")
+        sb.append(History.expTotal)
+        sb.append(",최대 심박수 : ")
+        sb.append(History.heartRateMax)
+        sb.append(",평균 심박수 : ")
+        sb.append(History.heartRateAverage)
+        History.finalRouteInfor_simul = sb.toString()
+
 
 
         //이제 여기에 히스토리,즐겨찾기 담아 데베로 넘긴다

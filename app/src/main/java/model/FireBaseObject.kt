@@ -5,12 +5,12 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
 
 
 
-        //StartingPoint 출발지
+        //얘가 도착지
         var arrivedName: String? = null    //출발지이름           //NavigationActivity - endOfRoute()에서
         var arrivedLat: Double? = null    //출발지 위도 (x)       //Main locationcallback에서 현재위치조정이 완료되었습니다 TTS완료 후 받음
         var arrivedLon: Double? = null     //출발지 경도 (y)      // 경로 이탈시, 목적지 재검색시 다시 받아야할듯?
 
-        //DestinationPoint 도착지
+        //얘가 출발지
         var dpName: String? = null     //도착지이름용         DoRetrofit  - getPOI() 중간쯤 목적지 좌표 찍고 받음
         var dpLat: Double? = null      //도착지 위도 (x)     DoRetrofit - getPoi() 중간쯤 목적지 좌표 찍고 받음
         var dpLon: Double? = null      //도착지 경도 (y)     DoRetrofit - getPoi() 중간쯤 목적지 좌표 찍고 받음
@@ -34,13 +34,20 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
         var stringData : String = ""            //엘리베이터(2회),분기점(31회),지하보도(1회)가 포함된 경로입니다.
 
         //후보경로 정보.
-        var totalRouteList = arrayListOf<otherRouteInfor>()
+       // var totalRouteList = arrayListOf<otherRouteInfor>()             //도로점수, 위험점수,
 
-        lateinit var preference : Preference
+       // lateinit var preference : Preference
 
 
+        //string데이타 웹에 쉽게 띄울 용으로. 앞에 세개는 경로 결정되는 즉시 저장
+        var totalRouteInfor : String = ""                       //후보 경로 정보 (웹 표용) : 경로4개별 도로점수, 위험점수, 총점수, stringData
+        var finalRouteInfor_now : String = " "                  //최종 경로 정보 (실시간용) : 출발지, 목적지, 최종경로점수, 경로길이, 예정소요시간, 스트링데이타(엘베2회, 분기점2회 포함된 경로입니다)
+        var routePreference : String = ""                       //해당 경로 이용시 설정했던 가중치 정보 : 도로상태 (1.2), 위험시설 (0.8), 횡단보도(80), 차도 비분리 시설 (30), 분기점 (50), 차도 분리 시설 (80)
+        //얘는 목적지 달성 후 저장 (navigation- endofRoute)
+        var finalRouteInfor_simul : String = ""                 //최종 경로 정보 (시뮬용) : 경로점수, 경로길이, 이탈횟수, 최대심박수, 평균심박수
 
-        //경로이탈정보 (exp = existPoint: 경로 이탈 부분)
+
+        //경이탈정보 (exp = existPoint: 경로 이탈 부분)
         var expTurnPoint: Int = 0      //분기점에서 이탈한 횟수  Navigation - locationCallBack
         var expCrossWalk: Int = 0       //횡단보도에서 이탈한 횟수
         var expStraightRoad: Int = 0    //직진길에서 이탈한 횟수
@@ -49,10 +56,10 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
         var expTotal: Int = 0           //총 이탈 횟수
 
         // 선호도 가중치 DB업데이트를 위한 Flag 모음. DoRetrofir 274
-      //  var hasDanger : Boolean = false                 //DangerA,B중 하나라도 있으면 true, 기본값은 False
-      //  var hasDangerA: Int? = null                 //DangerA중 하나라도 있으면 notNull, 순서는 엘리베이터-육교-지하보도-계단으로 각 자리수가 시설물의 개수를 나타냄
-      //  var hasDangerB: Int? = null                 //DangerB중 하나라도 있으면 notNull, 순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
-      //  var hasCrossWalk: Int = 0
+        var hasDanger : Boolean = false                 //DangerA,B중 하나라도 있으면 true, 기본값은 False
+        var hasDangerA: Int? = null                 //DangerA중 하나라도 있으면 notNull, 순서는 엘리베이터-육교-지하보도-계단으로 각 자리수가 시설물의 개수를 나타냄
+        var hasDangerB: Int? = null                 //DangerB중 하나라도 있으면 notNull, 순서는 교량-터널-고가도로-대형시설물이동통로 로 각 자리수가 시설물의 개수를 나타냄
+        var hasCrossWalk: Int = 0
 
 
 
@@ -83,7 +90,7 @@ object History { //히스토리 데이터 클래스 (파이어베이스 저장�
                 midPointSize = null
               //  hasCrossWalk = 0
 
-                totalRouteList.clear()
+             //   totalRouteList.clear()
 
         }
 

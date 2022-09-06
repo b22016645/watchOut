@@ -12,6 +12,8 @@ import model.*
 import retrofit.RetrofitManager
 import route.DetailRoute
 import route.SafeRoute
+import route.SafeRoute.saveFinalRouteInfor_now
+import route.SafeRoute.saveRoutePreferenceData
 import utils.Constant
 import utils.Constant.API.LOG
 import kotlin.concurrent.timer
@@ -280,14 +282,32 @@ class DoRetrofitActivity : Activity(){
 
                                 var ind = 0
                                 for (i in 0..3) {
-                                    History.totalRouteList[i] = routeList[i]
+                            //        History.totalRouteList[i] = otherRouteInfor(routeList[i]?.roadScore_final,routeList[i]?.dangerScore_final,routeList[i]?.stringData,false)
                                     if (routeList[i]?.routeScore!! > max) {
                                         max = routeList[i]?.routeScore!!
                                         ind=i
                                     }
                                 }
                                 History.routNum = ind       //DB저장용
-                                History.totalRouteList[ind].isSelected = true
+
+                           // 여기까지 하면 최종 안내할 루트가 결정됨
+
+                                //1. 해당 루트를 결정한 가중치 정보 스트링 형식으로 히스토리에 저장
+                                //ex ) 도로상태:0.8,위험시설:1.2,분기점:30,횡단보도:60,차도 비분리 시설:100,차도 분리 시설:80
+                                saveRoutePreferenceData()
+
+                                //2. 최종 경로 정보 (실시간용) 스트링형식으로 히스토리에 저장, 시뮬용 일부 저장
+                                //: 출발지, 목적지, 최종경로점수, 경로길이, 예정소요시간, 스트링데이타(엘베2회, 분기점2회 포함된 경로입니다)
+                                saveFinalRouteInfor_now(routeList[ind])
+
+                                //3.후보 경로 정보 (웹 표용) 스트링 형식으로 히스토리에 저장
+                                //: 경로4개별 도로점수, 위험점수, 총점수, stringData
+                                saveTotalRouteInfor()
+
+
+
+
+                                //    History.totalRouteList[ind].isSelected = true
 
 /*                               History.hasDanger = routeList[ind]!!.hasDanger
                                 History.hasDangerA = routeList[ind]!!.hasDangerA
@@ -329,27 +349,34 @@ class DoRetrofitActivity : Activity(){
    }
 
 
+
+
     private fun getRoute(startx : Double, starty : Double, endx : Double, endy : Double, startname : String, endname : String, searchOption: Int) {
         Log.d(LOG,"DoRetrofit - getRoute호출")
         Log.d(LOG,"DoRetrofit - searchOption : "+"${searchOption}")
 //        publish("topic","안전한 길 알고리즘으로 선택된 길입니다")
 
         //Safey data 4개 pub
-        var scoreBuilder = StringBuilder()
-        for(i in 0..3) {
-            scoreBuilder.append(routeList[i]?.routeInforStringData)
+       /* var scoreBuilder = StringBuilder()
+        for(i in 0..3) {        //웹에 퍼블리쉬할꺼 여기서 붙이세요
+       //     scoreBuilder.append(routeList[i]?.routeInforStringData)
             scoreBuilder.append(",");
-            scoreBuilder.append(routeList[i]?.ectInforStringData)
+         //   scoreBuilder.append(routeList[i]?.ectInforStringData)
             //여기서 routeInfor에 만들어놓은 퍼블리쉬할 스트링 모두 이어붙이기
             if (i < 3) {
                 scoreBuilder.append("!")
             }
         }
-        var routeData = scoreBuilder.toString()
+        var routeData = scoreBuilder.toString()*/
         // Log.d(LOG,"SaftyScore : "+scoreStr)
-        Log.d("DoRetrofit-getRoute() : 퍼블리쉬할 스트링데이터 (전체루트정보)",routeData)
+        //Log.d("수정전로그임 ) DoRetrofit-getRoute() : 퍼블리쉬할 스트링데이터 (전체루트정보)",routeData)
         //웹 내 표에 띄울 데이타들 퍼블리쉬
-        publish("saftyScore",routeData)
+
+        //웹에 퍼블리쉬
+        publish("preference",History.routePreference)       //가중치 정보
+        publish("selectedRouteInfor",History.finalRouteInfor_now) //선택된 경로의 최종정보.
+        publish("saftyScore",History.totalRouteInfor)       //표 정보
+
 
         routeList.clear() //안전한 길에서 빠져나와 getRoute를 호출했으면 초기화
 
@@ -583,5 +610,25 @@ class DoRetrofitActivity : Activity(){
         returnintent.putExtra("naviData",naviDataItem)
         setResult(RESULT_OK,returnintent)
         finish()
+    }
+
+
+    //3.후보 경로 정보 (웹 표용) 스트링 형식으로 히스토리에 저장
+    //: 경로4개별 도로점수, 위험점수, 총점수, stringData
+    private fun saveTotalRouteInfor() {
+        var totalRouteInforBuilder = StringBuilder()
+        for (i in 0..3) {
+            totalRouteInforBuilder.append(routeList[i]?.roadScore_final)
+            totalRouteInforBuilder.append("점,")
+            totalRouteInforBuilder.append(routeList[i]?.dangerScore_final)
+            totalRouteInforBuilder.append("점,")
+            totalRouteInforBuilder.append(routeList[i]?.routeScore)
+            totalRouteInforBuilder.append("점,")
+            totalRouteInforBuilder.append(routeList[i]?.stringData)
+            if (i <3)
+            totalRouteInforBuilder.append("!")
+        }
+        History.totalRouteInfor = totalRouteInforBuilder.toString()
+        Log.d("totalRouteInfor", "${History.totalRouteInfor}")
     }
 }

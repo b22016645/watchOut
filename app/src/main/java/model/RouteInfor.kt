@@ -4,6 +4,12 @@ package model
 
 import java.io.Serializable
 
+/*data class otherRouteInfor (
+                            var isSelected : Boolean = false,
+
+): Serializable*/
+
+
 data class RouteInfor (var searchOption : Int )
     : Serializable{
 
@@ -14,8 +20,8 @@ data class RouteInfor (var searchOption : Int )
     //var routeInforStringData : String? = null       //publish할 정보를 담고있는 string
     //var ectInforStringData : String? = null         //publish할 기타정보를 담고있는 string
 
-    var stringData : String? = null
-    var scoreData : String? = null
+    var stringData : String? = null             //웹 퍼블리쉬용 : 분기점(23)개, 횡단보도(2)개, 지하도로(1)개 포함된 경로입니다.
+    var scoreData : String? = null              //웹 퍼블리쉬용 : 도로점수, 위험점수, 최종점수 이렇게 콤마로 구분해서 스트링형식
 
     // DB업데이트를 위한 Flag 모음
    // var hasDanger : Boolean = false                 //DangerA,B중 하나라도 있으면 true, 기본값은 False
@@ -35,8 +41,8 @@ data class RouteInfor (var searchOption : Int )
     var roadScore_final : Double = 0.0
 
 
-    var DangerScore_draft = 0         //위험 점수 (정규화 전)
-    var DangerScore_final = 0         //위험점수 (정규화 O)
+    var dangerScore_draft :Double = 0.0        //위험 점수 (정규화 전)
+    var dangerScore_final : Double= 0.0        //위험점수 (정규화 O)
 
     /////////////////////////////////////Danger/////////////////////////////////////
     //Danger
@@ -55,7 +61,7 @@ data class RouteInfor (var searchOption : Int )
     var highroad  : Int = 0             //고가도로
     var largeFacilitypassage  : Int = 0 //대형시설물이동통로
 
-    var DangerCount : Int = 0           //위험시설 A~D의 총개수, 위험시설 점수 정규화를 위함
+    var dangerCount : Int = 0           //위험시설 A~D의 총개수, 위험시설 점수 정규화를 위함
 
 
     /////////////////////////////////////ROAD_TYPE/////////////////////////////////////

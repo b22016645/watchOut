@@ -355,11 +355,13 @@ class MainActivity : Activity() {
 
                     snapshotData = doc.data as Map<String, Any>
                     Log.d("MainActivity-algorithmWeightFromDB()","알고리즘 가중치 DB에서 불러와서 셋팅합니다.")
-                    Preference.algorithmWeight_crossWalk = "${snapshotData.get("algorithmWeight_crossWalk")}".toDouble()
-                    Preference.algorithmWeight_facilityCar = "${snapshotData.get("algorithmWeight_facilityCar")}".toDouble()
-                    Preference.algorithmWeight_facilityNoCar = "${snapshotData.get("algorithmWeight_facilityNoCar")}".toDouble()
-                    Preference.tableWeight = "${snapshotData.get("tableWeight")}".toDouble()
-                    Preference.algorithmWeight_turnPoint = "${snapshotData.get("algorithmWeight_turnPoint")}".toDouble()
+                    Preference.algorithmWeight_turnPoint = "${snapshotData.get("algorithmWeight_turnPoint")}".toInt()
+                    Preference.algorithmWeight_crossWalk = "${snapshotData.get("algorithmWeight_crossWalk")}".toInt()
+                    Preference.algorithmWeight_facilityCar = "${snapshotData.get("algorithmWeight_facilityCar")}".toInt()
+                    Preference.algorithmWeight_facilityNoCar = "${snapshotData.get("algorithmWeight_facilityNoCar")}".toInt()
+                    Preference.tableWeight_road = "${snapshotData.get("tableWeight_road")}".toDouble()
+                    Preference.tableWeight_danger = "${snapshotData.get("tableWeight_danger")}".toDouble()
+
                    // Preference.score = "${snapshotData.get("score")}".toInt()
 
                 } else {
