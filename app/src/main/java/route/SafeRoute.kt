@@ -39,7 +39,7 @@ object SafeRoute {//End of object SafeRoute
 
                 22 -> {//차도 인도 분리 X || 보행자 횡단에 제약 X 보행자도로 : 배점 ) 50
                     routeInfor.roadTypeC += distance
-                    routeInfor.roadScore_draft += (distance * 50)  }
+                    routeInfor.roadScore_draft += (distance * 70)  }
 
                 23 -> {//차량 통행 불가 보행자 도로 : 배점) 100
                     routeInfor.roadTypeA += distance
@@ -112,13 +112,15 @@ object SafeRoute {//End of object SafeRoute
                     routeInfor.dangerCount++}
 
                 //횡단보도. DangerA -순서1
-                15 ->{ //routeInfor.crossWalk = routeInfor.crossWalk?.plus(1)
-                  //  routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_crossWalk!!).toInt()
-                //    routeInfor.hasDanger = true
-                 //   routeInfor.hasCrossWalk.plus(1)
-                    routeInfor.crossWalk += 1
-                    routeInfor.dangerScore_draft += (pf.algorithmWeight_crossWalk!!)
-                    routeInfor.dangerCount++}     //횡단보도
+                15 -> { //routeInfor.crossWalk = routeInfor.crossWalk?.plus(1)
+                    //  routeInfor.DangerScore_draft = routeInfor.DangerScore_draft?.plus(pf.algorithmWeight_crossWalk!!).toInt()
+                    //    routeInfor.hasDanger = true
+                    //   routeInfor.hasCrossWalk.plus(1)
+
+                    //   routeInfor.crossWalk += 1
+                    //   routeInfor.dangerScore_draft += (pf.algorithmWeight_crossWalk!!)
+                    //  routeInfor.dangerCount++}     //횡단보도
+                }
             }
         }
 
@@ -265,9 +267,9 @@ object SafeRoute {//End of object SafeRoute
     fun makeFinalScore(routeList: ArrayList<RouteInfor?>) {
         routeList.forEach{
             if (it!= null){
-                it.routeScore = (Wr*it.roadScore_final+ Wd*it.dangerScore_final)
+                it.routeScore = (Wr*it.roadScore_final- Wd*it.dangerScore_final)
                 it. routeScore  = roundDigit(it.routeScore,2)
-                Log.d("SafeRoute-makeFinalScore() - ","(RoadScore:) ${it.roadScore_final} * $Wr   +    (DangerScore:)${it.dangerScore_final} * $Wd = ${it.routeScore}")
+                Log.d("SafeRoute-makeFinalScore() - ","(RoadScore:) ${it.roadScore_final} * $Wr   -   (DangerScore:)${it.dangerScore_final} * $Wd   = ${it.routeScore}")
             }
         }
     }//End of makeFinalScore()
@@ -286,22 +288,22 @@ object SafeRoute {//End of object SafeRoute
                 if (it.crossWalk >0)
                     stringDataBuilder.append(", 횡단보도(${it.crossWalk}회)")
                 if (it.elevator >0)
-                    stringDataBuilder.append(", 엘리베이터(${it.elevator}회")
+                    stringDataBuilder.append(", 엘리베이터(${it.elevator}회)")
                 if (it.overPasses >0)
-                    stringDataBuilder.append(", 육교(${it.overPasses}회")
+                    stringDataBuilder.append(", 육교(${it.overPasses}회)")
                 if (it.underPasses >0)
-                    stringDataBuilder.append(", 지하도로(${it.underPasses}회")
+                    stringDataBuilder.append(", 지하도로(${it.underPasses}회)")
                 if (it.stairs >0)
-                    stringDataBuilder.append(", 계단(${it.stairs}회")
+                    stringDataBuilder.append(", 계단(${it.stairs}회)")
                 if (it.bridge >0)
-                    stringDataBuilder.append(", 교량(${it.bridge}회")
+                    stringDataBuilder.append(", 교량(${it.bridge}회)")
                 if (it.turnnels >0)
-                    stringDataBuilder.append(", 터널(${it.turnnels}회")
+                    stringDataBuilder.append(", 터널(${it.turnnels}회)")
                 if (it.highroad >0)
-                    stringDataBuilder.append(", 고가도로(${it.highroad}회")
+                    stringDataBuilder.append(", 고가도로(${it.highroad}회)")
                 if (it.largeFacilitypassage >0)
-                    stringDataBuilder.append(", 대형시설물이동통로(${it.largeFacilitypassage}회")
-                stringDataBuilder.append(" 가 포함된 경로입니다.")
+                    stringDataBuilder.append(", 대형시설물이동통로(${it.largeFacilitypassage}회)")
+                stringDataBuilder.append("가 포함된 경로입니다.")
 
                 it.stringData = stringDataBuilder.toString()
                 Log.d("SafeRoute-makeStringData() : ","${it.stringData}")
