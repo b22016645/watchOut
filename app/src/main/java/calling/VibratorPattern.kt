@@ -17,7 +17,7 @@ class VibratorPattern(val context: Context) {
 
      fun startAndFinishPattern(){ //출발,도착
           val timing = longArrayOf(0,200, 0,200, 0,200, 0,200, 0,200, 0,200, 0,200)
-          val amplitudes = intArrayOf(0,100, 0,95, 0,90, 0,85, 0,80, 0,75, 0,70) //세기
+          val amplitudes = intArrayOf(0,85, 0,80, 0,75, 0,70, 0,65, 0,60, 0,55) //세기
           val effect = VibrationEffect.createWaveform(timing,amplitudes,-1)
           vibrator.vibrate(effect)
      }

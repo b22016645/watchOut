@@ -289,7 +289,7 @@ class DoRetrofitActivity : Activity(){
                                     }
                                 }
                                 History.routNum = ind       //DB저장용
-
+                                publish("route_num",ind.toString())
                            // 여기까지 하면 최종 안내할 루트가 결정됨
 
                                 //1. 해당 루트를 결정한 가중치 정보 스트링 형식으로 히스토리에 저장
