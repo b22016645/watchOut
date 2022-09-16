@@ -377,7 +377,7 @@ object SafeRoute {//End of object SafeRoute
         finalRouteInforBuilder.append("m,")
         finalRouteInforBuilder.append("예정 소요 시간 : ")
         finalRouteInforBuilder.append(History.expectedTime)
-        finalRouteInforBuilder.append(" 분,")
+        finalRouteInforBuilder.append(" 초,")
         finalRouteInforBuilder.append(routeInfor?.stringData)
 
         History.finalRouteInfor_now = finalRouteInforBuilder.toString()
