@@ -105,7 +105,7 @@ class MainActivity : Activity() {
         //레이아웃 세팅
         x = findViewById<TextView>(R.id.x)
         y = findViewById<TextView>(R.id.y)
-        btn = findViewById<Button>(R.id.btn)
+        //btn = findViewById<Button>(R.id.btn)
         x.setText(lon.toString())
         y.setText(lat.toString())
 
@@ -133,10 +133,10 @@ class MainActivity : Activity() {
         startActivityForResult(intent, 1000000)
 */
 
-        btn.setOnClickListener {
-            val intent = Intent(this, SetPreferenceActivity::class.java)
-            startActivityForResult(intent, 1000000)
-        }
+//        btn.setOnClickListener {
+//            val intent = Intent(this, SetPreferenceActivity::class.java)
+//            startActivityForResult(intent, 1000000)
+//        }
     }
 
     private fun startLocationUpdates() {
