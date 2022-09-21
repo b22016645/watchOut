@@ -78,6 +78,8 @@ class NavigationActivity : Activity(), LocationListener {
 
     private var sppoint = 0  //특정 장소에서의 알람을 반복하지 않기 위해
 
+    private var vibenum : Int = 0
+
 
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -196,6 +198,11 @@ class NavigationActivity : Activity(), LocationListener {
                         //안내시작 일단 0->1을 안내
                         //나침반불러와서
 
+                        vibenum ++
+                        if (vibenum == 3) {
+                            viberatorPattern.stopVibrator()
+                        }
+
                         if (midPointNum == 0 && sppoint == 0 ) {
                             viberatorPattern.startAndFinishPattern()
                             sppoint ++
@@ -301,7 +308,6 @@ class NavigationActivity : Activity(), LocationListener {
                                     }
                                     //분기점 다음 좌표에서 직진임을 알려줌
                                     else if (turnTypeList[midPointNum-1] in 12..19 || midPointNum == 1) {
-                                        viberatorPattern.stopVibrator()
                                         ttsSpeak("다음 안내까지 "+"${distance}"+"m 직진입니다")
                                     }
                                 }
@@ -402,6 +408,7 @@ class NavigationActivity : Activity(), LocationListener {
         //SensorActivity에서 받음
         if (requestCode == 4){
             if (resultCode == RESULT_OK) {
+                vibenum = 0
                 var trueName = data.getStringExtra("trueName")
                 var trueNum = data.getIntExtra("trueNum",0)
                 ttsSpeak("${trueName}"+" 입니다.")

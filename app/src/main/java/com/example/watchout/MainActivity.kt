@@ -57,10 +57,10 @@ class MainActivity : Activity() {
     private lateinit var tts: TextToSpeech
 
     // 현재위치
-    private var lat: Double = 0.0
-    private var lon: Double = 0.0
-//    private var lat: Double = 37.58217852030164
-//    private var lon: Double = 127.01152516595631
+//    private var lat: Double = 0.0
+//    private var lon: Double = 0.0
+    private var lat: Double = 37.58217852030164
+    private var lon: Double = 127.01152516595631
 
     //현재위치조정완료
     private var modified = 0
@@ -116,15 +116,15 @@ class MainActivity : Activity() {
 
         //진동관련
         vibrator = getSystemService(VIBRATOR_SERVICE) as Vibrator
+//
+//        //통합 위치 정보 제공자 클라이언트의 인스턴스
+//        locationRequest = LocationRequest.create()
+//        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
+//        locationRequest.interval = 5000
+//
+//        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
-        //통합 위치 정보 제공자 클라이언트의 인스턴스
-        locationRequest = LocationRequest.create()
-        locationRequest.priority = LocationRequest.PRIORITY_HIGH_ACCURACY
-        locationRequest.interval = 5000
-
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
-
-        startLocationUpdates()
+ //       startLocationUpdates()
 
 
 /*
@@ -172,7 +172,7 @@ class MainActivity : Activity() {
                     y.setText(lat.toString())
 
                     modified++
-                    if(modified==2){
+                    if(modified==1){
                         //현재위치가 조정 완료되었다는 tts
                         ttsSpeak("현재위치 조정이 완료되었습니다.")
                         val effect = VibrationEffect.createOneShot(500, 100)
@@ -219,16 +219,16 @@ class MainActivity : Activity() {
     private fun startSTT(intentNum:Int){
         //SpeechToTextActivity 실행
         if (intentNum == 0) { //목적지입력시
-            if (modified < 2) {
-                ttsSpeak("위치 조정 중")
-            } else {
+//            if (modified < 2) {
+//                ttsSpeak("위치 조정 중")
+//            } else {
                 History.dpLat = lat     //DB 저장용
                 History.dpLon = lon     // DB저장용
                 ttsSpeak("버튼을 눌러 목적지를 말하세요.")
                 publish("topic", "목적지 입력을 시작했습니다")
                 val intent = Intent(this, DestinationActivity::class.java)
                 startActivityForResult(intent, 0)
-            }
+//            }
         }
         else{ //즐겨찾기등록시
             ttsSpeak("즐겨찾기에 등록할 별명을 말해주세요")
