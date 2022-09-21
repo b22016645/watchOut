@@ -184,7 +184,7 @@ class DirectionActivity : Activity(), SensorEventListener {
                         ccccount++
                         Log.d(LOG, "ccccount=" + "${ccccount}" + ", azimuthin=" + "${azimuthinDegress}")
 //                       viberatorPattern.simplePattern()
-                        if (ccccount == 5) {
+                        if (ccccount == 3) {
                             startDirection = azimuthinDegress
                             offSensor()
                         }

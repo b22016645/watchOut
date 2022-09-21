@@ -139,51 +139,51 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun startLocationUpdates() {
-        if (checkPermissionForLocation(this)) {
-            if (ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_FINE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
-                    this,
-                    Manifest.permission.ACCESS_COARSE_LOCATION
-                ) != PackageManager.PERMISSION_GRANTED
-            ) {
-
-            }
-            fusedLocationClient.requestLocationUpdates(locationRequest,
-                locationCallback,
-                Looper.getMainLooper());
-        }
-    }
-
-    val locationCallback = object : LocationCallback() {
-        override fun onLocationResult(locationResult: LocationResult) {
-            if (locationResult == null) {
-                return
-            }
-
-            for (location in locationResult.locations) {
-                if (location != null) {
-                    lon = location.longitude
-                    lat = location.latitude
-
-                    x.setText(lon.toString())
-                    y.setText(lat.toString())
-
-                    modified++
-                    if(modified==1){
-                        //현재위치가 조정 완료되었다는 tts
-                        ttsSpeak("현재위치 조정이 완료되었습니다.")
-                        val effect = VibrationEffect.createOneShot(500, 100)
-                        vibrator.vibrate(effect)
-                    }
-
-                    Log.d(LOG,"MainActivity - 현재위치 : ["+"${lat}"+", "+"${lon}"+"]")
-                }
-            }
-        }
-    }
+//    private fun startLocationUpdates() {
+//        if (checkPermissionForLocation(this)) {
+//            if (ActivityCompat.checkSelfPermission(
+//                    this,
+//                    Manifest.permission.ACCESS_FINE_LOCATION
+//                ) != PackageManager.PERMISSION_GRANTED && ActivityCompat.checkSelfPermission(
+//                    this,
+//                    Manifest.permission.ACCESS_COARSE_LOCATION
+//                ) != PackageManager.PERMISSION_GRANTED
+//            ) {
+//
+//            }
+//            fusedLocationClient.requestLocationUpdates(locationRequest,
+//                locationCallback,
+//                Looper.getMainLooper());
+//        }
+//    }
+//
+//    val locationCallback = object : LocationCallback() {
+//        override fun onLocationResult(locationResult: LocationResult) {
+//            if (locationResult == null) {
+//                return
+//            }
+//
+//            for (location in locationResult.locations) {
+//                if (location != null) {
+//                    lon = location.longitude
+//                    lat = location.latitude
+//
+//                    x.setText(lon.toString())
+//                    y.setText(lat.toString())
+//
+//                    modified++
+//                    if(modified==1){
+//                        //현재위치가 조정 완료되었다는 tts
+//                        ttsSpeak("현재위치 조정이 완료되었습니다.")
+//                        val effect = VibrationEffect.createOneShot(500, 100)
+//                        vibrator.vibrate(effect)
+//                    }
+//
+//                    Log.d(LOG,"MainActivity - 현재위치 : ["+"${lat}"+", "+"${lon}"+"]")
+//                }
+//            }
+//        }
+//    }
 
     //mqtt관련
     fun publish(topic:String,data:String){
@@ -582,19 +582,19 @@ class MainActivity : Activity() {
         tts.speak(strTTS, TextToSpeech.QUEUE_ADD,null,null)
     }
 
-    override fun onPause() {
-        super.onPause()
-        stopLocationUpdates()
-    }
-
-    override fun onResume() {
-        super.onResume()
-        startLocationUpdates()
-    }
-
-    private fun stopLocationUpdates() {
-        fusedLocationClient.removeLocationUpdates(locationCallback)
-    }
+//    override fun onPause() {
+//        super.onPause()
+//        stopLocationUpdates()
+//    }
+//
+//    override fun onResume() {
+//        super.onResume()
+//        startLocationUpdates()
+//    }
+//
+//    private fun stopLocationUpdates() {
+//        fusedLocationClient.removeLocationUpdates(locationCallback)
+//    }
 
     fun setTTS(){
         // TTS를 생성하고 OnInitListener로 초기화 한다.

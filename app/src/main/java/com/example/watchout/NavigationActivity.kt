@@ -199,7 +199,7 @@ class NavigationActivity : Activity(), LocationListener {
                         //나침반불러와서
 
                         vibenum ++
-                        if (vibenum == 3) {
+                        if (vibenum == 2) {
                             viberatorPattern.stopVibrator()
                         }
 
