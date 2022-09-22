@@ -15,6 +15,7 @@ import android.widget.TextView
 import androidx.core.app.ActivityCompat
 import androidx.core.content.ContextCompat
 import calling.Mqtt
+import calling.MySensor
 import com.example.watchout.databinding.ActivityMainBinding
 import com.google.android.gms.location.*
 import com.google.firebase.auth.FirebaseAuth
@@ -35,7 +36,6 @@ class MainActivity : Activity() {
     private lateinit var binding: ActivityMainBinding
     lateinit var x: TextView
     lateinit var y: TextView
-    lateinit var btn : Button
 
     private lateinit var fusedLocationClient: FusedLocationProviderClient
     private lateinit var locationRequest:LocationRequest
@@ -77,7 +77,10 @@ class MainActivity : Activity() {
     //도착시 즐겨찾기 등록 활성화
     private var dofavor = false
 
-
+    //데모
+    private var timerTask: Timer? = null
+    private var time = 0
+    private lateinit var  mySensor:MySensor
 
     //여기서부터 onCreate
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -94,7 +97,8 @@ class MainActivity : Activity() {
 
 
         setTTS()        //TTS세팅 및 초기화
-
+        mySensor = MySensor(this)
+        mySensor.startSensor()
 
         //화면이 꺼지지 않게
         getWindow().addFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON)
@@ -105,7 +109,6 @@ class MainActivity : Activity() {
         //레이아웃 세팅
         x = findViewById<TextView>(R.id.x)
         y = findViewById<TextView>(R.id.y)
-        btn = findViewById<Button>(R.id.btn)
         x.setText(lon.toString())
         y.setText(lat.toString())
 
@@ -133,10 +136,6 @@ class MainActivity : Activity() {
         startActivityForResult(intent, 1000000)
 */
 
-        btn.setOnClickListener {
-            val intent = Intent(this, SetPreferenceActivity::class.java)
-            startActivityForResult(intent, 1000000)
-        }
     }
 
 //    private fun startLocationUpdates() {
@@ -276,9 +275,11 @@ class MainActivity : Activity() {
                 publish("topic","길 안내를 시작합니다")
                 History.departureTime = LocalDateTime.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss"))      //DB저장용
 
-                val intent = Intent(this, NavigationActivity::class.java)
-                intent.putExtra("naviData",naviData)
-                startActivityForResult(intent, 1)
+                start()
+
+//                val intent = Intent(this, NavigationActivity::class.java)
+//                intent.putExtra("naviData",naviData)
+//                startActivityForResult(intent, 1)
             }
             else if (resultCode == RESULT_CANCELED) { //음성이 이상할 때 혹은 204에러 때 다시 stt호출
                 publish("topic","목적지를 다시 입력해주세요")
@@ -326,7 +327,33 @@ class MainActivity : Activity() {
 
 
 
+    //데모오오오오옹
 
+    private fun start() {
+        ttsSpeak("길안내를 시작합니다")
+
+        timerTask = kotlin.concurrent.timer(period = 1000) {
+            time++
+            Log.d("timer","time:$time")
+            runOnUiThread {
+                if(time ==1 || time ==3 || time ==5 ){
+                    val demoString = "37.58217852030164,127.01152516595631," + mySensor.heartRate
+                    publish("now",demoString)
+                    Log.d("데모",demoString)
+                   //심박수; mySensor.heartRate
+                }
+                else if(time ==6){
+                    pause()
+                }
+            }
+        }
+    }
+
+    private fun pause() {
+        time = 0
+        Log.d("timer","pause")
+        timerTask?.cancel();
+    }
 
 
 
