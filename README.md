@@ -23,4 +23,7 @@
 ---
 *진동표*  
 
+![진동패턴](https://user-images.githubusercontent.com/90150969/191689136-f787b6aa-5e15-4422-b86b-4d891c05d164.png)
+
+
 
