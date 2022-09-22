@@ -20,3 +20,7 @@
 <img width="227" alt="실행화면" src="https://user-images.githubusercontent.com/90150969/191688418-332d26fc-ba0a-43b6-ad98-b3895133e03f.png">  
 
 
+---
+*진동표*  
+
+
