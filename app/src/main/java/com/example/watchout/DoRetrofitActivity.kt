@@ -289,6 +289,8 @@ class DoRetrofitActivity : Activity(){
                                     }
                                 }
                                 History.routNum = ind       //DB저장용
+                                History.routeScore = routeList[ind]?.routeScore!!
+                                publish("route_num",ind.toString())
 
                            // 여기까지 하면 최종 안내할 루트가 결정됨
 
